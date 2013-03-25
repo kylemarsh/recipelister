@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+	{% for recipe in recipes %}
+		<h2>{{ recipe.title.title() }}</h2>
+		<div id="recipe_body">
+			{{ recipe.recipe }}
+		</div>
+	{% else %}
+		{% if not search %}
+		<li>I can't find any recipes!
+		{% else %}
+		<li><h2>{{ search.title() }}</h2>
+		<li>We don't have any {{ search }} recipes.
+		{% endif %}
+		<div class="errorimg">
+			<img src="{{ url_for('static', filename='images/spilledbooze.gif') }}">
+		</div>
+	{% endfor %}
+{% endblock %}
