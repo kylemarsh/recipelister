@@ -13,12 +13,14 @@ class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255))
     recipe = db.Column(db.Text)
+    total_time = db.Column(db.Integer)
+    active_time = db.Column(db.Integer)
     labels = db.relationship('Label', secondary=recipe_label,
             backref=db.backref('recipes', lazy='dynamic'))
 
-    def __init__(self, title, recipe):
-        self.title = title
-        self.recipe = recipe
+    #def __init__(self, title, recipe):
+        #self.title = title
+        #self.recipe = recipe
 
     def __repr__(self):
         return "<Recipe(%s, %s)>" % (self.title, self.recipe)
@@ -33,8 +35,8 @@ class Label(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.String(255), nullable=False, unique=True)
 
-    def __init__(self, label):
-        self.label = label
+    #def __init__(self, label):
+        #self.label = label
 
     def __str__(self):
         return self.label
