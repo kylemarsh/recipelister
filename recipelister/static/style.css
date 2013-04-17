@@ -13,3 +13,5 @@ h2                 { font-size: 1.2em; }
                      border: 1px solid #AACBE2; }
 .error             { background: #F0D6D6; padding: 0.5em; }
 .errorimg          { text-align: center; }
+
+.recipe_time       { color: #6F1C00; font-family: 'Georgia', serif; }
