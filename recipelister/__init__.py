@@ -35,8 +35,8 @@ def init_db(bootstrap=app.debug):
             print "Loading Recipes:"
             for record in csvreader:
                 d = {x[0]: x[1].decode('utf-8') for x in zip(cols, record)}
-                if not Recipe.query.filter_by(recipe=d['recipe']).first():
-                    print "\t%s: %s" % (d['id'], d['title'])
+                if not Recipe.query.filter_by(recipe_body=d['recipe_body']).first():
+                    print "\t%s: %s" % (d['recipe_id'], d['title'])
                     recipe = Recipe(**d)
                     db.session.add(recipe)
 
@@ -50,8 +50,8 @@ def init_db(bootstrap=app.debug):
             print "Labeling Recipes:"
             for record in csvreader:
                 d = {x[0]: x[1] for x in zip(cols, record)}
-                recipe = Recipe.query.filter_by(id=d['recipe_id']).first()
-                label = Label.query.filter_by(id=d['label_id']).first()
+                recipe = Recipe.query.filter_by(recipe_id=d['recipe_id']).first()
+                label = Label.query.filter_by(label_id=d['label_id']).first()
                 if recipe and label:
                     print '\t%s tagged as %s' % (recipe.title, label.label)
                     recipe.labels.append(label)

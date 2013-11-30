@@ -1,27 +1,33 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h2>{{ recipe.title.title() }}</h2>
-	<div id="recipe">
-		<div id="time">
-			<div class='recipe_time'>
-				{{ recipe.total_time }} required
-				<span class='active_time'>
-					({{ recipe.active_time }} active)
-				</span>
-			</div>
-		</div>
-		<div id="recipe_body">
-			<p>
-			{% for line in recipe.recipe.split('\n') %}
-			{{ line }}<br>
-			{% endfor %}
-			</p>
+<h2>{{ recipe.title.title() }}</h2><!-- edit button -->
+<div id="recipe">
+	<div id="time">
+		<div class='recipe_time'>
+			{% if recipe.total_time %}
+			{{ recipe.total_time }} required
+			{% else %}
+			Time requirement unknown
+			{% endif %}
+			<span class='active_time'>
+				{% if recipe.active_time %}
+				({{ recipe.active_time }} active)
+				{% endif %}
+			</span>
 		</div>
 	</div>
-	<div id="labels">
-		<h2>Labels</h2>
-		{% for label in recipe.labels %}
-			<div class=label>{{ label.label }}</div>
+	<div id="recipe_body">
+		<p>
+		{% for line in recipe.recipe_body.split('\n') %}
+		{{ line }}<br>
 		{% endfor %}
+		</p>
 	</div>
+</div>
+<div id="labels">
+	<h2>Labels</h2>
+	{% for label in recipe.labels %}
+	<div class=label>{{ label.label }}</div>
+	{% endfor %}
+</div>
 {% endblock %}

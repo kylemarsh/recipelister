@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body %}
+<form action="{{ url_for('add_recipe') }}" method="POST">
+	{{ form.hidden_tag() }}
+	<div id="recipe">
+		{{form.title.label() }} {{ form.title }}
+		{{ render_errors(form.title) }}
+		<div id="time">
+			{{form.total_time.label() }} {{ form.total_time }} (minutes)
+			{{ render_errors(form.total_time) }}
+			<br/>
+			{{form.active_time.label() }} {{ form.active_time }} (minutes)
+			{{ render_errors(form.active_time) }}
+		</div>
+		<div id="recipe_body">
+			{{form.recipe_body.label() }}
+			<br/>
+			{{ form.recipe_body }}
+			{{ render_errors(form.recipe_body) }}
+		</div>
+	</div>
+	<div id="labels">
+		<!-- TODO: javascripty 2-pane list -->
+		{{ form.labels.label() }}
+		<br/>
+		{{ form.labels }}
+		{{ render_errors(form.labels) }}
+	</div>
+	<input type="submit" value="Add Recipe">
+</form>
+{% endblock %}
+
+{% macro render_errors(field) %}
+{% if field.errors %}
+<ul class=errors>
+	{% for error in field.errors %}
+	<li>{{ error }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}

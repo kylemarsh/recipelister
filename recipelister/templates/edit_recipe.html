@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<form action="{{ url_for('edit_recipe', recipe_id=form.recipe_id.data) }}" method="POST">
+	{{ form.hidden_tag() }}
+	<div id="recipe">
+		{{form.title.label() }} {{ form.title }}
+		{{ render_errors(form.title) }}
+		<div id="time">
+			{{form.total_time.label() }} {{ form.total_time }} (minutes)
+			{{ render_errors(form.total_time) }}
+			<br/>
+			{{form.active_time.label() }} {{ form.active_time }} (minutes)
+			{{ render_errors(form.active_time) }}
+		</div>
+		<div id="recipe_body">
+			{{form.recipe_body.label() }}
+			<br/>
+			{{ form.recipe_body }}
+			{{ render_errors(form.recipe_body) }}
+		</div>
+	</div>
+	<div id="labels">
+		{{ form.labels.label() }}
+		<ul class=labels>
+			{% for label in existing_labels %}
+			<li class=label name="{{ label.label_id }}">
+				{{ label.label }}
+				<!-- FIXME: ajaxify -->
+				<a href="{{ url_for('remove_label_from_recipe',
+					recipe_id=form.recipe_id.data,
+					label_id=label.label_id)
+				}}">[x]</a>
+			</li>
+			{% endfor %}
+		</ul>
+		<!-- TODO: javascripty 2-pane list -->
+		New Labels:
+		<br/>
+		{{ form.labels }}
+		{{ render_errors(form.labels) }}
+	</div>
+	<input type="submit" value="Make Changes">
+</form>
+{% endblock %}
+
+{% macro render_errors(field) %}
+{% if field.errors %}
+<ul class=errors>
+	{% for error in field.errors %}
+	<li>{{ error }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}
