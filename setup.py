@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 PROJECT = 'recipelister'
-VERSION = '0.1'
+VERSION = '0.2'
 
 from setuptools import setup, find_packages
 
@@ -20,7 +20,7 @@ setup(
     scripts=[],
     provides=[],
     install_requires=['flask', 'flask-sqlalchemy', 'flask-login',
-        'sqlalchemy'],
+        'flask-wtf', 'sqlalchemy', 'WTForms'],
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
