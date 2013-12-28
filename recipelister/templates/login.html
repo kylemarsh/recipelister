@@ -4,8 +4,10 @@
 	{{ form.hidden_tag() }}
 	{{form.username.label() }} {{ form.username }}
 	{{ render_errors(form.username) }}
+	<br />
 	{{form.password.label() }} {{ form.password }}
 	{{ render_errors(form.password) }}
+	<br />
 	<input type="submit" value="Log in">
 </form>
 {% endblock %}
