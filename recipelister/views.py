@@ -1,6 +1,7 @@
-from flask import abort, render_template, redirect, request, url_for
+from flask import abort, render_template, redirect, request, session, url_for
 from flask_wtf import Form
 from wtforms import IntegerField, HiddenField, TextField, TextAreaField
+from wtforms import PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.validators import DataRequired
 
@@ -92,6 +93,24 @@ def remove_label_from_recipe(recipe_id, label_id):
     return redirect(url_for('show_edit_recipe', recipe_id=recipe.recipe_id))
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm(request.form)
+
+    if not form.validate_on_submit():
+        return render_template('login.html', form=form)
+
+    if request.method == 'POST':
+        if form.username.data != app.config['USERNAME']:
+            form.username.errors.append(u'Invalid username')
+        elif form.password.data != app.config['PASSWORD']:
+            form.password.errors.append(u'Invalid password')
+        else:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+    return render_template('login.html', form=form)
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
@@ -105,3 +124,8 @@ class AddRecipeForm(Form):
     total_time = IntegerField('Total Time')
     active_time = IntegerField('Active Time')
     labels = QuerySelectMultipleField(query_factory=lambda: Label.query.all())
+
+
+class LoginForm(Form):
+    username = TextField('Name', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
