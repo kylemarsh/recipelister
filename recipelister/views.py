@@ -7,6 +7,8 @@ from wtforms.validators import DataRequired
 
 from recipelister import app, db
 from recipelister.models import Recipe, Label
+from recipelister.helpers import login_required
+from recipelister.helpers import is_safe_url, get_redirect_target
 
 
 @app.route("/")
@@ -26,6 +28,7 @@ def view_recipe(recipe_id):
 
 
 @app.route("/recipe/add", methods=['GET', 'POST'])
+@login_required
 def add_recipe():
     form = AddRecipeForm()
     del form.recipe_id
@@ -49,6 +52,7 @@ def add_recipe():
 
 
 @app.route("/recipe/edit/<recipe_id>", methods=['GET', 'POST'])
+@login_required
 def edit_recipe(recipe_id):
     recipe = Recipe.query.get(recipe_id)
     form = AddRecipeForm(request.form, recipe)
@@ -82,6 +86,7 @@ def edit_recipe(recipe_id):
 
 
 @app.route("/remove_label/recipe/<recipe_id>/label/<label_id>")
+@login_required
 def remove_label_from_recipe(recipe_id, label_id):
     recipe = Recipe.query.get(recipe_id)
     label = Label.query.get(label_id)
@@ -107,7 +112,7 @@ def login():
             form.password.errors.append(u'Invalid password')
         else:
             session['logged_in'] = True
-            return redirect(url_for('index'))
+            return form.redirect('index')
     return render_template('login.html', form=form)
 
 
@@ -132,6 +137,22 @@ class AddRecipeForm(Form):
     labels = QuerySelectMultipleField(query_factory=lambda: Label.query.all())
 
 
-class LoginForm(Form):
+class RedirectingForm(Form):
+    forward_to = HiddenField()
+
+    def __init__(self, *args, **kwargs):
+        Form.__init__(self, *args, **kwargs)
+        if not self.forward_to.data:
+            self.forward_to.data = get_redirect_target() or ''
+
+    def redirect(self, endpoint='index', **values):
+
+        if is_safe_url(self.forward_to.data):
+            return redirect(self.forward_to.data)
+        target = get_redirect_target()
+        return redirect(target or url_for(endpoint, **values))
+
+
+class LoginForm(RedirectingForm):
     username = TextField('Name', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
