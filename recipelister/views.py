@@ -93,7 +93,7 @@ def remove_label_from_recipe(recipe_id, label_id):
         recipe.labels.remove(label)
         db.session.add(recipe)
         db.session.commit()
-    return redirect(url_for('show_edit_recipe', recipe_id=recipe.recipe_id))
+    return redirect(url_for('edit_recipe', recipe_id=recipe.recipe_id))
 
 
 @app.route("/search")
