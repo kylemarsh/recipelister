@@ -21,7 +21,7 @@ class Recipe(db.Model):
         backref=db.backref('recipes', lazy='dynamic'))
 
     def __repr__(self):
-        return "<Recipe(%r, %r)>" % (self.title, self.recipe)
+        return "<Recipe(%r, %r)>" % (self.title, self.recipe_body)
 
     def __str__(self):
         return "Recipe for %s" % (self.title)
