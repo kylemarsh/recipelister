@@ -5,12 +5,7 @@
 	<li><a href="{{ url_for('view_recipe', recipe_id=recipe.recipe_id) }}">{{ recipe.title.title() }}</a></li>
 	</ul>
 	{% else %}
-		{% if not search %}
 		<li>I can't find any recipes!
-		{% else %}
-		<li><h2>{{ search.title() }}</h2>
-		<li>We don't have any {{ search }} recipes.
-		{% endif %}
 		<div class="errorimg">
 			<img src="{{ url_for('static', filename='images/spilledbooze.gif') }}">
 		</div>

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<form action="{{ url_for('search') }}" method="GET">
+	<div id="title">
+		{{form.title_fragments.label() }}:
+		<br />
+		{{ form.title_fragments }}
+		{{ render_errors(form.title_fragments) }}
+	</div>
+	<div id="time">
+		{{form.max_total_time.label() }}:
+		<br />
+		{{ form.max_total_time }}
+		{{ render_errors(form.max_total_time) }}
+		<br/>
+		{{form.max_active_time.label() }}:
+		<br />
+		{{ form.max_active_time }}
+		{{ render_errors(form.max_active_time) }}
+	</div>
+	<div id="labels">
+		<!-- TODO: javascripty 2-pane list -->
+		{{ form.included_labels.label() }}:
+		<br />
+		{{ form.included_labels }}
+		{{ render_errors(form.included_labels) }}
+		<br />
+		{{ form.excluded_labels.label() }}:
+		<br />
+		{{ form.excluded_labels }}
+		{{ render_errors(form.excluded_labels) }}
+	</div>
+	<input type="submit" value="Search">
+</form>
+{% endblock %}
+
+{% macro render_errors(field) %}
+{% if field.errors %}
+<ul class=errors>
+	{% for error in field.errors %}
+	<li>{{ error }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}

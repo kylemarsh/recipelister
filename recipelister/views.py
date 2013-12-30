@@ -1,9 +1,10 @@
 from flask import abort, render_template, redirect, request, session, url_for
 from flask_wtf import Form
+from sqlalchemy import or_
 from wtforms import IntegerField, HiddenField, TextField, TextAreaField
 from wtforms import PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from recipelister import app, db
 from recipelister.models import Recipe, Label
@@ -13,10 +14,7 @@ from recipelister.helpers import is_safe_url, get_redirect_target
 
 @app.route("/")
 def index():
-    #TODO: implement search
-    recipes = Recipe.query.all()
-
-    return render_template('index.html', recipes=recipes)
+    return render_template('index.html', recipes=Recipe.query.all())
 
 
 @app.route("/recipe/<recipe_id>")
@@ -98,6 +96,33 @@ def remove_label_from_recipe(recipe_id, label_id):
     return redirect(url_for('show_edit_recipe', recipe_id=recipe.recipe_id))
 
 
+@app.route("/search")
+def search():
+    form = SearchForm(request.args)
+    del form.csrf_token
+
+    if not form.validate_on_submit():
+        return render_template('search.html', form=form)
+
+    max_active_time = form.max_active_time.data
+    max_total_time = form.max_total_time.data
+    fragments = form.title_fragments.data.split()
+
+    query = Recipe.query
+    if max_active_time is not None:
+        query = query.filter(Recipe.active_time <= max_active_time)
+    if max_total_time is not None:
+        query = query.filter(Recipe.total_time <= max_total_time)
+    if fragments is not None:
+        query = query.filter(
+            or_(*[Recipe.title.contains(x) for x in fragments]))
+
+    # TODO With included_labels
+    # TODO Without excluded_labels
+
+    return render_template('index.html', recipes=query.all())
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
@@ -135,6 +160,27 @@ class AddRecipeForm(Form):
     total_time = IntegerField('Total Time')
     active_time = IntegerField('Active Time')
     labels = QuerySelectMultipleField(query_factory=lambda: Label.query.all())
+
+
+class SearchForm(Form):
+    title_fragments = TextField('Title Contains', validators=[Optional()])
+    max_active_time = IntegerField(
+        'Maximum Active Time (min)',
+        validators=[Optional()])
+    max_total_time = IntegerField(
+        'Maximum Total Time (min)',
+        validators=[Optional()])
+    included_labels = QuerySelectMultipleField(
+        'Tagged with all of',
+        validators=[Optional()],
+        query_factory=lambda: Label.query.all())
+    excluded_labels = QuerySelectMultipleField(
+        'Not tagged with any of',
+        validators=[Optional()],
+        query_factory=lambda: Label.query.all())
+
+    def is_submitted(self):
+        return request and bool(request.args)
 
 
 class RedirectingForm(Form):
