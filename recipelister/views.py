@@ -18,6 +18,7 @@ def index():
 
 
 @app.route("/recipe/<recipe_id>")
+@login_required
 def view_recipe(recipe_id):
     recipe = Recipe.query.get(recipe_id)
     if recipe is None:
