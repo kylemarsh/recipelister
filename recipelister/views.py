@@ -1,6 +1,6 @@
 from flask import abort, render_template, redirect, request, session, url_for
 from flask_wtf import Form
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 from wtforms import IntegerField, HiddenField, TextField, TextAreaField
 from wtforms import PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
@@ -12,9 +12,9 @@ from recipelister.helpers import login_required
 from recipelister.helpers import is_safe_url, get_redirect_target
 
 
-@app.route("/")
-def index():
-    return render_template('index.html', recipes=Recipe.query.all())
+@app.route("/recipe/all")
+def show_all():
+    return render_template('list.html', recipes=Recipe.query.all())
 
 
 @app.route("/recipe/<recipe_id>")
@@ -97,6 +97,8 @@ def remove_label_from_recipe(recipe_id, label_id):
     return redirect(url_for('edit_recipe', recipe_id=recipe.recipe_id))
 
 
+@app.route("/")
+@app.route("/index")
 @app.route("/search")
 def search():
     form = SearchForm(request.args)
@@ -108,6 +110,8 @@ def search():
     max_active_time = form.max_active_time.data
     max_total_time = form.max_total_time.data
     fragments = form.title_fragments.data.split()
+    included_labels = form.included_labels.data
+    excluded_labels = form.excluded_labels.data
 
     query = Recipe.query
     if max_active_time is not None:
@@ -117,11 +121,13 @@ def search():
     if fragments is not None:
         query = query.filter(
             or_(*[Recipe.title.contains(x) for x in fragments]))
+    if included_labels is not None:
+        query = query.filter(and_(
+            *[Recipe.labels.contains(l) for l in included_labels]))
+    for label in excluded_labels:
+        query = query.filter(~Recipe.labels.contains(label))
 
-    # TODO With included_labels
-    # TODO Without excluded_labels
-
-    return render_template('index.html', recipes=query.all())
+    return render_template('list.html', recipes=query.all())
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -138,14 +144,14 @@ def login():
             form.password.errors.append(u'Invalid password')
         else:
             session['logged_in'] = True
-            return form.redirect('index')
+            return form.redirect('search')
     return render_template('login.html', form=form)
 
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    return redirect(url_for('index'))
+    return redirect(url_for('search'))
 
 
 @app.errorhandler(404)
@@ -154,6 +160,7 @@ def page_not_found(error):
 
 
 #TODO: Set up validators
+#TODO: Set up sane default sizes
 class AddRecipeForm(Form):
     recipe_id = HiddenField('Recipe ID')
     title = TextField('Title', validators=[DataRequired()])
@@ -163,6 +170,7 @@ class AddRecipeForm(Form):
     labels = QuerySelectMultipleField(query_factory=lambda: Label.query.all())
 
 
+#TODO: set up sane default sizes
 class SearchForm(Form):
     title_fragments = TextField('Title Contains', validators=[Optional()])
     max_active_time = IntegerField(
@@ -172,11 +180,11 @@ class SearchForm(Form):
         'Maximum Total Time (min)',
         validators=[Optional()])
     included_labels = QuerySelectMultipleField(
-        'Tagged with all of',
+        'Including',
         validators=[Optional()],
         query_factory=lambda: Label.query.all())
     excluded_labels = QuerySelectMultipleField(
-        'Not tagged with any of',
+        'Excluding',
         validators=[Optional()],
         query_factory=lambda: Label.query.all())
 
@@ -192,7 +200,7 @@ class RedirectingForm(Form):
         if not self.forward_to.data:
             self.forward_to.data = get_redirect_target() or ''
 
-    def redirect(self, endpoint='index', **values):
+    def redirect(self, endpoint='search', **values):
 
         if is_safe_url(self.forward_to.data):
             return redirect(self.forward_to.data)

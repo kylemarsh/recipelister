@@ -20,16 +20,21 @@
 		{{ render_errors(form.max_active_time) }}
 	</div>
 	<div id="labels">
-		<!-- TODO: javascripty 2-pane list -->
+		<!-- TODO: good boolean UI?? -->
+		<table><tr>
+		<td>
 		{{ form.included_labels.label() }}:
 		<br />
 		{{ form.included_labels }}
 		{{ render_errors(form.included_labels) }}
-		<br />
+		</td>
+		<td>
 		{{ form.excluded_labels.label() }}:
 		<br />
 		{{ form.excluded_labels }}
 		{{ render_errors(form.excluded_labels) }}
+		</td>
+		</tr></table>
 	</div>
 	<input type="submit" value="Search">
 </form>
