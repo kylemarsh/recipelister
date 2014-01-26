@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Optional
 
 from recipelister import app, db
 from recipelister.models import Recipe, Label
-from recipelister.helpers import login_required
+from recipelister.helpers import login_required, get_labels
 from recipelister.helpers import is_safe_url, get_redirect_target
 
 
@@ -167,10 +167,9 @@ class AddRecipeForm(Form):
     recipe_body = TextAreaField('Recipe', validators=[DataRequired()])
     total_time = IntegerField('Total Time')
     active_time = IntegerField('Active Time')
-    labels = QuerySelectMultipleField(query_factory=lambda: Label.query.all())
+    labels = QuerySelectMultipleField(query_factory=get_labels)
 
 
-#TODO: set up sane default sizes
 class SearchForm(Form):
     title_fragments = TextField('Title Contains', validators=[Optional()])
     max_active_time = IntegerField(
@@ -182,11 +181,11 @@ class SearchForm(Form):
     included_labels = QuerySelectMultipleField(
         'Including',
         validators=[Optional()],
-        query_factory=lambda: Label.query.all())
+        query_factory=get_labels)
     excluded_labels = QuerySelectMultipleField(
         'Excluding',
         validators=[Optional()],
-        query_factory=lambda: Label.query.all())
+        query_factory=get_labels)
 
     def is_submitted(self):
         return request and bool(request.args)

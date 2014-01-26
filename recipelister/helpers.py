@@ -2,6 +2,8 @@ from flask import redirect, request, session, url_for
 from functools import wraps
 from urlparse import urlparse, urljoin
 
+from recipelister.models import Label
+
 
 def login_required(f):
     @wraps(f)
@@ -25,3 +27,7 @@ def get_redirect_target():
             continue
         if is_safe_url(target):
             return target
+
+
+def get_labels():
+    return Label.query.order_by(Label.label).all()

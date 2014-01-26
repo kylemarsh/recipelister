@@ -6,7 +6,7 @@
 <form action="{{ url_for('edit_recipe', recipe_id=form.recipe_id.data) }}" method="POST">
 	{{ form.hidden_tag() }}
 	<div id="recipe">
-		{{form.title.label() }} {{ form.title }}
+		{{form.title.label() }} {{ form.title(size=80) }}
 		{{ render_errors(form.title) }}
 		<div id="time">
 			{{form.total_time.label() }} {{ form.total_time }} (minutes)
@@ -18,7 +18,7 @@
 		<div id="recipe_body">
 			{{form.recipe_body.label() }}
 			<br/>
-			{{ form.recipe_body }}
+			{{ form.recipe_body(rows=15, cols=80) }}
 			{{ render_errors(form.recipe_body) }}
 		</div>
 	</div>
@@ -39,7 +39,7 @@
 		<!-- TODO: javascripty 2-pane list -->
 		New Labels:
 		<br/>
-		{{ form.labels }}
+		{{ form.labels(size=30) }}
 		{{ render_errors(form.labels) }}
 	</div>
 	<input type="submit" value="Make Changes">

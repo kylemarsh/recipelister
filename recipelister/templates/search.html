@@ -5,7 +5,7 @@
 	<div id="title">
 		{{form.title_fragments.label() }}:
 		<br />
-		{{ form.title_fragments }}
+		{{ form.title_fragments(size=40) }}
 		{{ render_errors(form.title_fragments) }}
 	</div>
 	<div id="time">
@@ -25,13 +25,13 @@
 		<td>
 		{{ form.included_labels.label() }}:
 		<br />
-		{{ form.included_labels }}
+		{{ form.included_labels(size=30) }}
 		{{ render_errors(form.included_labels) }}
 		</td>
 		<td>
 		{{ form.excluded_labels.label() }}:
 		<br />
-		{{ form.excluded_labels }}
+		{{ form.excluded_labels(size=30) }}
 		{{ render_errors(form.excluded_labels) }}
 		</td>
 		</tr></table>
