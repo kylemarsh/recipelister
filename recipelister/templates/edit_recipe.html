@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title %}Edit {{form.title.data}}{% endblock %}
 {% block body %}
 
 <div style='font-size:x-small'><a href="{{ url_for('view_recipe', recipe_id=form.recipe_id.data) }}">[cancel]</a></div>
