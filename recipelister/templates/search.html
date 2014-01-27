@@ -22,20 +22,15 @@
 	</div>
 	<div id="labels">
 		<!-- TODO: good boolean UI?? -->
-		<table><tr>
-		<td>
 		{{ form.included_labels.label() }}:
 		<br />
-		{{ form.included_labels(size=30) }}
+		{{ form.included_labels(**{'data-placeholder': 'Find recipes tagged with...'}) }}
 		{{ render_errors(form.included_labels) }}
-		</td>
-		<td>
+		<br />
 		{{ form.excluded_labels.label() }}:
 		<br />
-		{{ form.excluded_labels(size=30) }}
+		{{ form.excluded_labels(**{'data-placeholder': 'And not tagged with...'}) }}
 		{{ render_errors(form.excluded_labels) }}
-		</td>
-		</tr></table>
 	</div>
 	<input type="submit" value="Search">
 </form>

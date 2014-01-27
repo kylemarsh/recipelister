@@ -24,7 +24,7 @@
 		<!-- TODO: javascripty 2-pane list -->
 		{{ form.labels.label() }}
 		<br/>
-		{{ form.labels(size=30) }}
+		{{ form.labels(**{'data-placeholder': 'Add labels...'}) }}
 		{{ render_errors(form.labels) }}
 	</div>
 	<input type="submit" value="Add Recipe">

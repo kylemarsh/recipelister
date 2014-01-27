@@ -58,26 +58,11 @@ def edit_recipe(recipe_id):
 
     if recipe is None:
         abort(404)
-    else:
-        all_labels = Label.query.all()
-        form.labels.query = [l for l in all_labels if l not in recipe.labels]
 
     if not form.validate_on_submit():
-        return render_template(
-            'edit_recipe.html',
-            form=form,
-            existing_labels=recipe.labels)
+        return render_template('edit_recipe.html', form=form)
 
-    # FIXME: If we get the label widget working nicely, this can use:
-    # form.populate_obj(recipe) instead.
-    recipe.title = form.title.data
-    recipe.total_time = form.total_time.data
-    recipe.active_time = form.active_time.data
-    recipe.recipe_body = form.recipe_body.data
-
-    for label in form.labels.data:
-        recipe.labels.append(label)
-
+    form.populate_obj(recipe)
     db.session.add(recipe)
     db.session.commit()
 
@@ -160,7 +145,6 @@ def page_not_found(error):
 
 
 #TODO: Set up validators
-#TODO: Set up sane default sizes
 class AddRecipeForm(Form):
     recipe_id = HiddenField('Recipe ID')
     title = TextField('Title', validators=[DataRequired()])

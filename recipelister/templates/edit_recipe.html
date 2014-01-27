@@ -25,22 +25,8 @@
 	</div>
 	<div id="labels">
 		{{ form.labels.label() }}
-		<ul class=labels>
-			{% for label in existing_labels %}
-			<li class=label name="{{ label.label_id }}">
-				{{ label.label }}
-				<!-- FIXME: ajaxify -->
-				<a href="{{ url_for('remove_label_from_recipe',
-					recipe_id=form.recipe_id.data,
-					label_id=label.label_id)
-				}}">[x]</a>
-			</li>
-			{% endfor %}
-		</ul>
-		<!-- TODO: javascripty 2-pane list -->
-		New Labels:
 		<br/>
-		{{ form.labels(size=30) }}
+		{{ form.labels(**{'data-placeholder': 'Add labels...'}) }}
 		{{ render_errors(form.labels) }}
 	</div>
 	<input type="submit" value="Make Changes">
