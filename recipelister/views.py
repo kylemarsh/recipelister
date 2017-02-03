@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Optional
 
 from recipelister import app, db
 from recipelister.models import Recipe, Label
-from recipelister.helpers import login_required, get_labels
+from recipelister.helpers import admin_login_required, login_required, get_labels
 from recipelister.helpers import is_safe_url, get_redirect_target
 
 
@@ -27,7 +27,7 @@ def view_recipe(recipe_id):
 
 
 @app.route("/recipe/add", methods=['GET', 'POST'])
-@login_required
+@admin_login_required
 def add_recipe():
     form = AddRecipeForm()
     del form.recipe_id
@@ -51,7 +51,7 @@ def add_recipe():
 
 
 @app.route("/recipe/edit/<recipe_id>", methods=['GET', 'POST'])
-@login_required
+@admin_login_required
 def edit_recipe(recipe_id):
     recipe = Recipe.query.get(recipe_id)
     form = AddRecipeForm(request.form, recipe)
@@ -70,7 +70,7 @@ def edit_recipe(recipe_id):
 
 
 @app.route("/remove_label/recipe/<recipe_id>/label/<label_id>")
-@login_required
+@admin_login_required
 def remove_label_from_recipe(recipe_id, label_id):
     recipe = Recipe.query.get(recipe_id)
     label = Label.query.get(label_id)
@@ -123,18 +123,27 @@ def login():
         return render_template('login.html', form=form)
 
     if request.method == 'POST':
-        if form.username.data != app.config['USERNAME']:
-            form.username.errors.append(u'Invalid username')
-        elif form.password.data != app.config['PASSWORD']:
-            form.password.errors.append(u'Invalid password')
-        else:
+        un = form.username.data
+        pw = form.password.data
+        if un == app.config['USERNAME'] and pw == app.config['PASSWORD']:
+            session['admin_logged_in'] = True
             session['logged_in'] = True
             return form.redirect('search')
+        elif un == app.config['GUEST_UN'] and pw == app.config['GUEST_PW']:
+            session['logged_in'] = True
+            return form.redirect('search')
+
+        if un not in (app.config['USERNAME'], app.config['GUEST_UN']):
+            form.username.errors.append(u'Invalid username')
+        else:
+            form.password.errors.append(u'Invalid password')
+
     return render_template('login.html', form=form)
 
 
 @app.route('/logout')
 def logout():
+    session.pop('admin_logged_in', None)
     session.pop('logged_in', None)
     return redirect(url_for('search'))
 
