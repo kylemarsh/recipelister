@@ -21,6 +21,6 @@
 	{% endfor %}
 	{% block body %}{% endblock %}
 	{% if session.logged_in %}
-	<a href="{{ url_for('logout') }}" style='font-size:x-small'>[log out]</a>
+	<a class='button button-dark' href="{{ url_for('logout') }}">log out</a>
 	{% endif %}
 </div>

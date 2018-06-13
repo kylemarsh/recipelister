@@ -16,3 +16,54 @@ h2                 { font-size: 1.2em; }
 .errorimg          { text-align: center; }
 
 .recipe_time       { color: #6F1C00; font-family: 'Georgia', serif; }
+
+/* Button CSS adapted from DreamHost */
+.button {
+	color: #6F1C00;
+	background: transparent;
+	border: solid 1px #6F1C00;
+	border-radius: 3px;
+	display: inline-block;
+	font-size: 1rem;
+	line-height: 1rem;
+	padding: 0.5rem 1rem 0.375rem;
+	margin: 0;
+	margin-top: 1px;
+	text-align: center;
+	text-decoration: none;
+	font-weight: 600;
+	text-shadow: none;
+	vertical-align: baseline;
+	outline: none;
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.button-dark {
+	border-color: #071c26;
+	color: #071c26;
+}
+.button-primary {
+	background: #6F1C00;
+	color: #ffffff;
+	border: solid 1px #6F1C00;
+}
+
+.button:hover, .button:active, .button.is-open {
+	color: #8a3e24;
+	text-decoration: none;
+	border-color: #8a3e24;
+	box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.button-primary:hover, .button-primary:active, .button-primary.is-open {
+	color: #ffffff;
+	background: #8a3e24;
+	border-color: #6F1C00;
+}
