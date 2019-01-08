@@ -1,7 +1,7 @@
 from flask import abort, render_template, redirect, request, session, url_for
 from flask_wtf import Form
 from sqlalchemy import and_, or_
-from wtforms import IntegerField, HiddenField, TextField, TextAreaField
+from wtforms import IntegerField, HiddenField, TextField, TextAreaField, BooleanField
 from wtforms import PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.validators import DataRequired, Optional
@@ -97,6 +97,7 @@ def search():
     fragments = form.title_fragments.data.split()
     included_labels = form.included_labels.data
     excluded_labels = form.excluded_labels.data
+    randomize = form.randomize.data
 
     query = Recipe.query
     if max_active_time is not None:
@@ -112,7 +113,12 @@ def search():
     for label in excluded_labels:
         query = query.filter(~Recipe.labels.contains(label))
 
-    return render_template('list.html', recipes=query.all())
+    results = query.all()
+    if randomize is not None:
+        import random
+        random.shuffle(results)
+
+    return render_template('list.html', recipes=results)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -179,6 +185,7 @@ class SearchForm(Form):
         'Excluding',
         validators=[Optional()],
         query_factory=get_labels)
+    randomize = BooleanField("Randomize Results", validators=[Optional()])
 
     def is_submitted(self):
         return request and bool(request.args)

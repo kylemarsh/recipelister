@@ -33,6 +33,11 @@
 			{{ form.excluded_labels(**{'data-placeholder': 'And not tagged with...'}) }}
 			{{ render_errors(form.excluded_labels) }}
 		</div>
+        <div id="rand">
+            {{ form.randomize .label() }}:
+            {{ form.randomize() }}
+            {{ render_errors(form.randomize) }}
+        </div>
 		<input class="button button-primary" type="submit" value="Search">
 	</form>
 	<a class='button' href="{{ url_for('add_recipe') }}">New Recipe</a>
