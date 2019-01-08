@@ -10,6 +10,8 @@
 			{{ form.title_fragments(size=40) }}
 			{{ render_errors(form.title_fragments) }}
 		</div>
+		<input class="button button-primary" type="submit" name="action" value="Quick">
+        <br>
 		<div id="time">
 			{{form.max_total_time.label() }}:
 			<br />
@@ -38,7 +40,7 @@
             {{ form.randomize() }}
             {{ render_errors(form.randomize) }}
         </div>
-		<input class="button button-primary" type="submit" value="Search">
+		<input class="button button-primary" type="submit" name="action" value="Search">
 	</form>
 	<a class='button' href="{{ url_for('add_recipe') }}">New Recipe</a>
 </div>

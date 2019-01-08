@@ -1,6 +1,7 @@
 from flask import abort, render_template, redirect, request, session, url_for
 from flask_wtf import Form
 from sqlalchemy import and_, or_
+from werkzeug import ImmutableMultiDict
 from wtforms import IntegerField, HiddenField, TextField, TextAreaField, BooleanField
 from wtforms import PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
@@ -86,7 +87,15 @@ def remove_label_from_recipe(recipe_id, label_id):
 @app.route("/index")
 @app.route("/search")
 def search():
-    form = SearchForm(request.args)
+    args = request.args
+    if args.get('action') == "Quick":
+        default_exclude = [8, 9, 17, 20, 21, 22, 23, 24] # desert/drink/breakfast things
+        args = dict(request.args)
+        args['excluded_labels'] = [unicode(x) for x in default_exclude]
+        args['randomize'] = 'y'
+        args = ImmutableMultiDict(args)
+
+    form = SearchForm(args)
     del form.csrf_token
 
     if not form.validate_on_submit():
