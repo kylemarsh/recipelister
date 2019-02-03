@@ -1,0 +1,37 @@
+.App {
+  background-color: #FFF5EA;
+  min-height: 100vh;
+  display: flex;
+  /*justify-content: center;*/
+  font-size: calc(10px + 2vmin);
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.display-pane { flex: 50%; }
+.list-pane { flex: 25%; }
+.query-pane { flex: 25%; }
+
+.recipebody {
+    white-space: pre-wrap;
+}
+
+.active {
+    background-color: #DDDDDD;
+    /*color: #1155AA;*/
+    /*font-style: italic;*/
+}
+
+.column {
+    border-style: dotted;
+    border-width: 1px;
+    border-color: gray;
+    min-width: 200px;
+}
+@media screen and (max-width: 600px) {
+    .column {
+        flex: 100%;
+    }
+}
