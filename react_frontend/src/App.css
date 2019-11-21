@@ -1,37 +1,22 @@
 .App {
-  background-color: #FFF5EA;
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
   min-height: 100vh;
   display: flex;
-  /*justify-content: center;*/
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   font-size: calc(10px + 2vmin);
+  color: white;
 }
 
 .App-link {
-  color: #61dafb;
-}
-
-.display-pane { flex: 50%; }
-.list-pane { flex: 25%; }
-.query-pane { flex: 25%; }
-
-.recipebody {
-    white-space: pre-wrap;
-}
-
-.active {
-    background-color: #DDDDDD;
-    /*color: #1155AA;*/
-    /*font-style: italic;*/
-}
-
-.column {
-    border-style: dotted;
-    border-width: 1px;
-    border-color: gray;
-    min-width: 200px;
-}
-@media screen and (max-width: 600px) {
-    .column {
-        flex: 100%;
-    }
+  color: #09d3ac;
 }
