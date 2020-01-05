@@ -4,15 +4,16 @@ const ResultList = props => {
     const rows = props.items.map((item) => {
         return (
             <li
-                key={item.id}
-                id={item.id}
+                class="result-list-item"
+                key={item.ID}
+                id={item.ID}
                 onClick={props.handleClick}
             >
-                {item.title}
+                {item.Title}
             </li>
         )
     })
-    return <ul>{rows}</ul>
+    return <div class="result-list"><ul>{rows}</ul></div>
 }
 
 export default ResultList

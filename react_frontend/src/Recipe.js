@@ -5,17 +5,20 @@ const Recipe = props => {
         return <div>Nothing to show</div>
     }
     return (
-        <div>
-            <h2>{props.title}</h2>
-            <p>{props.instructions}</p>
-            <TagList tags={props.tags} />
+        <div class="recipe-container">
+            <h2>{props.Title}</h2>
+            <p class="recipe-body">{props.Body}</p>
+            <TagList tags={props.Labels} />
         </div>
     )
 }
 
 const TagList = props => {
+    if (!props.tags || !props.tags.length) {
+        return <div>no tags</div>
+    }
     const tags = props.tags.map((tag) => {
-        return <li key={tag}>{tag}</li>
+        return <li key={tag.ID}>{tag.Label}</li>
     })
     return <ul className='taglist'>{tags}</ul>
 }
