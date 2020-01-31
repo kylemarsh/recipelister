@@ -12,13 +12,16 @@ class App extends Component {
             results: [],
             currentRecipe: null,
             error: null,
+            filters: {fragments: ""},
         }
     }
     render () {
         return (
             <div className="medium-container">
                 <h1>Liz's Recipe Database</h1>
-                <QueryForm handleSubmit={this.handleSubmit} />
+                <QueryForm
+                    fragments={this.state.filters.fragments}
+                    handleChange={this.handleFilterChange} />
                 <hr />
                 <ResultList items={this.state.results} handleClick={this.handleResultClick}/>
                 <hr />
@@ -28,12 +31,26 @@ class App extends Component {
         )
     }
 
-    handleSubmit = (query) => {
-        // Make the API call here.
+    handleFilterChange = (event) => {
+        const newfilters = {...this.state.filters, [event.target.name]: event.target.value}
+        const results = this.applyFilters(newfilters)
         this.setState({
             ...this.state,
-            results: this.state.allRecipes,
+            filters: newfilters,
+            results: results,
         })
+    }
+
+    applyFilters = (filters) => {
+        //TODO other filters
+        //FIXME: make it like slackmoji search, where it can skip characters
+        var results = this.state.allRecipes
+        if (filters.fragments !== "") {
+            results =  results.filter(recipe =>
+                recipe.Title.toLowerCase().includes(filters.fragments.toLowerCase())
+            );
+        }
+        return results
     }
 
     handleResultClick = (event) => {
@@ -51,6 +68,7 @@ class App extends Component {
                     this.setState({
                         ...this.state,
                         allRecipes: resp,
+                        results: resp,
                     });
                 },
                 (error) => {

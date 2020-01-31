@@ -5,9 +5,9 @@ const Recipe = props => {
         return <div>Nothing to show</div>
     }
     return (
-        <div class="recipe-container">
+        <div className="recipe-container">
             <h2>{props.Title}</h2>
-            <p class="recipe-body">{props.Body}</p>
+            <p className="recipe-body">{props.Body}</p>
             <TagList tags={props.Labels} />
         </div>
     )
