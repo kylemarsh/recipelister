@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import './main.css'
+import LoginComponent from './LoginComponent'
 import QueryForm from './QueryForm'
 import ResultList from './ResultList'
 import Recipe from './Recipe'
@@ -7,15 +8,21 @@ import Recipe from './Recipe'
 class App extends Component {
     constructor(props) {
         super(props)
+
+        const loggedInAs = localStorage.getItem('username');
+        const savedJwt = localStorage.getItem('token');
+
         this.state = {
             allRecipes: [],
             results: [],
             currentRecipe: null,
             error: null,
             filters: {fragments: ""},
+            login: {valid: !!loggedInAs, username: loggedInAs, token: savedJwt},
         }
     }
     render () {
+        const loggedIn = this.state.login.valid
         return (
             <div className="medium-container">
                 <h1>Liz's Recipe Database</h1>
@@ -27,6 +34,13 @@ class App extends Component {
                 <hr />
                 <Recipe {...this.state.currentRecipe} />
                 <hr />
+                <div className="footer">
+                    <hr />
+                    <LoginComponent
+                    loggedIn={loggedIn}
+                    username={this.state.login.username}
+                    handleClick={loggedIn ? this.doLogout : this.doLogin} />
+                </div>
             </div>
         )
     }
@@ -60,8 +74,57 @@ class App extends Component {
         })
     }
 
+    doLogin = (event) => {
+        const host = "http://localhost:8080/";
+        const endpoint = "debug/getToken/";
+        // TODO authenticate for real with username/password
+        // TODO handle incorrect auth
+        // TODO on success, re-fetch recipes.
+        fetch(host + endpoint)
+            .then(res => res.json())
+            .then(
+                (resp) => {
+                    alert("got token: " + resp.token)
+                    this.setState({
+                        ...this.state,
+                        login: {valid: true, username: "test_user", token: resp.token},
+                    });
+                    localStorage.setItem("username", "test_user");
+                    localStorage.setItem("token", resp.token);
+                },
+                (error) => {
+                    alert(error);
+                    this.setState({
+                        ...this.state,
+                        error: error,
+                    });
+                }
+            )
+    }
+
+    doLogout = (event) => {
+        localStorage.removeItem('username', '');
+        localStorage.removeItem('token', '');
+        this.setState({
+            ...this.state,
+            login: {valid: false, username: null, token: null},
+        });
+    }
+
     componentDidMount() {
-        fetch("http://localhost:8080/recipes/")
+        const token = this.state.login.token;
+        var host = "http://localhost:8080/";
+        var endpoint = "recipes/";
+        var requestInit = {};
+        if (token) {
+            requestInit = {headers: {'x-access-token': token}};
+            endpoint = "priv/recipes/";
+        }
+        // TODO: handle expired/invalid auth token
+        //   - remove token from state and localStorage
+        //   - re-fetch public recipe list
+        // TODO: move this fetch into a helper function that I can pass params to
+        fetch(host + endpoint, requestInit)
             .then(res => res.json())
             .then(
                 (resp) => {
