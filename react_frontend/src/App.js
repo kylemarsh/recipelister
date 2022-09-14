@@ -17,7 +17,7 @@ class App extends Component {
       results: [],
       currentRecipe: null,
       error: null,
-      filters: { fragments: "" },
+      filters: { fragments: "", fullText: false },
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
     };
   }
@@ -68,8 +68,13 @@ class App extends Component {
     //FIXME: make it like slackmoji search, where it can skip characters
     var results = this.state.allRecipes;
     if (filters.fragments !== "") {
-      results = results.filter((recipe) =>
-        recipe.Title.toLowerCase().includes(filters.fragments.toLowerCase())
+      results = results.filter(
+        (recipe) =>
+          recipe.Title.toLowerCase().includes(
+            filters.fragments.toLowerCase()
+          ) ||
+          (filters.fullText &&
+            recipe.Body.toLowerCase().includes(filters.fragments.toLowerCase()))
       );
     }
     return results;
@@ -78,28 +83,34 @@ class App extends Component {
   handleResultClick = (event) => {
     this.setState({
       ...this.state,
-      currentRecipe: this.state.allRecipes.find((recipe) => {
-        return recipe.ID.toString() === event.target.id;
-      }),
+      targetRecipe: event.target.id,
+      currentRecipe: this.fetchRecipe(event.target.id, this.state.allRecipes),
     });
   };
 
   doLogin = (event) => {
+    event.preventDefault();
+
+    var username = event.target.form.username.value;
+    var formData = new FormData(event.target.form);
+    var requestInit = {
+      method: "POST",
+      body: formData,
+    };
+    // TODO set host from environment or something?
     const host = "http://localhost:8080/";
-    const endpoint = "debug/getToken/";
-    // TODO authenticate for real with username/password
+    const endpoint = "login/";
     // TODO handle incorrect auth
-    // TODO on success, re-fetch recipes.
-    fetch(host + endpoint)
+    fetch(host + endpoint, requestInit)
       .then((res) => res.json())
       .then(
         (resp) => {
-          alert("got token: " + resp.token);
           this.setState({
             ...this.state,
-            login: { valid: true, username: "test_user", token: resp.token },
+            login: { valid: true, username: username, token: resp.token },
+            reloadRecipeList: true,
           });
-          localStorage.setItem("username", "test_user");
+          localStorage.setItem("username", username);
           localStorage.setItem("token", resp.token);
         },
         (error) => {
@@ -113,15 +124,17 @@ class App extends Component {
   };
 
   doLogout = (event) => {
+    event.preventDefault();
     localStorage.removeItem("username", "");
     localStorage.removeItem("token", "");
     this.setState({
       ...this.state,
       login: { valid: false, username: null, token: null },
+      reloadRecipeList: true,
     });
   };
 
-  componentDidMount() {
+  getRecipes = (event) => {
     const token = this.state.login.token;
     var host = "http://localhost:8080/";
     var endpoint = "recipes/";
@@ -132,8 +145,6 @@ class App extends Component {
     }
     // TODO: handle expired/invalid auth token
     //   - remove token from state and localStorage
-    //   - re-fetch public recipe list
-    // TODO: move this fetch into a helper function that I can pass params to
     fetch(host + endpoint, requestInit)
       .then((res) => res.json())
       .then(
@@ -142,6 +153,7 @@ class App extends Component {
             ...this.state,
             allRecipes: resp,
             results: resp,
+            currentRecipe: this.fetchRecipe(this.state.targetRecipe, resp),
           });
         },
         (error) => {
@@ -152,6 +164,26 @@ class App extends Component {
           });
         }
       );
+  };
+
+  fetchRecipe = (targetId, recipeList) => {
+    return recipeList.find((recipe) => {
+      return recipe.ID.toString() === targetId;
+    });
+  };
+
+  componentDidMount() {
+    this.getRecipes();
+  }
+
+  componentDidUpdate() {
+    if (this.state.reloadRecipeList) {
+      this.getRecipes();
+      this.setState({
+        ...this.state,
+        reloadRecipeList: false,
+      });
+    }
   }
 
   sampleResults = [

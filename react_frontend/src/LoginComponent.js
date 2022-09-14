@@ -1,11 +1,22 @@
 import React from "react";
 
 const LoginComponent = (props) => {
-  const text = props.loggedIn ? props.username + " Log Out" : "Log In";
+  if (props.loggedIn) {
+    return (
+      <button className="authButton" onClick={props.handleClick}>
+        Log Out
+      </button>
+    );
+  }
+
   return (
-    <button className="authButton" onClick={props.handleClick}>
-      {text}
-    </button>
+    <form>
+      <input placeholder="Username" name="username" type="text" />
+      <input name="password" type="password" />
+      <button className="authButton" onClick={props.handleClick}>
+        Log In
+      </button>
+    </form>
   );
 };
 
