@@ -3,7 +3,7 @@ import React from "react";
 const LoginComponent = (props) => {
   if (props.loggedIn) {
     return (
-      <button className="authButton" onClick={props.handleClick}>
+      <button className="auth-button" onClick={props.handleClick}>
         Log Out
       </button>
     );
@@ -13,7 +13,7 @@ const LoginComponent = (props) => {
     <form>
       <input placeholder="Username" name="username" type="text" />
       <input name="password" type="password" />
-      <button className="authButton" onClick={props.handleClick}>
+      <button className="auth-button" onClick={props.handleClick}>
         Log In
       </button>
     </form>

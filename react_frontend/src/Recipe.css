@@ -1,0 +1,44 @@
+/* Labels */
+.tag-list {
+	list-style: none;
+	display: flex;
+}
+
+.tag-list-title {
+	font-weight: bold;
+}
+
+.tag-list > li {
+	background-color: thistle;
+  width: fit-content;
+  padding-inline: 5px;
+  border-color: gray;
+  border-style: solid;
+  border-radius: 10px;
+  border-width: thin;
+	margin: 5px;
+}
+
+/* Notes */
+.note-list-title {
+	font-weight: bold;
+}
+
+.note-list > li {
+	width: fit-content;
+	background-color: antiquewhite;
+  padding-inline: 5px;
+  border-color: gray;
+  border-style: solid;
+  border-radius: 10px;
+  border-width: thin;
+	margin-block: 5px;
+}
+
+.note-list > li.flagged {
+	background-color: lightpink;
+}
+
+.note-stamp {
+	font-style: italic;
+}

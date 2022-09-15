@@ -5,6 +5,8 @@ import QueryForm from "./QueryForm";
 import ResultList from "./ResultList";
 import Recipe from "./Recipe";
 
+import { login, fetchRecipes, fetchNotes } from "./api";
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -26,18 +28,19 @@ class App extends Component {
     return (
       <div className="medium-container">
         <h1>Liz's Recipe Database</h1>
-        <QueryForm
-          fragments={this.state.filters.fragments}
-          handleChange={this.handleFilterChange}
-        />
-        <hr />
-        <ResultList
-          items={this.state.results}
-          handleClick={this.handleResultClick}
-        />
-        <hr />
-        <Recipe {...this.state.currentRecipe} />
-        <hr />
+        <div className="content-container">
+          <div className="search-pane">
+            <QueryForm
+              fragments={this.state.filters.fragments}
+              handleChange={this.handleFilterChange}
+            />
+            <ResultList
+              items={this.state.results}
+              handleClick={this.handleResultClick}
+            />
+          </div>
+          <Recipe {...this.state.currentRecipe} />
+        </div>
         <div className="footer">
           <hr />
           <LoginComponent
@@ -57,7 +60,6 @@ class App extends Component {
     };
     const results = this.applyFilters(newfilters);
     this.setState({
-      ...this.state,
       filters: newfilters,
       results: results,
     });
@@ -82,45 +84,34 @@ class App extends Component {
 
   handleResultClick = (event) => {
     this.setState({
-      ...this.state,
       targetRecipe: event.target.id,
-      currentRecipe: this.fetchRecipe(event.target.id, this.state.allRecipes),
+      currentRecipe: this.selectRecipe(event.target.id, this.state.allRecipes),
     });
+    this.loadNotes(event);
   };
 
-  doLogin = (event) => {
+  doLogin = async (event) => {
     event.preventDefault();
 
     var username = event.target.form.username.value;
-    var formData = new FormData(event.target.form);
-    var requestInit = {
-      method: "POST",
-      body: formData,
-    };
     // TODO set host from environment or something?
-    const host = "http://localhost:8080/";
-    const endpoint = "login/";
-    // TODO handle incorrect auth
-    fetch(host + endpoint, requestInit)
-      .then((res) => res.json())
-      .then(
-        (resp) => {
-          this.setState({
-            ...this.state,
-            login: { valid: true, username: username, token: resp.token },
-            reloadRecipeList: true,
-          });
-          localStorage.setItem("username", username);
-          localStorage.setItem("token", resp.token);
-        },
-        (error) => {
-          alert(error);
-          this.setState({
-            ...this.state,
-            error: error,
-          });
-        }
-      );
+    try {
+      const token = await login(event.target.form, {
+        host: "http://localhost:8080/",
+      });
+
+      this.setState({
+        login: { valid: true, username: username, token: token },
+        reloadRecipeList: true,
+      });
+      localStorage.setItem("username", username);
+      localStorage.setItem("token", token);
+    } catch (e) {
+      // TODO: make UI react to invalid auth
+      console.error(e.name);
+      console.error(e.message);
+      this.setState({ error: "error logging in" });
+    }
   };
 
   doLogout = (event) => {
@@ -128,45 +119,59 @@ class App extends Component {
     localStorage.removeItem("username", "");
     localStorage.removeItem("token", "");
     this.setState({
-      ...this.state,
       login: { valid: false, username: null, token: null },
       reloadRecipeList: true,
     });
   };
 
-  getRecipes = (event) => {
-    const token = this.state.login.token;
-    var host = "http://localhost:8080/";
-    var endpoint = "recipes/";
-    var requestInit = {};
-    if (token) {
-      requestInit = { headers: { "x-access-token": token } };
-      endpoint = "priv/recipes/";
+  getRecipes = async (event) => {
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+
+    try {
+      const recipes = await fetchRecipes(config);
+      this.setState({
+        allRecipes: recipes,
+        results: recipes,
+        currentRecipe: this.selectRecipe(this.state.targetRecipe, recipes),
+      });
+    } catch (e) {
+      // TODO: handle expired/invalid auth token -- figure out exactly what
+      // that error looks like
+      //if(e.message == "bad token") {
+      //  console.error("invalid authentication; logging out")
+      //  this.doLogout() //fixme can I do this without an event?
+      //  this.getRecipes(event); // try again to just get the titles/tags
+      //  this.setState({ error: "login expired" });
+      //}
+      console.error(e.name);
+      console.error(e.message);
+      this.setState({ error: "error fetching recipe list" });
     }
-    // TODO: handle expired/invalid auth token
-    //   - remove token from state and localStorage
-    fetch(host + endpoint, requestInit)
-      .then((res) => res.json())
-      .then(
-        (resp) => {
-          this.setState({
-            ...this.state,
-            allRecipes: resp,
-            results: resp,
-            currentRecipe: this.fetchRecipe(this.state.targetRecipe, resp),
-          });
-        },
-        (error) => {
-          alert(error);
-          this.setState({
-            ...this.state,
-            error: error,
-          });
-        }
-      );
   };
 
-  fetchRecipe = (targetId, recipeList) => {
+  loadNotes = async (event) => {
+    const recipeId = event.target.id;
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+
+    try {
+      const notes = await fetchNotes(recipeId, config);
+      var recipe = this.selectRecipe(recipeId, this.state.allRecipes);
+      recipe.Notes = notes;
+      this.setState({ currentRecipe: recipe });
+    } catch (e) {
+      console.error(e.name);
+      console.error(e.message);
+      this.setState({ error: `could not fetch notes for recipe ${recipeId}` });
+    }
+  };
+
+  selectRecipe = (targetId, recipeList) => {
     return recipeList.find((recipe) => {
       return recipe.ID.toString() === targetId;
     });
@@ -185,22 +190,6 @@ class App extends Component {
       });
     }
   }
-
-  sampleResults = [
-    {
-      ID: 23,
-      Title: "Chicken Pot Pie",
-      tags: ["chicken", "main", "soup/stew"],
-      instructions: "1 Chicken\n3 cups water\nSpices",
-    },
-    {
-      ID: 42,
-      Title: "Decadent Cake",
-      tags: ["dessert", "cake", "baking"],
-      instructions:
-        "Preheat oven to 350\nEmpty box into bowl\nMix in 3 eggs\nBake for 40 min",
-    },
-  ];
 }
 
 export default App;

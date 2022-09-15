@@ -20,3 +20,32 @@
 .App-link {
   color: #09d3ac;
 }
+
+.content-container {
+	display: flex;
+}
+
+
+.content-container > div {
+	margin: 5px;
+	padding: 5px;
+}
+
+.search-pane {
+	border-right-style: solid;
+	border-right-width: thin;
+	border-right-color: gray;
+}
+
+@media (max-width: 400px) {
+	.content-container {
+		display: block;
+	}
+	.search-pane {
+		border-right: none;
+		border-bottom-style: solid;
+		border-bottom-width: thin;
+		border-bottom-color: gray;
+	}
+}
+

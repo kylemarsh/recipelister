@@ -3,12 +3,7 @@ import React from "react";
 const ResultList = (props) => {
   const rows = props.items.map((item) => {
     return (
-      <li
-        className="result-list-item"
-        key={item.ID}
-        id={item.ID}
-        onClick={props.handleClick}
-      >
+      <li key={item.ID} id={item.ID} onClick={props.handleClick}>
         {item.Title}
       </li>
     );
