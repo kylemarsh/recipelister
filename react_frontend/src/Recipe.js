@@ -1,17 +1,18 @@
 import React from "react";
 
 const Recipe = (props) => {
-  if (!Object.entries(props).length && props.constructor === Object) {
+  const recipe = props.recipe;
+  if (!recipe) {
     return <div>Nothing to show</div>;
   }
   return (
     <div className="recipe-container">
-      <h2>{props.Title}</h2>
-      <p className="recipe-body">{props.Body}</p>
+      <h2>{recipe.Title}</h2>
+      <p className="recipe-body">{recipe.Body}</p>
       <span className="tag-list-title">Tags</span>
-      <TagList tags={props.Labels} />
+      <TagList tags={recipe.Labels} />
       <span className="note-list-title">Notes</span>
-      <NoteList notes={props.Notes} />
+      <NoteList notes={recipe.Notes} handleFlagClick={props.handleFlagClick} />
     </div>
   );
 };
@@ -31,9 +32,28 @@ const NoteList = (props) => {
     return <div>no notes</div>;
   }
   const notes = props.notes.map((note) => {
+    const stamp = new Date(note.Created * 1000).toLocaleString("en-UK", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
     return (
-      <li className={note.Flagged ? "flagged" : "unflagged"} key={note.ID}>
-        <span className="note-stamp">{note.Created}</span>
+      <li
+        className={note.Flagged ? "flagged" : ""}
+        data-note-id={note.ID}
+        data-flagged={note.Flagged ? "1" : ""}
+        key={note.ID}
+      >
+        <span
+          className="note-flag"
+          role="img"
+          aria-label="flag-icon"
+          onClick={props.handleFlagClick}
+        >
+          🚩
+        </span>
+        <span className="note-stamp">{stamp}</span>
+        <br />
         {note.Note}
       </li>
     );

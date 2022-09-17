@@ -5,7 +5,7 @@ import QueryForm from "./QueryForm";
 import ResultList from "./ResultList";
 import Recipe from "./Recipe";
 
-import { login, fetchRecipes, fetchNotes } from "./api";
+import { login, fetchRecipes, fetchNotes, toggleNote } from "./api";
 
 class App extends Component {
   constructor(props) {
@@ -39,7 +39,10 @@ class App extends Component {
               handleClick={this.handleResultClick}
             />
           </div>
-          <Recipe {...this.state.currentRecipe} />
+          <Recipe
+            recipe={this.state.currentRecipe}
+            handleFlagClick={this.handleFlagClick}
+          />
         </div>
         <div className="footer">
           <hr />
@@ -88,6 +91,31 @@ class App extends Component {
       currentRecipe: this.selectRecipe(event.target.id, this.state.allRecipes),
     });
     this.loadNotes(event);
+  };
+
+  handleFlagClick = async (event) => {
+    const noteTag = event.target.parentElement;
+    const noteData = noteTag.dataset;
+
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+
+    try {
+      const newFlag = !noteData.flagged;
+      await toggleNote(noteData.noteId, newFlag, config);
+      const recipe = this.selectRecipe(
+        this.state.targetRecipe,
+        this.state.allRecipes
+      );
+      const note = recipe.Notes.find((n) => n.ID === parseInt(noteData.noteId));
+      note.Flagged = newFlag;
+      this.setState({ allRecipes: this.state.allRecipes });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "error flagging note" });
+    }
   };
 
   doLogin = async (event) => {
