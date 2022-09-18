@@ -1,18 +1,16 @@
 import React from "react";
+import * as Util from "./Util";
 
 const ResultList = (props) => {
-  const rows = props.items.map((item) => {
+  const filteredItems = Util.applyFilters(props.items, props.filters);
+  const rows = filteredItems.map((item) => {
     return (
       <li key={item.ID} id={item.ID} onClick={props.handleClick}>
         {item.Title}
       </li>
     );
   });
-  return (
-    <div className="result-list">
-      <ul>{rows}</ul>
-    </div>
-  );
+  return <ul className="result-list">{rows}</ul>;
 };
 
 export default ResultList;

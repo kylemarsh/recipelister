@@ -4,6 +4,7 @@ import LoginComponent from "./LoginComponent";
 import QueryForm from "./QueryForm";
 import ResultList from "./ResultList";
 import Recipe from "./Recipe";
+import * as Util from "./Util";
 
 import { login, fetchRecipes, fetchNotes, toggleNote } from "./api";
 
@@ -16,8 +17,6 @@ class App extends Component {
 
     this.state = {
       allRecipes: [],
-      results: [],
-      currentRecipe: null,
       error: null,
       filters: { fragments: "", fullText: false },
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
@@ -35,13 +34,17 @@ class App extends Component {
               handleChange={this.handleFilterChange}
             />
             <ResultList
-              items={this.state.results}
+              items={this.state.allRecipes}
+              filters={this.state.filters}
               handleClick={this.handleResultClick}
             />
           </div>
           <Recipe
-            recipe={this.state.currentRecipe}
+            recipes={this.state.allRecipes}
+            targetRecipeId={this.state.targetRecipe}
             handleFlagClick={this.handleFlagClick}
+            handleTagUnlinkClick={this.handleTagUnlinkClick}
+            handleNoteUnlinkClick={this.handleNoteUnlinkClick}
           />
         </div>
         <div className="footer">
@@ -61,35 +64,11 @@ class App extends Component {
       ...this.state.filters,
       [event.target.name]: event.target.value,
     };
-    const results = this.applyFilters(newfilters);
-    this.setState({
-      filters: newfilters,
-      results: results,
-    });
-  };
-
-  applyFilters = (filters) => {
-    //TODO other filters
-    //FIXME: make it like slackmoji search, where it can skip characters
-    var results = this.state.allRecipes;
-    if (filters.fragments !== "") {
-      results = results.filter(
-        (recipe) =>
-          recipe.Title.toLowerCase().includes(
-            filters.fragments.toLowerCase()
-          ) ||
-          (filters.fullText &&
-            recipe.Body.toLowerCase().includes(filters.fragments.toLowerCase()))
-      );
-    }
-    return results;
+    this.setState({ filters: newfilters });
   };
 
   handleResultClick = (event) => {
-    this.setState({
-      targetRecipe: event.target.id,
-      currentRecipe: this.selectRecipe(event.target.id, this.state.allRecipes),
-    });
+    this.setState({ targetRecipe: event.target.id });
     this.loadNotes(event);
   };
 
@@ -105,7 +84,7 @@ class App extends Component {
     try {
       const newFlag = !noteData.flagged;
       await toggleNote(noteData.noteId, newFlag, config);
-      const recipe = this.selectRecipe(
+      const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
       );
@@ -117,6 +96,14 @@ class App extends Component {
       this.setState({ error: "error flagging note" });
     }
   };
+
+  handleTagUnlinkClick = async (event) => {
+    //get tagid and recipe id
+    //make call to remove tag/recipe link
+    //find tag in current recipe's Tags and delete it
+  };
+
+  handleNoteUnlinkClick = async (event) => {};
 
   doLogin = async (event) => {
     event.preventDefault();
@@ -163,7 +150,6 @@ class App extends Component {
       this.setState({
         allRecipes: recipes,
         results: recipes,
-        currentRecipe: this.selectRecipe(this.state.targetRecipe, recipes),
       });
     } catch (e) {
       // TODO: handle expired/invalid auth token -- figure out exactly what
@@ -189,20 +175,15 @@ class App extends Component {
 
     try {
       const notes = await fetchNotes(recipeId, config);
-      var recipe = this.selectRecipe(recipeId, this.state.allRecipes);
+      const recipes = this.state.allRecipes;
+      const recipe = Util.selectRecipe(recipeId, recipes);
       recipe.Notes = notes;
-      this.setState({ currentRecipe: recipe });
+      this.setState({ allRecipes: recipes });
     } catch (e) {
       console.error(e.name);
       console.error(e.message);
       this.setState({ error: `could not fetch notes for recipe ${recipeId}` });
     }
-  };
-
-  selectRecipe = (targetId, recipeList) => {
-    return recipeList.find((recipe) => {
-      return recipe.ID.toString() === targetId;
-    });
   };
 
   componentDidMount() {

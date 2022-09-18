@@ -1,18 +1,26 @@
 import React from "react";
+import * as Util from "./Util";
 
 const Recipe = (props) => {
-  const recipe = props.recipe;
+  const recipe = Util.selectRecipe(props.targetRecipeId, props.recipes);
   if (!recipe) {
-    return <div>Nothing to show</div>;
+    return <div className="recipe-container"></div>;
   }
   return (
-    <div className="recipe-container">
+    <div className="recipe-container" data-recipe-id={recipe.ID}>
       <h2>{recipe.Title}</h2>
       <p className="recipe-body">{recipe.Body}</p>
       <span className="tag-list-title">Tags</span>
-      <TagList tags={recipe.Labels} />
+      <TagList
+        tags={recipe.Labels}
+        handleUnlinkClick={props.handleTagUnlinkClick}
+      />
       <span className="note-list-title">Notes</span>
-      <NoteList notes={recipe.Notes} handleFlagClick={props.handleFlagClick} />
+      <NoteList
+        notes={recipe.Notes}
+        handleUnlinkClick={props.handleNoteUnlinkClick}
+        handleFlagClick={props.handleFlagClick}
+      />
     </div>
   );
 };
@@ -22,7 +30,19 @@ const TagList = (props) => {
     return <div>no tags</div>;
   }
   const tags = props.tags.map((tag) => {
-    return <li key={tag.ID}>{tag.Label}</li>;
+    return (
+      <li key={tag.ID} data-tag-name={tag.Label}>
+        {tag.Label}
+        <span
+          className="tag-unlink"
+          role="img"
+          aria-label="close-icon"
+          onClick={props.handleUnlinkClick}
+        >
+          &times;
+        </span>
+      </li>
+    );
   });
   return <ul className="tag-list">{tags}</ul>;
 };
@@ -53,6 +73,14 @@ const NoteList = (props) => {
           🚩
         </span>
         <span className="note-stamp">{stamp}</span>
+        <span
+          className="note-unlink"
+          role="img"
+          aria-label="close-icon"
+          onClick={props.handleUnlinkClick}
+        >
+          &times;
+        </span>
         <br />
         {note.Note}
       </li>
