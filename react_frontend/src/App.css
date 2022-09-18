@@ -22,30 +22,30 @@
 }
 
 .content-container {
-	display: flex;
+  display: flex;
 }
 
 
 .content-container > div {
-	margin: 5px;
-	padding: 5px;
+  margin: 5px;
+  padding: 5px;
 }
 
 .search-pane {
-	border-right-style: solid;
-	border-right-width: thin;
-	border-right-color: gray;
+  border-right-style: solid;
+  border-right-width: thin;
+  border-right-color: gray;
+  min-width: 40%;
 }
 
 @media (max-width: 400px) {
-	.content-container {
-		display: block;
-	}
-	.search-pane {
-		border-right: none;
-		border-bottom-style: solid;
-		border-bottom-width: thin;
-		border-bottom-color: gray;
-	}
+  .content-container {
+    display: block;
+  }
+  .search-pane {
+    border-right: none;
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+    border-bottom-color: gray;
+  }
 }
-

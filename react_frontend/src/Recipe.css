@@ -1,44 +1,70 @@
 /* Labels */
 .tag-list {
-	list-style: none;
-	display: flex;
+  list-style: none;
+  display: flex;
 }
 
 .tag-list-title {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .tag-list > li {
-	background-color: thistle;
+  background-color: thistle;
   width: fit-content;
   padding-inline: 5px;
   border-color: gray;
   border-style: solid;
   border-radius: 10px;
   border-width: thin;
-	margin: 5px;
+  margin: 5px;
+}
+
+.tag-unlink {
+  float: right;
+  position: relative;
+  top: -10px !important;
+  right: -5px !important;
+  font-weight: bold;
+  color: maroon;
+  opacity: 0.5;
+  cursor: pointer;
 }
 
 /* Notes */
 .note-list-title {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .note-list > li {
-	width: fit-content;
-	background-color: antiquewhite;
+  width: fit-content;
+  background-color: antiquewhite;
   padding-inline: 5px;
   border-color: gray;
   border-style: solid;
   border-radius: 10px;
   border-width: thin;
-	margin-block: 5px;
+  margin-block: 5px;
+}
+
+.note-flag {
+  cursor: pointer;
 }
 
 .note-list > li.flagged {
-	background-color: lightpink;
+  background-color: lightpink;
 }
 
 .note-stamp {
-	font-style: italic;
+  font-style: italic;
+}
+
+.note-unlink {
+  float:right;
+  position: relative;
+  top: -10px !important;
+  right: -5px !important;
+  font-weight: bold;
+  color: maroon;
+  opacity: 0.5;
+  cursor: pointer;
 }
