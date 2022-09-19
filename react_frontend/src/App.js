@@ -130,6 +130,26 @@ class App extends Component {
 
   handleNoteDeleteClick = async (event) => {
     //TODO
+    const noteTag = event.target.parentElement;
+    const noteId = noteTag.dataset.noteId;
+
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+    try {
+      await Api.deleteNote(noteId, config);
+      const recipe = Util.selectRecipe(
+        this.state.targetRecipe,
+        this.state.allRecipes
+      );
+      const newNotes = recipe.Notes.filter((x) => x.ID !== parseInt(noteId));
+      recipe.Notes = newNotes;
+      this.setState({ allRecipes: this.state.allRecipes });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "error deleting note" });
+    }
   };
 
   doLogin = async (event) => {
