@@ -5,8 +5,7 @@ import QueryForm from "./QueryForm";
 import ResultList from "./ResultList";
 import Recipe from "./Recipe";
 import * as Util from "./Util";
-
-import { login, fetchRecipes, fetchNotes, toggleNote } from "./api";
+import * as Api from "./api";
 
 class App extends Component {
   constructor(props) {
@@ -17,9 +16,10 @@ class App extends Component {
 
     this.state = {
       allRecipes: [],
-      error: null,
+      allLabels: [],
       filters: { fragments: "", fullText: false },
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
+      error: null,
     };
   }
   render() {
@@ -41,10 +41,12 @@ class App extends Component {
           </div>
           <Recipe
             recipes={this.state.allRecipes}
+            availableLabels={this.state.allLabels}
             targetRecipeId={this.state.targetRecipe}
             handleFlagClick={this.handleFlagClick}
-            handleTagUnlinkClick={this.handleTagUnlinkClick}
-            handleNoteUnlinkClick={this.handleNoteUnlinkClick}
+            handleLabelLinkClick={this.handleLabelLinkClick}
+            handleLabelUnlinkClick={this.handleLabelUnlinkClick}
+            handleNoteDeleteClick={this.handleNoteDeleteClick}
           />
         </div>
         <div className="footer">
@@ -83,7 +85,7 @@ class App extends Component {
 
     try {
       const newFlag = !noteData.flagged;
-      await toggleNote(noteData.noteId, newFlag, config);
+      await Api.toggleNote(noteData.noteId, newFlag, config);
       const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
@@ -92,18 +94,45 @@ class App extends Component {
       note.Flagged = newFlag;
       this.setState({ allRecipes: this.state.allRecipes });
     } catch (e) {
+      //FIXME apparently these catches aren't actually catching the error properly?
       console.error(e);
       this.setState({ error: "error flagging note" });
     }
   };
 
-  handleTagUnlinkClick = async (event) => {
-    //get tagid and recipe id
-    //make call to remove tag/recipe link
-    //find tag in current recipe's Tags and delete it
+  handleLabelLinkClick = async (event) => {
+    //TODO
   };
 
-  handleNoteUnlinkClick = async (event) => {};
+  handleLabelUnlinkClick = async (event) => {
+    const labelTag = event.target.parentElement;
+    const labelId = labelTag.dataset.tagId;
+    const recipeTag = labelTag.closest(".recipe-container");
+    const recipeId = recipeTag.dataset.recipeId;
+
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+    try {
+      await Api.unlinkLabel(recipeId, labelId, config);
+      const recipe = Util.selectRecipe(
+        this.state.targetRecipe,
+        this.state.allRecipes
+      );
+      const newTags = recipe.Labels.filter((x) => x.ID !== parseInt(labelId));
+      recipe.Labels = newTags;
+      this.setState({ allRecipes: this.state.allRecipes });
+    } catch (e) {
+      //FIXME apparently these catches aren't actually catching the error properly?
+      console.error(e);
+      this.setState({ error: "error unlinking label from recipe" });
+    }
+  };
+
+  handleNoteDeleteClick = async (event) => {
+    //TODO
+  };
 
   doLogin = async (event) => {
     event.preventDefault();
@@ -111,7 +140,7 @@ class App extends Component {
     var username = event.target.form.username.value;
     // TODO set host from environment or something?
     try {
-      const token = await login(event.target.form, {
+      const token = await Api.login(event.target.form, {
         host: "http://localhost:8080/",
       });
 
@@ -122,6 +151,7 @@ class App extends Component {
       localStorage.setItem("username", username);
       localStorage.setItem("token", token);
     } catch (e) {
+      //FIXME apparently these catches aren't actually catching the error properly?
       // TODO: make UI react to invalid auth
       console.error(e.name);
       console.error(e.message);
@@ -146,12 +176,13 @@ class App extends Component {
     };
 
     try {
-      const recipes = await fetchRecipes(config);
+      const recipes = await Api.fetchRecipes(config);
       this.setState({
         allRecipes: recipes,
         results: recipes,
       });
     } catch (e) {
+      //FIXME apparently these catches aren't actually catching the error properly?
       // TODO: handle expired/invalid auth token -- figure out exactly what
       // that error looks like
       //if(e.message == "bad token") {
@@ -160,9 +191,21 @@ class App extends Component {
       //  this.getRecipes(event); // try again to just get the titles/tags
       //  this.setState({ error: "login expired" });
       //}
-      console.error(e.name);
-      console.error(e.message);
+      console.error(e);
       this.setState({ error: "error fetching recipe list" });
+    }
+  };
+
+  getLabels = async (event) => {
+    const config = { host: "http://localhost:8080/" };
+
+    try {
+      const labels = await Api.fetchLabels(config);
+      this.setState({ allLabels: labels });
+    } catch (e) {
+      //FIXME apparently these catches aren't actually catching the error properly?
+      console.error(e);
+      this.setState({ error: "error fetching label list" });
     }
   };
 
@@ -174,12 +217,13 @@ class App extends Component {
     };
 
     try {
-      const notes = await fetchNotes(recipeId, config);
+      const notes = await Api.fetchNotes(recipeId, config);
       const recipes = this.state.allRecipes;
       const recipe = Util.selectRecipe(recipeId, recipes);
       recipe.Notes = notes;
       this.setState({ allRecipes: recipes });
     } catch (e) {
+      //FIXME apparently these catches aren't actually catching the error properly?
       console.error(e.name);
       console.error(e.message);
       this.setState({ error: `could not fetch notes for recipe ${recipeId}` });
@@ -188,6 +232,7 @@ class App extends Component {
 
   componentDidMount() {
     this.getRecipes();
+    this.getLabels();
   }
 
   componentDidUpdate() {

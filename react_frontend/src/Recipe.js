@@ -13,12 +13,15 @@ const Recipe = (props) => {
       <span className="tag-list-title">Tags</span>
       <TagList
         tags={recipe.Labels}
-        handleUnlinkClick={props.handleTagUnlinkClick}
+        handleUnlinkClick={props.handleLabelUnlinkClick}
       />
+      <button className="link-tag-button" onClick={props.handleLabelLinkClick}>
+        add Label
+      </button>
       <span className="note-list-title">Notes</span>
       <NoteList
         notes={recipe.Notes}
-        handleUnlinkClick={props.handleNoteUnlinkClick}
+        handleDeleteClick={props.handleNoteDeleteClick}
         handleFlagClick={props.handleFlagClick}
       />
     </div>
@@ -31,7 +34,7 @@ const TagList = (props) => {
   }
   const tags = props.tags.map((tag) => {
     return (
-      <li key={tag.ID} data-tag-name={tag.Label}>
+      <li key={tag.ID} data-tag-id={tag.ID} data-tag-name={tag.Label}>
         {tag.Label}
         <span
           className="tag-unlink"
@@ -74,10 +77,10 @@ const NoteList = (props) => {
         </span>
         <span className="note-stamp">{stamp}</span>
         <span
-          className="note-unlink"
+          className="note-delete"
           role="img"
           aria-label="close-icon"
-          onClick={props.handleUnlinkClick}
+          onClick={props.handleDeleteClick}
         >
           &times;
         </span>
