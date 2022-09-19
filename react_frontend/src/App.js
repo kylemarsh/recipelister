@@ -94,7 +94,6 @@ class App extends Component {
       note.Flagged = newFlag;
       this.setState({ allRecipes: this.state.allRecipes });
     } catch (e) {
-      //FIXME apparently these catches aren't actually catching the error properly?
       console.error(e);
       this.setState({ error: "error flagging note" });
     }
@@ -124,7 +123,6 @@ class App extends Component {
       recipe.Labels = newTags;
       this.setState({ allRecipes: this.state.allRecipes });
     } catch (e) {
-      //FIXME apparently these catches aren't actually catching the error properly?
       console.error(e);
       this.setState({ error: "error unlinking label from recipe" });
     }
@@ -151,7 +149,6 @@ class App extends Component {
       localStorage.setItem("username", username);
       localStorage.setItem("token", token);
     } catch (e) {
-      //FIXME apparently these catches aren't actually catching the error properly?
       // TODO: make UI react to invalid auth
       console.error(e.name);
       console.error(e.message);
@@ -182,7 +179,6 @@ class App extends Component {
         results: recipes,
       });
     } catch (e) {
-      //FIXME apparently these catches aren't actually catching the error properly?
       // TODO: handle expired/invalid auth token -- figure out exactly what
       // that error looks like
       //if(e.message == "bad token") {
@@ -203,7 +199,6 @@ class App extends Component {
       const labels = await Api.fetchLabels(config);
       this.setState({ allLabels: labels });
     } catch (e) {
-      //FIXME apparently these catches aren't actually catching the error properly?
       console.error(e);
       this.setState({ error: "error fetching label list" });
     }
@@ -223,7 +218,6 @@ class App extends Component {
       recipe.Notes = notes;
       this.setState({ allRecipes: recipes });
     } catch (e) {
-      //FIXME apparently these catches aren't actually catching the error properly?
       console.error(e.name);
       console.error(e.message);
       this.setState({ error: `could not fetch notes for recipe ${recipeId}` });

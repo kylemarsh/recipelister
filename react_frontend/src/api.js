@@ -39,7 +39,7 @@ async function toggleNote(noteId, flag, config) {
     method: "PUT",
     headers: { "x-access-token": config.auth.token },
   };
-  doAction(resource, requestInit);
+  await doAction(resource, requestInit);
 }
 
 async function unlinkLabel(recipeId, labelId, config) {
@@ -49,7 +49,7 @@ async function unlinkLabel(recipeId, labelId, config) {
     method: "DELETE",
     headers: { "x-access-token": config.auth.token },
   };
-  doAction(resource, requestInit);
+  await doAction(resource, requestInit);
 }
 
 // Helpers
