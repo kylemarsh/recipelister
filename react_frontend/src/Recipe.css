@@ -1,3 +1,7 @@
+.hidden {
+	display: none;
+}
+
 /* Labels */
 .tag-list {
   list-style: none;
@@ -46,10 +50,6 @@
   margin-block: 5px;
 }
 
-.note-flag {
-  cursor: pointer;
-}
-
 .note-list > li.flagged {
   background-color: lightpink;
 }
@@ -58,13 +58,13 @@
   font-style: italic;
 }
 
-.note-delete {
-  float:right;
-  position: relative;
-  top: -10px !important;
-  right: -5px !important;
+.note-actions > span {
   font-weight: bold;
   color: maroon;
   opacity: 0.5;
   cursor: pointer;
+}
+
+.note-edit-form > textarea {
+	background: white;
 }

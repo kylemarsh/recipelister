@@ -43,9 +43,12 @@ class App extends Component {
             recipes={this.state.allRecipes}
             availableLabels={this.state.allLabels}
             targetRecipeId={this.state.targetRecipe}
-            handleFlagClick={this.handleFlagClick}
+            handleNoteFlagClick={this.handleNoteFlagClick}
             handleLabelLinkClick={this.handleLabelLinkClick}
             handleLabelUnlinkClick={this.handleLabelUnlinkClick}
+            handleNoteEditClick={this.handleNoteEditClick}
+            handleNoteEditCancel={this.handleNoteEditCancel}
+            handleNoteEditSubmit={this.handleNoteEditSubmit}
             handleNoteDeleteClick={this.handleNoteDeleteClick}
           />
         </div>
@@ -72,31 +75,6 @@ class App extends Component {
   handleResultClick = (event) => {
     this.setState({ targetRecipe: event.target.id });
     this.loadNotes(event);
-  };
-
-  handleFlagClick = async (event) => {
-    const noteTag = event.target.parentElement;
-    const noteData = noteTag.dataset;
-
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
-
-    try {
-      const newFlag = !noteData.flagged;
-      await Api.toggleNote(noteData.noteId, newFlag, config);
-      const recipe = Util.selectRecipe(
-        this.state.targetRecipe,
-        this.state.allRecipes
-      );
-      const note = recipe.Notes.find((n) => n.ID === parseInt(noteData.noteId));
-      note.Flagged = newFlag;
-      this.setState({ allRecipes: this.state.allRecipes });
-    } catch (e) {
-      console.error(e);
-      this.setState({ error: "error flagging note" });
-    }
   };
 
   handleLabelLinkClick = async (event) => {
@@ -128,9 +106,79 @@ class App extends Component {
     }
   };
 
+  handleNoteFlagClick = async (event) => {
+    const noteTag = event.target.closest("li");
+    const noteData = noteTag.dataset;
+
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+
+    try {
+      const newFlag = !noteData.flagged;
+      await Api.toggleNote(noteData.noteId, newFlag, config);
+      const recipe = Util.selectRecipe(
+        this.state.targetRecipe,
+        this.state.allRecipes
+      );
+      const note = recipe.Notes.find((n) => n.ID === parseInt(noteData.noteId));
+      note.Flagged = newFlag;
+      this.setState({ allRecipes: this.state.allRecipes });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "error flagging note" });
+    }
+  };
+
+  handleNoteEditClick = (event) => {
+    const noteTag = event.target.closest("li");
+    const contentTag = noteTag.querySelector(".note-content");
+    const contentForm = noteTag.querySelector(".note-edit-form");
+    contentTag.classList.add("hidden");
+    contentForm.classList.remove("hidden");
+  };
+  handleNoteEditCancel = (event) => {
+    event.preventDefault();
+    const noteTag = event.target.closest("li");
+    const contentTag = noteTag.querySelector(".note-content");
+    const contentForm = noteTag.querySelector(".note-edit-form");
+    contentTag.classList.remove("hidden");
+    contentForm.classList.add("hidden");
+  };
+
+  handleNoteEditSubmit = async (event) => {
+    event.preventDefault();
+    const noteTag = event.target.closest("li");
+    const noteId = noteTag.dataset.noteId;
+    const contentTag = noteTag.querySelector(".note-content");
+    const contentForm = noteTag.querySelector(".note-edit-form");
+    const formData = new FormData(contentForm);
+
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+
+    try {
+      await Api.editNote(noteId, formData, config);
+      const recipe = Util.selectRecipe(
+        this.state.targetRecipe,
+        this.state.allRecipes
+      );
+      var noteData = recipe.Notes.find((x) => x.ID === parseInt(noteId));
+      noteData.Note = formData.get("text");
+      this.setState({ allRecipes: this.state.allRecipes });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "error editing note" });
+    }
+    contentTag.classList.remove("hidden");
+    contentForm.classList.add("hidden");
+  };
+
   handleNoteDeleteClick = async (event) => {
-    //TODO
-    const noteTag = event.target.parentElement;
+    const noteTag = event.target.closest("li");
     const noteId = noteTag.dataset.noteId;
 
     const config = {

@@ -22,7 +22,10 @@ const Recipe = (props) => {
       <NoteList
         notes={recipe.Notes}
         handleDeleteClick={props.handleNoteDeleteClick}
-        handleFlagClick={props.handleFlagClick}
+        handleEditClick={props.handleNoteEditClick}
+        handleEditSubmit={props.handleNoteEditSubmit}
+        handleEditCancel={props.handleNoteEditCancel}
+        handleFlagClick={props.handleNoteFlagClick}
       />
     </div>
   );
@@ -60,6 +63,7 @@ const NoteList = (props) => {
       month: "long",
       day: "numeric",
     });
+    const symb = String.fromCharCode(note.Flagged ? 0x2605 : 0x2606);
     return (
       <li
         className={note.Flagged ? "flagged" : ""}
@@ -67,25 +71,51 @@ const NoteList = (props) => {
         data-flagged={note.Flagged ? "1" : ""}
         key={note.ID}
       >
-        <span
-          className="note-flag"
-          role="img"
-          aria-label="flag-icon"
-          onClick={props.handleFlagClick}
-        >
-          🚩
-        </span>
-        <span className="note-stamp">{stamp}</span>
-        <span
-          className="note-delete"
-          role="img"
-          aria-label="close-icon"
-          onClick={props.handleDeleteClick}
-        >
-          &times;
+        <span className="note-stamp">{stamp}</span>&nbsp;|&nbsp;
+        <span className="note-actions">
+          <span
+            className="note-flag"
+            role="img"
+            aria-label="flag-icon"
+            onClick={props.handleFlagClick}
+          >
+            {symb}
+          </span>
+          <span
+            className="note-edit"
+            role="img"
+            aria-label="edit-icon"
+            onClick={props.handleEditClick}
+          >
+            &#9998;
+          </span>
+          <span
+            className="note-delete"
+            role="img"
+            aria-label="close-icon"
+            onClick={props.handleDeleteClick}
+          >
+            &otimes;
+          </span>
         </span>
         <br />
-        {note.Note}
+        <hr />
+        <span className="note-content">{note.Note}</span>
+        <form className="note-edit-form hidden">
+          <textarea name="text" defaultValue={note.Note} />
+          <button
+            className="edit-submit-button"
+            onClick={props.handleEditSubmit}
+          >
+            Save
+          </button>
+          <button
+            className="edit-cancel-button"
+            onClick={props.handleEditCancel}
+          >
+            Cancel
+          </button>
+        </form>
       </li>
     );
   });

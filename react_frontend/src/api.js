@@ -42,6 +42,17 @@ async function toggleNote(noteId, flag, config) {
   await doAction(resource, requestInit);
 }
 
+async function editNote(noteId, formData, config) {
+  const host = config.host ? config.host : "http://localhost:8080/";
+  const resource = `${host}priv/note/${noteId}`;
+  const requestInit = {
+    method: "PUT",
+    headers: { "x-access-token": config.auth.token },
+    body: formData,
+  };
+  await doAction(resource, requestInit);
+}
+
 async function deleteNote(noteId, config) {
   const host = config.host ? config.host : "http://localhost:8080/";
   const resource = `${host}priv/note/${noteId}`;
@@ -86,5 +97,6 @@ export {
   unlinkLabel,
   fetchNotes,
   toggleNote,
+  editNote,
   deleteNote,
 };
