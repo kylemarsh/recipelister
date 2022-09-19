@@ -11,13 +11,21 @@ const Recipe = (props) => {
       <h2>{recipe.Title}</h2>
       <p className="recipe-body">{recipe.Body}</p>
       <span className="tag-list-title">Tags</span>
-      <TagList
-        tags={recipe.Labels}
-        handleUnlinkClick={props.handleLabelUnlinkClick}
-      />
-      <button className="link-tag-button" onClick={props.handleLabelLinkClick}>
-        add Label
-      </button>
+      <div className="tag-list-container">
+        <TagList
+          tags={recipe.Labels}
+          handleUnlinkClick={props.handleLabelUnlinkClick}
+        />
+        <span className="link-tag-button" onClick={props.handleLabelLinkClick}>
+          &oplus;
+        </span>
+        <form
+          className="link-tag-form hidden"
+          onSubmit={props.handleLabelLinkSubmit}
+        >
+          <input name="label" type="text" placeholder="label" />
+        </form>
+      </div>
       <span className="note-list-title">Notes</span>
       <NoteList
         notes={recipe.Notes}
@@ -45,7 +53,7 @@ const TagList = (props) => {
           aria-label="close-icon"
           onClick={props.handleUnlinkClick}
         >
-          &times;
+          &otimes;
         </span>
       </li>
     );
@@ -111,6 +119,7 @@ const NoteList = (props) => {
           </button>
           <button
             className="edit-cancel-button"
+            //FIXME maybe use onSubmit for the form?
             onClick={props.handleEditCancel}
           >
             Cancel

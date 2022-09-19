@@ -45,6 +45,7 @@ class App extends Component {
             targetRecipeId={this.state.targetRecipe}
             handleNoteFlagClick={this.handleNoteFlagClick}
             handleLabelLinkClick={this.handleLabelLinkClick}
+            handleLabelLinkSubmit={this.handleLabelLinkSubmit}
             handleLabelUnlinkClick={this.handleLabelUnlinkClick}
             handleNoteEditClick={this.handleNoteEditClick}
             handleNoteEditCancel={this.handleNoteEditCancel}
@@ -77,8 +78,79 @@ class App extends Component {
     this.loadNotes(event);
   };
 
-  handleLabelLinkClick = async (event) => {
-    //TODO
+  handleLabelLinkClick = (event) => {
+    const addLabelTag = event.target;
+    const recipe = addLabelTag.closest(".recipe-container");
+    const form = recipe.querySelector(".link-tag-form");
+    form.reset();
+
+    addLabelTag.classList.add("hidden");
+    form.classList.remove("hidden");
+    form.querySelector("[name=label]").focus();
+  };
+
+  // TODO: Bind this to <esc> keypress inside the form
+  // TODO: Create cancel button for mobile
+  handleLabelLinkCancel = (event) => {
+    const addLabelTag = event.target;
+    const recipe = addLabelTag.closest(".recipe-container");
+    const form = recipe.querySelector(".link-tag-form");
+
+    addLabelTag.classList.add("hidden");
+    form.classList.remove("hidden");
+  };
+
+  // TODO: <tab> keypres inside the form?
+  // TODO: Create submit button for mobile
+  handleLabelLinkSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const recipeTag = form.closest(".recipe-container");
+    const recipeId = recipeTag.dataset.recipeId;
+    const addTagButton = recipeTag.querySelector(".link-tag-button");
+    const labelData = this.state.allLabels.find(
+      (x) => x.Label === formData.get("label").toLowerCase()
+    );
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+
+    try {
+      if (labelData) {
+        await Api.linkLabel(recipeId, labelData.ID, config);
+      } else {
+        //TODO: call "PUT /priv/label/{name}"
+        //FIXME need to get the new label's ID -- need to update API for that.
+        recipeTag.querySelector(".link-tag-button").classList.remove("hidden");
+        form.classList.add("hidden");
+        throw Error("creating label not yet implemented");
+      }
+      const recipe = Util.selectRecipe(
+        this.state.targetRecipe,
+        this.state.allRecipes
+      );
+      var labelEntry = recipe.Labels.find(
+        (x) => x.ID === parseInt(labelData.ID)
+      );
+      if (!labelEntry) {
+        const newLabel = { ID: labelData.ID, Label: formData.get("label") };
+        recipe.Labels.push(newLabel);
+        const allLabels = this.state.allLabels;
+        allLabels.push(newLabel);
+        this.setState({
+          allLabels: allLabels,
+          allRecipes: this.state.allRecipes,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "error editing note" });
+    }
+
+    form.classList.add("hidden");
+    addTagButton.classList.remove("hidden");
   };
 
   handleLabelUnlinkClick = async (event) => {

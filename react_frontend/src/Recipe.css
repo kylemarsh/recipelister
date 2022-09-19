@@ -5,7 +5,11 @@
 /* Labels */
 .tag-list {
   list-style: none;
-  display: flex;
+  display: inline-flex;
+}
+
+.tag-list-container {
+	display: flex;
 }
 
 .tag-list-title {
@@ -23,11 +27,13 @@
   margin: 5px;
 }
 
+.link-tag-button {
+	color: darkseagreen;
+	font-weight: bold;
+	cursor: pointer;
+}
+
 .tag-unlink {
-  float: right;
-  position: relative;
-  top: -10px !important;
-  right: -5px !important;
   font-weight: bold;
   color: maroon;
   opacity: 0.5;
