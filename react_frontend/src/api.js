@@ -63,6 +63,16 @@ async function deleteNote(noteId, config) {
   await doAction(resource, requestInit);
 }
 
+async function createLabel(labelName, config) {
+  const host = config.host ? config.host : "http://localhost:8080/";
+  const resource = `${host}priv/label/${labelName}`;
+  const requestInit = {
+    method: "PUT",
+    headers: { "x-access-token": config.auth.token },
+  };
+  return await doFetch(resource, requestInit);
+}
+
 async function linkLabel(recipeId, labelId, config) {
   const host = config.host ? config.host : "http://localhost:8080/";
   const resource = `${host}priv/recipe/${recipeId}/label/${labelId}`;
@@ -104,6 +114,7 @@ export {
   login,
   fetchRecipes,
   fetchLabels,
+  createLabel,
   linkLabel,
   unlinkLabel,
   fetchNotes,

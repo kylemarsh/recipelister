@@ -106,27 +106,25 @@ class App extends Component {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+    const labelName = formData.get("label").toLowerCase();
     const recipeTag = form.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
     const addTagButton = recipeTag.querySelector(".link-tag-trigger");
-    const labelData = this.state.allLabels.find(
-      (x) => x.Label === formData.get("label").toLowerCase()
-    );
+    var labelData = this.state.allLabels.find((x) => x.Label === labelName);
+    var labelIsNew = false;
+
     const config = {
       auth: this.state.login,
       host: "http://localhost:8080/",
     };
 
     try {
-      if (labelData) {
-        await Api.linkLabel(recipeId, labelData.ID, config);
-      } else {
-        //TODO: call "PUT /priv/label/{name}"
-        //FIXME need to get the new label's ID -- need to update API for that.
-        recipeTag.querySelector(".link-tag-trigger").classList.remove("hidden");
-        form.classList.add("hidden");
-        throw Error("creating label not yet implemented");
+      if (!labelData) {
+        // Create the label before we can link it
+        labelData = await Api.createLabel(labelName, config);
+        labelIsNew = true;
       }
+      await Api.linkLabel(recipeId, labelData.ID, config);
       const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
@@ -138,7 +136,9 @@ class App extends Component {
         const newLabel = { ID: labelData.ID, Label: formData.get("label") };
         recipe.Labels.push(newLabel);
         const allLabels = this.state.allLabels;
-        allLabels.push(newLabel);
+        if (labelIsNew) {
+          allLabels.push(newLabel);
+        }
         this.setState({
           allLabels: allLabels,
           allRecipes: this.state.allRecipes,
