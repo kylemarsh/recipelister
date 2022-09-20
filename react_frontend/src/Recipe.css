@@ -5,11 +5,14 @@
 /* Labels */
 .tag-list {
   list-style: none;
+	padding: 0;
+	margin: 0;
   display: inline-flex;
 }
 
 .tag-list-container {
 	display: flex;
+	align-items: baseline;
 }
 
 .tag-list-title {
@@ -19,7 +22,7 @@
 .tag-list > li {
   background-color: thistle;
   width: fit-content;
-  padding-inline: 5px;
+	padding-inline: 0.3rem;
   border-color: gray;
   border-style: solid;
   border-radius: 10px;
@@ -27,10 +30,30 @@
   margin: 5px;
 }
 
-.link-tag-button {
+.link-tag-trigger {
 	color: darkseagreen;
 	font-weight: bold;
 	cursor: pointer;
+}
+
+.link-tag-form > [name=label] {
+	display: inline;
+	padding: unset;
+	padding-inline: 0.3rem;
+	margin: unset;
+	width: 7rem;
+}
+
+.inline-text-button {
+	all: unset;
+	cursor: pointer;
+	text-align: center;
+	vertical-align: middle;
+	font-weight: bold;
+}
+
+.inline-text-button .submit {
+	background:
 }
 
 .tag-unlink {

@@ -46,6 +46,7 @@ class App extends Component {
             handleNoteFlagClick={this.handleNoteFlagClick}
             handleLabelLinkClick={this.handleLabelLinkClick}
             handleLabelLinkSubmit={this.handleLabelLinkSubmit}
+            handleLabelLinkCancel={this.handleLabelLinkCancel}
             handleLabelUnlinkClick={this.handleLabelUnlinkClick}
             handleNoteEditClick={this.handleNoteEditClick}
             handleNoteEditCancel={this.handleNoteEditCancel}
@@ -90,25 +91,24 @@ class App extends Component {
   };
 
   // TODO: Bind this to <esc> keypress inside the form
-  // TODO: Create cancel button for mobile
   handleLabelLinkCancel = (event) => {
-    const addLabelTag = event.target;
-    const recipe = addLabelTag.closest(".recipe-container");
-    const form = recipe.querySelector(".link-tag-form");
+    event.preventDefault();
+    const form = event.target.closest("form");
+    const recipe = event.target.closest(".recipe-container");
+    const linkLabelTrigger = recipe.querySelector(".link-tag-trigger");
 
-    addLabelTag.classList.add("hidden");
-    form.classList.remove("hidden");
+    linkLabelTrigger.classList.remove("hidden");
+    form.classList.add("hidden");
   };
 
   // TODO: <tab> keypres inside the form?
-  // TODO: Create submit button for mobile
   handleLabelLinkSubmit = async (event) => {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     const recipeTag = form.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
-    const addTagButton = recipeTag.querySelector(".link-tag-button");
+    const addTagButton = recipeTag.querySelector(".link-tag-trigger");
     const labelData = this.state.allLabels.find(
       (x) => x.Label === formData.get("label").toLowerCase()
     );
@@ -123,7 +123,7 @@ class App extends Component {
       } else {
         //TODO: call "PUT /priv/label/{name}"
         //FIXME need to get the new label's ID -- need to update API for that.
-        recipeTag.querySelector(".link-tag-button").classList.remove("hidden");
+        recipeTag.querySelector(".link-tag-trigger").classList.remove("hidden");
         form.classList.add("hidden");
         throw Error("creating label not yet implemented");
       }

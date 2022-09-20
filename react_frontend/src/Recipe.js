@@ -16,7 +16,7 @@ const Recipe = (props) => {
           tags={recipe.Labels}
           handleUnlinkClick={props.handleLabelUnlinkClick}
         />
-        <span className="link-tag-button" onClick={props.handleLabelLinkClick}>
+        <span className="link-tag-trigger" onClick={props.handleLabelLinkClick}>
           &oplus;
         </span>
         <form
@@ -24,6 +24,15 @@ const Recipe = (props) => {
           onSubmit={props.handleLabelLinkSubmit}
         >
           <input name="label" type="text" placeholder="label" />
+          <button className="inline-text-button submit">
+            {String.fromCharCode(0x2713)}
+          </button>
+          <button
+            className="inline-text-button cancel"
+            onClick={props.handleLabelLinkCancel}
+          >
+            {String.fromCharCode(0x2717)}
+          </button>
         </form>
       </div>
       <span className="note-list-title">Notes</span>
