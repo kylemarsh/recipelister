@@ -31,6 +31,17 @@ async function fetchNotes(recipeId, config) {
   return await doFetch(resource, requestInit);
 }
 
+async function createNote(recipeId, formData, config) {
+  const host = config.host ? config.host : "http://localhost:8080/";
+  const resource = `${host}priv/recipe/${recipeId}/note/`;
+  const requestInit = {
+    method: "POST",
+    headers: { "x-access-token": config.auth.token },
+    body: formData,
+  };
+  return await doFetch(resource, requestInit);
+}
+
 async function toggleNote(noteId, flag, config) {
   const flagstring = flag ? "flag" : "unflag";
   const host = config.host ? config.host : "http://localhost:8080/";
@@ -118,6 +129,7 @@ export {
   linkLabel,
   unlinkLabel,
   fetchNotes,
+  createNote,
   toggleNote,
   editNote,
   deleteNote,
