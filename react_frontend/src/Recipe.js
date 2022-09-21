@@ -13,25 +13,9 @@ const Recipe = (props) => {
       <h2>{recipe.Title}</h2>
       <p className="recipe-body">{recipe.Body}</p>
       <span className="tag-list-title">Tags</span>
-      <TagList
-        tags={recipe.Labels}
-        handleUnlinkClick={props.handleLabelUnlinkClick}
-        handleLabelLinkClick={props.handleLabelLinkClick}
-        handleLabelLinkSubmit={props.handleLabelLinkSubmit}
-        handleLabelLinkCancel={props.handleLabelLinkCancel}
-      />
+      <TagList tags={recipe.Labels} handlers={props.labelHandlers} />
       <span className="note-list-title">Notes</span>
-      <NoteList
-        notes={recipe.Notes}
-        handleDeleteClick={props.handleNoteDeleteClick}
-        handleEditClick={props.handleNoteEditClick}
-        handleEditSubmit={props.handleNoteEditSubmit}
-        handleEditCancel={props.handleNoteEditCancel}
-        handleFlagClick={props.handleNoteFlagClick}
-        handleAddClick={props.handleNoteAddClick}
-        handleAddCancel={props.handleNoteAddCancel}
-        handleAddSubmit={props.handleNoteAddSubmit}
-      />
+      <NoteList notes={recipe.Notes} handlers={props.noteHandlers} />
     </div>
   );
 };

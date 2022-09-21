@@ -43,18 +43,22 @@ class App extends Component {
             recipes={this.state.allRecipes}
             availableLabels={this.state.allLabels}
             targetRecipeId={this.state.targetRecipe}
-            handleNoteFlagClick={this.handleNoteFlagClick}
-            handleLabelLinkClick={this.handleLabelLinkClick}
-            handleLabelLinkSubmit={this.handleLabelLinkSubmit}
-            handleLabelLinkCancel={this.handleLabelLinkCancel}
-            handleLabelUnlinkClick={this.handleLabelUnlinkClick}
-            handleNoteEditClick={this.handleNoteEditClick}
-            handleNoteEditCancel={this.handleNoteEditCancel}
-            handleNoteEditSubmit={this.handleNoteEditSubmit}
-            handleNoteDeleteClick={this.handleNoteDeleteClick}
-            handleNoteAddClick={this.handleNoteAddClick}
-            handleNoteAddCancel={this.handleNoteAddCancel}
-            handleNoteAddSubmit={this.handleNoteAddSubmit}
+            noteHandlers={{
+              FlagClick: this.handleNoteFlagClick,
+              EditClick: this.handleNoteEditClick,
+              EditCancel: this.handleNoteEditCancel,
+              EditSubmit: this.handleNoteEditSubmit,
+              DeleteClick: this.handleNoteDeleteClick,
+              AddClick: this.handleNoteAddClick,
+              AddCancel: this.handleNoteAddCancel,
+              AddSubmit: this.handleNoteAddSubmit,
+            }}
+            labelHandlers={{
+              LinkClick: this.handleLabelLinkClick,
+              LinkSubmit: this.handleLabelLinkSubmit,
+              LinkCancel: this.handleLabelLinkCancel,
+              UnlinkClick: this.handleLabelUnlinkClick,
+            }}
           />
         </div>
         <div className="footer">

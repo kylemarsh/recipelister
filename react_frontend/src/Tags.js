@@ -8,7 +8,7 @@ const TagList = (props) => {
         <TagListItem
           key={tag.ID}
           tag={tag}
-          unlinkHandler={props.handleUnlinkClick}
+          unlinkHandler={props.handlers.UnlinkClick}
         />
       );
     });
@@ -19,9 +19,9 @@ const TagList = (props) => {
         {tags}
         <li>
           <LinkTagForm
-            handleTriggerClick={props.handleLabelLinkClick}
-            handleSubmit={props.handleLabelLinkSubmit}
-            handleCancel={props.handleLabelLinkCancel}
+            handleTriggerClick={props.handlers.LinkClick}
+            handleSubmit={props.handlers.LinkSubmit}
+            handleCancel={props.handlers.LinkCancel}
           />
         </li>
       </ul>

@@ -8,11 +8,11 @@ const NoteList = (props) => {
         <NoteListItem
           key={note.ID}
           note={note}
-          handleFlagClick={props.handleFlagClick}
-          handleDeleteClick={props.handleDeleteClick}
-          handleEditClick={props.handleEditClick}
-          handleEditSubmit={props.handleEditSubmit}
-          handleEditCancel={props.handleEditCancel}
+          handleFlagClick={props.handlers.FlagClick}
+          handleDeleteClick={props.handlers.DeleteClick}
+          handleEditClick={props.handlers.EditClick}
+          handleEditSubmit={props.handlers.EditSubmit}
+          handleEditCancel={props.handlers.EditCancel}
         />
       );
     });
