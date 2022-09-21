@@ -22,11 +22,15 @@ const NoteList = (props) => {
     <ul className="note-list">
       {notes}
       <li>
-        <AddNoteForm
-          handleAddClick={props.handlers.AddClick}
-          handleAddSubmit={props.handlers.AddSubmit}
-          handleAddCancel={props.handlers.AddCancel}
-        />
+        {props.showAddNote ? (
+          <EditNoteForm
+            showEditor={true}
+            handleSubmit={props.handlers.AddSubmit}
+            handleCancel={props.handlers.AddCancel}
+          />
+        ) : (
+          <AddNoteTrigger handleClick={props.handlers.AddClick} />
+        )}
       </li>
     </ul>
   );
@@ -108,38 +112,25 @@ const NoteActions = (props) => {
 };
 
 const EditNoteForm = (props) => {
+  const defaultText = props.note ? props.note.Note : "";
   return (
-    <form className="note-edit-form">
-      <textarea name="text" defaultValue={props.note.Note} />
-      <button className="edit-submit-button" onClick={props.handleSubmit}>
-        Save
+    <form className="note-edit-form" onSubmit={props.handleSubmit}>
+      <textarea name="text" defaultValue={defaultText} />
+      <button className="textarea-button submit">
+        {String.fromCharCode(0x2713)}
       </button>
-      <button className="edit-cancel-button" onClick={props.handleCancel}>
-        Cancel
+      <button className="textarea-button cancel" onClick={props.handleCancel}>
+        {String.fromCharCode(0x2717)}
       </button>
     </form>
   );
 };
 
-const AddNoteForm = (props) => {
+const AddNoteTrigger = (props) => {
   return (
-    <div className="add-note-container">
-      <span className="note-add-trigger" onClick={props.handleAddClick}>
-        + Add Note
-      </span>
-      <form className="add-note-form hidden" onSubmit={props.handleAddSubmit}>
-        <textarea name="text" />
-        <button className="textarea-button submit">
-          {String.fromCharCode(0x2713)}
-        </button>
-        <button
-          className="textarea-button submit"
-          onClick={props.handleAddCancel}
-        >
-          {String.fromCharCode(0x2717)}
-        </button>
-      </form>
-    </div>
+    <span className="note-add-trigger" onClick={props.handleClick}>
+      + Add Note
+    </span>
   );
 };
 

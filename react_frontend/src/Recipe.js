@@ -22,6 +22,7 @@ const Recipe = (props) => {
       <NoteList
         notes={recipe.Notes}
         showNoteEditor={props.showNoteEditor}
+        showAddNote={props.showAddNote}
         handlers={props.noteHandlers}
       />
     </div>

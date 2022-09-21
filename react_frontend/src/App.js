@@ -22,6 +22,7 @@ class App extends Component {
       error: null,
       showLabelEditor: false,
       showNoteEditor: false,
+      showAddNote: false,
     };
   }
   render() {
@@ -47,6 +48,7 @@ class App extends Component {
             targetRecipeId={this.state.targetRecipe}
             showLabelEditor={this.state.showLabelEditor}
             showNoteEditor={this.state.showNoteEditor}
+            showAddNote={this.state.showAddNote}
             noteHandlers={{
               FlagClick: this.handleNoteFlagClick,
               EditClick: this.handleNoteEditClick,
@@ -100,7 +102,7 @@ class App extends Component {
     this.setState({ showLabelEditor: false });
   };
 
-  // TODO: <tab> keypres inside the form?
+  // TODO: bind to <tab> keypress inside the form?
   handleLabelLinkSubmit = async (event) => {
     event.preventDefault();
     const form = event.target;
@@ -167,27 +169,14 @@ class App extends Component {
     }
   };
 
-  //FIXME is it more react-y to have a component for the form and render that
-  //based on application state instead of fiddling with `display:none` stuff?
   handleNoteAddClick = (event) => {
-    const addNoteTag = event.target;
-    const noteList = addNoteTag.closest(".add-note-container");
-    const form = noteList.querySelector(".add-note-form");
-    form.reset();
-
-    addNoteTag.classList.add("hidden");
-    form.classList.remove("hidden");
-    form.querySelector("textarea").focus();
+    //FIXME how do we focus to textarea inside the newly-rendered component?
+    this.setState({ showAddNote: true });
   };
 
   handleNoteAddCancel = (event) => {
     event.preventDefault();
-    const form = event.target.closest("form");
-    const noteList = form.closest(".add-note-container");
-    const addNoteTrigger = noteList.querySelector(".note-add-trigger");
-
-    form.classList.add("hidden");
-    addNoteTrigger.classList.remove("hidden");
+    this.setState({ showAddNote: false });
   };
 
   handleNoteAddSubmit = async (event) => {
@@ -196,7 +185,6 @@ class App extends Component {
     const formData = new FormData(form);
     const recipeTag = form.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
-    const addNoteTrigger = recipeTag.querySelector(".note-add-trigger");
 
     try {
       const hasText = !!formData.get("text");
@@ -221,8 +209,7 @@ class App extends Component {
       console.error(e);
       this.setState({ error: "error editing note" });
     }
-    form.classList.add("hidden");
-    addNoteTrigger.classList.remove("hidden");
+    this.setState({ showAddNote: false });
   };
 
   handleNoteFlagClick = async (event) => {
@@ -255,10 +242,10 @@ class App extends Component {
 
   handleNoteEditSubmit = async (event) => {
     event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
     const noteTag = event.target.closest("li");
     const noteId = noteTag.dataset.noteId;
-    const contentForm = noteTag.querySelector(".note-edit-form");
-    const formData = new FormData(contentForm);
 
     try {
       await Api.editNote(noteId, formData, this.state.login);
@@ -298,11 +285,8 @@ class App extends Component {
     event.preventDefault();
 
     var username = event.target.form.username.value;
-    // TODO set host from environment or something?
     try {
-      const token = await Api.login(event.target.form, {
-        host: "http://localhost:8080/",
-      });
+      const token = await Api.login(event.target.form);
 
       this.setState({
         login: { valid: true, username: username, token: token },
