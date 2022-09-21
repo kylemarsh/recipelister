@@ -18,11 +18,14 @@ const TagList = (props) => {
       <ul className="tag-list">
         {tags}
         <li>
-          <LinkTagForm
-            handleTriggerClick={props.handlers.LinkClick}
-            handleSubmit={props.handlers.LinkSubmit}
-            handleCancel={props.handlers.LinkCancel}
-          />
+          {props.showLabelEditor ? (
+            <LinkTagForm
+              handleSubmit={props.handlers.LinkSubmit}
+              handleCancel={props.handlers.LinkCancel}
+            />
+          ) : (
+            <LinkTagTrigger handleTriggerClick={props.handlers.LinkClick} />
+          )}
         </li>
       </ul>
     </div>
@@ -45,25 +48,28 @@ const TagListItem = (props) => {
   );
 };
 
+const LinkTagTrigger = (props) => {
+  return (
+    <span className="link-tag-trigger" onClick={props.handleTriggerClick}>
+      + add label
+    </span>
+  );
+};
+
 const LinkTagForm = (props) => {
   return (
-    <div className="link-tag-container">
-      <span className="link-tag-trigger" onClick={props.handleTriggerClick}>
-        + add label
-      </span>
-      <form className="link-tag-form hidden" onSubmit={props.handleSubmit}>
-        <input name="label" type="text" placeholder="label" />
-        <button className="inline-text-button submit">
-          {String.fromCharCode(0x2713)}
-        </button>
-        <button
-          className="inline-text-button cancel"
-          onClick={props.handleCancel}
-        >
-          {String.fromCharCode(0x2717)}
-        </button>
-      </form>
-    </div>
+    <form className="link-tag-form" onSubmit={props.handleSubmit}>
+      <input name="label" type="text" placeholder="label" />
+      <button className="inline-text-button submit">
+        {String.fromCharCode(0x2713)}
+      </button>
+      <button
+        className="inline-text-button cancel"
+        onClick={props.handleCancel}
+      >
+        {String.fromCharCode(0x2717)}
+      </button>
+    </form>
   );
 };
 

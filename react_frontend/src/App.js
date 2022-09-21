@@ -20,6 +20,7 @@ class App extends Component {
       filters: { fragments: "", fullText: false },
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
+      showLabelEditor: false,
     };
   }
   render() {
@@ -43,6 +44,7 @@ class App extends Component {
             recipes={this.state.allRecipes}
             availableLabels={this.state.allLabels}
             targetRecipeId={this.state.targetRecipe}
+            showLabelEditor={this.state.showLabelEditor}
             noteHandlers={{
               FlagClick: this.handleNoteFlagClick,
               EditClick: this.handleNoteEditClick,
@@ -86,26 +88,14 @@ class App extends Component {
     this.loadNotes(event);
   };
 
-  handleLabelLinkClick = (event) => {
-    const addLabelTag = event.target;
-    const recipe = addLabelTag.closest(".recipe-container");
-    const form = recipe.querySelector(".link-tag-form");
-    form.reset();
+  handleLabelLinkClick = (event) => this.setState({ showLabelEditor: true });
 
-    addLabelTag.classList.add("hidden");
-    form.classList.remove("hidden");
-    form.querySelector("[name=label]").focus();
-  };
-
-  // TODO: Bind this to <esc> keypress inside the form
+  // TODO: reset this state flag to `false` whenever we move away from the form?
+  //	* <esc> keypress inside the form
+  //	* form (whole thing, not any individual component) losing focus)
   handleLabelLinkCancel = (event) => {
     event.preventDefault();
-    const form = event.target.closest("form");
-    const recipe = event.target.closest(".recipe-container");
-    const linkLabelTrigger = recipe.querySelector(".link-tag-trigger");
-
-    linkLabelTrigger.classList.remove("hidden");
-    form.classList.add("hidden");
+    this.setState({ showLabelEditor: false });
   };
 
   // TODO: <tab> keypres inside the form?
@@ -116,7 +106,6 @@ class App extends Component {
     const labelName = formData.get("label").toLowerCase();
     const recipeTag = form.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
-    const addTagButton = recipeTag.querySelector(".link-tag-trigger");
     var labelData = this.state.allLabels.find((x) => x.Label === labelName);
     var labelIsNew = false;
 
@@ -147,14 +136,12 @@ class App extends Component {
       this.setState({
         allLabels: allLabels,
         allRecipes: this.state.allRecipes,
+        showLabelEditor: false,
       });
     } catch (e) {
       console.error(e);
-      this.setState({ error: "error editing note" });
+      this.setState({ error: "error editing note", showLabelEditor: false });
     }
-
-    form.classList.add("hidden");
-    addTagButton.classList.remove("hidden");
   };
 
   handleLabelUnlinkClick = async (event) => {

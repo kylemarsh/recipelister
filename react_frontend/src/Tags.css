@@ -5,6 +5,7 @@
   display: inline-flex;
 }
 
+/*TODO: make this wrap into multiple rows*/
 .tag-list-container {
 	display: flex;
 	align-items: baseline;
@@ -35,6 +36,7 @@
 	padding-inline: 0.3rem;
 	margin: unset;
 	width: 7rem;
+	background: white;
 }
 
 .inline-text-button {
@@ -43,10 +45,6 @@
 	text-align: center;
 	vertical-align: middle;
 	font-weight: bold;
-}
-
-.inline-text-button .submit {
-	background:
 }
 
 .tag-unlink {
