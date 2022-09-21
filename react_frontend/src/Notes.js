@@ -22,9 +22,9 @@ const NoteList = (props) => {
       {notes}
       <li>
         <AddNoteForm
-          handleAddClick={props.handleAddClick}
-          handleAddSubmit={props.handleAddSubmit}
-          handleAddCancel={props.handleAddCancel}
+          handleAddClick={props.handlers.AddClick}
+          handleAddSubmit={props.handlers.AddSubmit}
+          handleAddCancel={props.handlers.AddCancel}
         />
       </li>
     </ul>
