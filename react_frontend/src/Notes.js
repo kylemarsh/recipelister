@@ -8,6 +8,7 @@ const NoteList = (props) => {
         <NoteListItem
           key={note.ID}
           note={note}
+          showEditor={props.showNoteEditor}
           handleFlagClick={props.handlers.FlagClick}
           handleDeleteClick={props.handlers.DeleteClick}
           handleEditClick={props.handlers.EditClick}
@@ -46,19 +47,25 @@ const NoteListItem = (props) => {
     >
       <span className="note-stamp">{stamp}</span>&nbsp;|&nbsp;
       <NoteActions
+        noteId={note.ID}
         flagged={note.Flagged}
+        showEditor={props.showEditor}
         handleFlagClick={props.handleFlagClick}
         handleEditClick={props.handleEditClick}
+        handleEditCancel={props.handleEditCancel}
         handleDeleteClick={props.handleDeleteClick}
       />
       <br />
       <hr />
-      <span className="note-content">{note.Note}</span>
-      <EditNoteForm
-        note={note}
-        handleSubmit={props.handleEditSubmit}
-        handleCancel={props.handleEditCancel}
-      />
+      {props.showEditor === note.ID ? (
+        <EditNoteForm
+          note={note}
+          handleSubmit={props.handleEditSubmit}
+          handleCancel={props.handleEditCancel}
+        />
+      ) : (
+        <span className="note-content">{note.Note}</span>
+      )}
     </li>
   );
 };
@@ -79,7 +86,12 @@ const NoteActions = (props) => {
         className="note-edit"
         role="img"
         aria-label="edit-icon"
-        onClick={props.handleEditClick}
+        data-note-id={props.noteId}
+        onClick={
+          props.showEditor === props.noteId
+            ? props.handleEditCancel
+            : props.handleEditClick
+        }
       >
         &#9998;
       </span>
@@ -97,7 +109,7 @@ const NoteActions = (props) => {
 
 const EditNoteForm = (props) => {
   return (
-    <form className="note-edit-form hidden">
+    <form className="note-edit-form">
       <textarea name="text" defaultValue={props.note.Note} />
       <button className="edit-submit-button" onClick={props.handleSubmit}>
         Save

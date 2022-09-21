@@ -19,7 +19,11 @@ const Recipe = (props) => {
         handlers={props.labelHandlers}
       />
       <span className="note-list-title">Notes</span>
-      <NoteList notes={recipe.Notes} handlers={props.noteHandlers} />
+      <NoteList
+        notes={recipe.Notes}
+        showNoteEditor={props.showNoteEditor}
+        handlers={props.noteHandlers}
+      />
     </div>
   );
 };

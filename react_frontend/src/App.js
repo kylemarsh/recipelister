@@ -21,6 +21,7 @@ class App extends Component {
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
       showLabelEditor: false,
+      showNoteEditor: false,
     };
   }
   render() {
@@ -45,6 +46,7 @@ class App extends Component {
             availableLabels={this.state.allLabels}
             targetRecipeId={this.state.targetRecipe}
             showLabelEditor={this.state.showLabelEditor}
+            showNoteEditor={this.state.showNoteEditor}
             noteHandlers={{
               FlagClick: this.handleNoteFlagClick,
               EditClick: this.handleNoteEditClick,
@@ -244,27 +246,17 @@ class App extends Component {
   };
 
   handleNoteEditClick = (event) => {
-    const noteTag = event.target.closest("li");
-    const contentTag = noteTag.querySelector(".note-content");
-    const contentForm = noteTag.querySelector(".note-edit-form");
-    contentTag.classList.add("hidden");
-    contentForm.classList.remove("hidden");
-    contentForm.querySelector("textarea").focus();
+    this.setState({ showNoteEditor: parseInt(event.target.dataset.noteId) });
   };
   handleNoteEditCancel = (event) => {
     event.preventDefault();
-    const noteTag = event.target.closest("li");
-    const contentTag = noteTag.querySelector(".note-content");
-    const contentForm = noteTag.querySelector(".note-edit-form");
-    contentTag.classList.remove("hidden");
-    contentForm.classList.add("hidden");
+    this.setState({ showNoteEditor: false });
   };
 
   handleNoteEditSubmit = async (event) => {
     event.preventDefault();
     const noteTag = event.target.closest("li");
     const noteId = noteTag.dataset.noteId;
-    const contentTag = noteTag.querySelector(".note-content");
     const contentForm = noteTag.querySelector(".note-edit-form");
     const formData = new FormData(contentForm);
 
@@ -281,8 +273,7 @@ class App extends Component {
       console.error(e);
       this.setState({ error: "error editing note" });
     }
-    contentTag.classList.remove("hidden");
-    contentForm.classList.add("hidden");
+    this.setState({ showNoteEditor: false });
   };
 
   handleNoteDeleteClick = async (event) => {
