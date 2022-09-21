@@ -1,0 +1,40 @@
+.note-list > li {
+  width: fit-content;
+  background-color: antiquewhite;
+  padding-inline: 5px;
+  border-color: gray;
+  border-style: solid;
+  border-radius: 10px;
+  border-width: thin;
+  margin-block: 5px;
+}
+
+.note-list > li.flagged {
+  background-color: lightpink;
+}
+
+.note-stamp {
+  font-style: italic;
+}
+
+.note-actions > span {
+  font-weight: bold;
+  color: maroon;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.note-edit-form > textarea {
+	background: white;
+}
+
+.add-note-form > textarea {
+	background: white;
+	margin-top: 0.5rem;
+	border-radius: 10px;
+}
+
+.note-add-trigger {
+	cursor: pointer;
+	font-style: italic;
+}
