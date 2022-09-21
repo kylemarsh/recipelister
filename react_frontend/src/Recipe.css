@@ -31,8 +31,9 @@
 }
 
 .link-tag-trigger {
-	color: darkseagreen;
-	font-weight: bold;
+	/*color: darkseagreen;*/
+	/*font-weight: bold;*/
+	font-style: italic;
 	cursor: pointer;
 }
 
