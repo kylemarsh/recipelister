@@ -132,21 +132,23 @@ class App extends Component {
         this.state.targetRecipe,
         this.state.allRecipes
       );
-      var labelEntry = recipe.Labels.find(
-        (x) => x.ID === parseInt(labelData.ID)
-      );
-      if (!labelEntry) {
-        const newLabel = { ID: labelData.ID, Label: formData.get("label") };
-        recipe.Labels.push(newLabel);
-        const allLabels = this.state.allLabels;
-        if (labelIsNew) {
-          allLabels.push(newLabel);
+      var labelEntry;
+      if (recipe.Labels) {
+        labelEntry = recipe.Labels.find((x) => x.ID === parseInt(labelData.ID));
+        if (!labelEntry) {
+          recipe.Labels.push(labelData);
         }
-        this.setState({
-          allLabels: allLabels,
-          allRecipes: this.state.allRecipes,
-        });
+      } else {
+        recipe.Labels = [labelData];
       }
+      const allLabels = this.state.allLabels;
+      if (labelIsNew) {
+        allLabels.push(labelData);
+      }
+      this.setState({
+        allLabels: allLabels,
+        allRecipes: this.state.allRecipes,
+      });
     } catch (e) {
       console.error(e);
       this.setState({ error: "error editing note" });
@@ -225,7 +227,11 @@ class App extends Component {
           this.state.targetRecipe,
           this.state.allRecipes
         );
-        recipe.Notes.push(newNote);
+        if (recipe.Notes) {
+          recipe.Notes.push(newNote);
+        } else {
+          recipe.Notes = [newNote];
+        }
         this.setState({ allRecipes: this.state.allRecipes });
       }
     } catch (e) {
