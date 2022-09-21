@@ -120,18 +120,13 @@ class App extends Component {
     var labelData = this.state.allLabels.find((x) => x.Label === labelName);
     var labelIsNew = false;
 
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
-
     try {
       if (!labelData) {
         // Create the label before we can link it
-        labelData = await Api.createLabel(labelName, config);
+        labelData = await Api.createLabel(labelName, this.state.login);
         labelIsNew = true;
       }
-      await Api.linkLabel(recipeId, labelData.ID, config);
+      await Api.linkLabel(recipeId, labelData.ID, this.state.login);
       const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
@@ -168,12 +163,8 @@ class App extends Component {
     const recipeTag = labelTag.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
 
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
     try {
-      await Api.unlinkLabel(recipeId, labelId, config);
+      await Api.unlinkLabel(recipeId, labelId, this.state.login);
       const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
@@ -218,15 +209,14 @@ class App extends Component {
     const recipeId = recipeTag.dataset.recipeId;
     const addNoteTrigger = recipeTag.querySelector(".note-add-trigger");
 
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
-
     try {
       const hasText = !!formData.get("text");
       if (hasText) {
-        const newNote = await Api.createNote(recipeId, formData, config);
+        const newNote = await Api.createNote(
+          recipeId,
+          formData,
+          this.state.login
+        );
         const recipe = Util.selectRecipe(
           this.state.targetRecipe,
           this.state.allRecipes
@@ -250,14 +240,9 @@ class App extends Component {
     const noteTag = event.target.closest("li");
     const noteData = noteTag.dataset;
 
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
-
     try {
       const newFlag = !noteData.flagged;
-      await Api.toggleNote(noteData.noteId, newFlag, config);
+      await Api.toggleNote(noteData.noteId, newFlag, this.state.login);
       const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
@@ -296,13 +281,8 @@ class App extends Component {
     const contentForm = noteTag.querySelector(".note-edit-form");
     const formData = new FormData(contentForm);
 
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
-
     try {
-      await Api.editNote(noteId, formData, config);
+      await Api.editNote(noteId, formData, this.state.login);
       const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
@@ -321,13 +301,8 @@ class App extends Component {
   handleNoteDeleteClick = async (event) => {
     const noteTag = event.target.closest("li");
     const noteId = noteTag.dataset.noteId;
-
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
     try {
-      await Api.deleteNote(noteId, config);
+      await Api.deleteNote(noteId, this.state.login);
       const recipe = Util.selectRecipe(
         this.state.targetRecipe,
         this.state.allRecipes
@@ -376,13 +351,8 @@ class App extends Component {
   };
 
   getRecipes = async (event) => {
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
-
     try {
-      const recipes = await Api.fetchRecipes(config);
+      const recipes = await Api.fetchRecipes(this.state.login);
       this.setState({
         allRecipes: recipes,
         results: recipes,
@@ -402,10 +372,8 @@ class App extends Component {
   };
 
   getLabels = async (event) => {
-    const config = { host: "http://localhost:8080/" };
-
     try {
-      const labels = await Api.fetchLabels(config);
+      const labels = await Api.fetchLabels();
       this.setState({ allLabels: labels });
     } catch (e) {
       console.error(e);
@@ -415,13 +383,8 @@ class App extends Component {
 
   loadNotes = async (event) => {
     const recipeId = event.target.id;
-    const config = {
-      auth: this.state.login,
-      host: "http://localhost:8080/",
-    };
-
     try {
-      const notes = await Api.fetchNotes(recipeId, config);
+      const notes = await Api.fetchNotes(recipeId, this.state.login);
       const recipes = this.state.allRecipes;
       const recipe = Util.selectRecipe(recipeId, recipes);
       recipe.Notes = notes;

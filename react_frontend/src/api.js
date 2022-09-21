@@ -1,105 +1,95 @@
-async function login(form, config) {
+const API_HOST = process.env.REACT_APP_API_HOST;
+
+async function login(form) {
   var formData = new FormData(form);
   var requestInit = {
     method: "POST",
     body: formData,
   };
-  const host = config.host ? config.host : "http://localhost:8080/";
   const endpoint = "login/";
-  const response = await doFetch(host + endpoint, requestInit);
+  const response = await doFetch(API_HOST + endpoint, requestInit);
   return response.token;
 }
 
-async function fetchRecipes(config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const endpoint = config.auth.valid ? "priv/recipes/" : "recipes/";
-  const requestInit = config.auth.valid
-    ? { headers: { "x-access-token": config.auth.token } }
+async function fetchRecipes(auth) {
+  const endpoint = auth.valid ? "priv/recipes/" : "recipes/";
+  const requestInit = auth.valid
+    ? { headers: { "x-access-token": auth.token } }
     : {};
-  return await doFetch(host + endpoint, requestInit);
+  return await doFetch(API_HOST + endpoint, requestInit);
 }
-async function fetchLabels(config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const endpoint = "labels/";
-  return await doFetch(host + endpoint);
+async function fetchLabels() {
+  return await doFetch(API_HOST + "labels/");
 }
 
-async function fetchNotes(recipeId, config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/recipe/${recipeId}/notes/`;
-  const requestInit = { headers: { "x-access-token": config.auth.token } };
+async function fetchNotes(recipeId, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}/notes/`;
+  const requestInit = { headers: { "x-access-token": auth.token } };
   return await doFetch(resource, requestInit);
 }
 
-async function createNote(recipeId, formData, config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/recipe/${recipeId}/note/`;
+async function createNote(recipeId, formData, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}/note/`;
   const requestInit = {
     method: "POST",
-    headers: { "x-access-token": config.auth.token },
+    headers: { "x-access-token": auth.token },
     body: formData,
   };
   return await doFetch(resource, requestInit);
 }
 
-async function toggleNote(noteId, flag, config) {
+async function toggleNote(noteId, flag, auth) {
   const flagstring = flag ? "flag" : "unflag";
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/note/${noteId}/${flagstring}`;
+  const resource = `${API_HOST}priv/note/${noteId}/${flagstring}`;
   const requestInit = {
     method: "PUT",
-    headers: { "x-access-token": config.auth.token },
+    headers: { "x-access-token": auth.token },
   };
   await doAction(resource, requestInit);
 }
 
-async function editNote(noteId, formData, config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/note/${noteId}`;
+async function editNote(noteId, formData, auth) {
+  const resource = `${API_HOST}priv/note/${noteId}`;
   const requestInit = {
     method: "PUT",
-    headers: { "x-access-token": config.auth.token },
+    headers: { "x-access-token": auth.token },
     body: formData,
   };
   await doAction(resource, requestInit);
 }
 
-async function deleteNote(noteId, config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/note/${noteId}`;
+async function deleteNote(noteId, auth) {
+  const resource = `${API_HOST}priv/note/${noteId}`;
   const requestInit = {
     method: "DELETE",
-    headers: { "x-access-token": config.auth.token },
+    headers: { "x-access-token": auth.token },
   };
   await doAction(resource, requestInit);
 }
 
-async function createLabel(labelName, config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/label/${labelName}`;
+async function createLabel(labelName, auth) {
+  const resource = `${API_HOST}priv/label/${labelName}`;
   const requestInit = {
     method: "PUT",
-    headers: { "x-access-token": config.auth.token },
+    headers: { "x-access-token": auth.token },
   };
   return await doFetch(resource, requestInit);
 }
 
-async function linkLabel(recipeId, labelId, config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/recipe/${recipeId}/label/${labelId}`;
+async function linkLabel(recipeId, labelId, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
   const requestInit = {
     method: "PUT",
-    headers: { "x-access-token": config.auth.token },
+    headers: { "x-access-token": auth.token },
   };
   await doAction(resource, requestInit);
 }
 
-async function unlinkLabel(recipeId, labelId, config) {
-  const host = config.host ? config.host : "http://localhost:8080/";
-  const resource = `${host}priv/recipe/${recipeId}/label/${labelId}`;
+async function unlinkLabel(recipeId, labelId, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
   const requestInit = {
     method: "DELETE",
-    headers: { "x-access-token": config.auth.token },
+    headers: { "x-access-token": auth.token },
   };
   await doAction(resource, requestInit);
 }
