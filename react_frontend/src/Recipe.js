@@ -1,4 +1,5 @@
 import React from "react";
+import NoteList from "./Notes";
 import * as Util from "./Util";
 
 const Recipe = (props) => {
@@ -43,6 +44,9 @@ const Recipe = (props) => {
         handleEditSubmit={props.handleNoteEditSubmit}
         handleEditCancel={props.handleNoteEditCancel}
         handleFlagClick={props.handleNoteFlagClick}
+        handleAddClick={props.handleNoteAddClick}
+        handleAddCancel={props.handleNoteAddCancel}
+        handleAddSubmit={props.handleNoteAddSubmit}
       />
     </div>
   );
@@ -68,76 +72,6 @@ const TagList = (props) => {
     );
   });
   return <ul className="tag-list">{tags}</ul>;
-};
-
-const NoteList = (props) => {
-  if (!props.notes || !props.notes.length) {
-    return <div>no notes</div>;
-  }
-  const notes = props.notes.map((note) => {
-    const stamp = new Date(note.Created * 1000).toLocaleString("en-UK", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-    const symb = String.fromCharCode(note.Flagged ? 0x2605 : 0x2606);
-    return (
-      <li
-        className={note.Flagged ? "flagged" : ""}
-        data-note-id={note.ID}
-        data-flagged={note.Flagged ? "1" : ""}
-        key={note.ID}
-      >
-        <span className="note-stamp">{stamp}</span>&nbsp;|&nbsp;
-        <span className="note-actions">
-          <span
-            className="note-flag"
-            role="img"
-            aria-label="flag-icon"
-            onClick={props.handleFlagClick}
-          >
-            {symb}
-          </span>
-          <span
-            className="note-edit"
-            role="img"
-            aria-label="edit-icon"
-            onClick={props.handleEditClick}
-          >
-            &#9998;
-          </span>
-          <span
-            className="note-delete"
-            role="img"
-            aria-label="close-icon"
-            onClick={props.handleDeleteClick}
-          >
-            &otimes;
-          </span>
-        </span>
-        <br />
-        <hr />
-        <span className="note-content">{note.Note}</span>
-        <form className="note-edit-form hidden">
-          <textarea name="text" defaultValue={note.Note} />
-          <button
-            className="edit-submit-button"
-            onClick={props.handleEditSubmit}
-          >
-            Save
-          </button>
-          <button
-            className="edit-cancel-button"
-            //FIXME maybe use onSubmit for the form?
-            onClick={props.handleEditCancel}
-          >
-            Cancel
-          </button>
-        </form>
-      </li>
-    );
-  });
-  return <ul className="note-list">{notes}</ul>;
 };
 
 export default Recipe;

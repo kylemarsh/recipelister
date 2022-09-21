@@ -52,6 +52,9 @@ class App extends Component {
             handleNoteEditCancel={this.handleNoteEditCancel}
             handleNoteEditSubmit={this.handleNoteEditSubmit}
             handleNoteDeleteClick={this.handleNoteDeleteClick}
+            handleNoteAddClick={this.handleNoteAddClick}
+            handleNoteAddCancel={this.handleNoteAddCancel}
+            handleNoteAddSubmit={this.handleNoteAddSubmit}
           />
         </div>
         <div className="footer">
@@ -178,6 +181,61 @@ class App extends Component {
     }
   };
 
+  //FIXME is it more react-y to have a component for the form and render that
+  //based on application state instead of fiddling with `display:none` stuff?
+  handleNoteAddClick = (event) => {
+    const addNoteTag = event.target;
+    const noteList = addNoteTag.closest(".add-note-container");
+    const form = noteList.querySelector(".add-note-form");
+    form.reset();
+
+    addNoteTag.classList.add("hidden");
+    form.classList.remove("hidden");
+    form.querySelector("textarea").focus();
+  };
+
+  handleNoteAddCancel = (event) => {
+    event.preventDefault();
+    const form = event.target.closest("form");
+    const noteList = form.closest(".add-note-container");
+    const addNoteTrigger = noteList.querySelector(".note-add-trigger");
+
+    form.classList.add("hidden");
+    addNoteTrigger.classList.remove("hidden");
+  };
+
+  handleNoteAddSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const recipeTag = form.closest(".recipe-container");
+    const recipeId = recipeTag.dataset.recipeId;
+    const addNoteTrigger = recipeTag.querySelector(".note-add-trigger");
+
+    const config = {
+      auth: this.state.login,
+      host: "http://localhost:8080/",
+    };
+
+    try {
+      const hasText = !!formData.get("text");
+      if (hasText) {
+        const newNote = await Api.createNote(recipeId, formData, config);
+        const recipe = Util.selectRecipe(
+          this.state.targetRecipe,
+          this.state.allRecipes
+        );
+        recipe.Notes.push(newNote);
+        this.setState({ allRecipes: this.state.allRecipes });
+      }
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "error editing note" });
+    }
+    form.classList.add("hidden");
+    addNoteTrigger.classList.remove("hidden");
+  };
+
   handleNoteFlagClick = async (event) => {
     const noteTag = event.target.closest("li");
     const noteData = noteTag.dataset;
@@ -209,6 +267,7 @@ class App extends Component {
     const contentForm = noteTag.querySelector(".note-edit-form");
     contentTag.classList.add("hidden");
     contentForm.classList.remove("hidden");
+    contentForm.querySelector("textarea").focus();
   };
   handleNoteEditCancel = (event) => {
     event.preventDefault();

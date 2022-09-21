@@ -97,3 +97,14 @@
 .note-edit-form > textarea {
 	background: white;
 }
+
+.add-note-form > textarea {
+	background: white;
+	margin-top: 0.5rem;
+	border-radius: 10px;
+}
+
+.note-add-trigger {
+	cursor: pointer;
+	font-style: italic;
+}
