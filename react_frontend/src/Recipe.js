@@ -21,17 +21,24 @@ const Recipe = (props) => {
       <p className="recipe-body">{recipe.Body}</p>
       <span className="tag-list-title">Tags</span>
       <TagList
+        loggedIn={props.loggedIn}
         tags={recipe.Labels}
         showLabelEditor={props.showLabelEditor}
         handlers={props.labelHandlers}
       />
-      <span className="note-list-title">Notes</span>
-      <NoteList
-        notes={recipe.Notes}
-        showNoteEditor={props.showNoteEditor}
-        showAddNote={props.showAddNote}
-        handlers={props.noteHandlers}
-      />
+      {props.loggedIn ? (
+        <div className="notes-section">
+          <span className="note-list-title">Notes</span>
+          <NoteList
+            notes={recipe.Notes}
+            showNoteEditor={props.showNoteEditor}
+            showAddNote={props.showAddNote}
+            handlers={props.noteHandlers}
+          />
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

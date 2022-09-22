@@ -46,6 +46,7 @@ class App extends Component {
           </div>
           {this.state.targetRecipe ? (
             <Recipe
+              loggedIn={loggedIn}
               recipes={this.state.allRecipes}
               availableLabels={this.state.allLabels}
               targetRecipeId={this.state.targetRecipe}
@@ -333,7 +334,9 @@ class App extends Component {
 
   handleResultClick = (event) => {
     this.setState({ targetRecipe: event.target.id });
-    this.loadNotes(event);
+    if (this.state.login.valid) {
+      this.loadNotes(event);
+    }
   };
 
   doLogin = async (event) => {

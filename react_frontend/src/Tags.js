@@ -9,6 +9,7 @@ const TagList = (props) => {
           key={tag.ID}
           tag={tag}
           unlinkHandler={props.handlers.UnlinkClick}
+          loggedIn={props.loggedIn}
         />
       );
     });
@@ -17,16 +18,20 @@ const TagList = (props) => {
     <div className="tag-list-container">
       <ul className="tag-list">
         {tags}
-        <li>
-          {props.showLabelEditor ? (
-            <LinkTagForm
-              handleSubmit={props.handlers.LinkSubmit}
-              handleCancel={props.handlers.LinkCancel}
-            />
-          ) : (
-            <LinkTagTrigger handleTriggerClick={props.handlers.LinkClick} />
-          )}
-        </li>
+        {props.loggedIn ? (
+          <li>
+            {props.showLabelEditor ? (
+              <LinkTagForm
+                handleSubmit={props.handlers.LinkSubmit}
+                handleCancel={props.handlers.LinkCancel}
+              />
+            ) : (
+              <LinkTagTrigger handleTriggerClick={props.handlers.LinkClick} />
+            )}
+          </li>
+        ) : (
+          ""
+        )}
       </ul>
     </div>
   );
@@ -36,14 +41,18 @@ const TagListItem = (props) => {
   return (
     <li data-tag-id={props.tag.ID} data-tag-name={props.tag.Label}>
       {props.tag.Label}
-      <span
-        className="tag-unlink"
-        role="img"
-        aria-label="delete-icon"
-        onClick={props.unlinkHandler}
-      >
-        &otimes;
-      </span>
+      {props.loggedIn ? (
+        <span
+          className="tag-unlink"
+          role="img"
+          aria-label="delete-icon"
+          onClick={props.unlinkHandler}
+        >
+          &otimes;
+        </span>
+      ) : (
+        ""
+      )}
     </li>
   );
 };
