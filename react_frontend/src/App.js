@@ -60,7 +60,11 @@ class App extends Component {
               showLabelEditor={this.state.showLabelEditor}
               showNoteEditor={this.state.showNoteEditor}
               showAddNote={this.state.showAddNote}
-              handleEditClick={this.triggerEditRecipe}
+              recipeHandlers={{
+                EditClick: () => this.setState({ showRecipeEditor: true }),
+                UntargetClick: () => this.setState({ targetRecipe: undefined }),
+                DeleteClick: this.handleRecipeDelete,
+              }}
               noteHandlers={{
                 FlagClick: this.handleNoteFlagClick,
                 EditClick: this.handleNoteEditClick,
@@ -136,8 +140,16 @@ class App extends Component {
     }
   };
 
-  triggerEditRecipe = (event) => {
-    this.setState({ showRecipeEditor: true });
+  handleRecipeDelete = async (event) => {
+    const recipeId = this.state.targetRecipe;
+    try {
+      await Api.deleteRecipe(recipeId, this.state.login);
+      const recipes = this.state.allRecipes.filter((x) => x.ID !== recipeId);
+      this.setState({ allRecipes: recipes, targetRecipe: undefined });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "could not delete recipe" });
+    }
   };
 
   /*****************

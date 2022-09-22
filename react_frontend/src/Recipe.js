@@ -14,18 +14,11 @@ const Recipe = (props) => {
   return (
     <div className="recipe-container" data-recipe-id={recipe.ID}>
       <h2>{recipe.Title}</h2>
-      <span
-        className="recipe-edit-trigger"
-        role="img"
-        aria-label="edit-icon"
-        onClick={props.handleEditClick}
-      >
-        &#9998;
-      </span>
-      <span className="recipe-timing">
+      <RecipeActions type="recipe" {...props.recipeHandlers} />
+      <div className="recipe-timing">
         <div className="active-time">Active Time: {activeTime}</div>
         <div className="total-time">Total Time: {totalTime}</div>
-      </span>
+      </div>
       <hr />
       <p className="recipe-body">{recipe.Body}</p>
       <span className="tag-list-title">Tags</span>
@@ -90,6 +83,37 @@ const NewRecipeForm = (props) => {
         <button>Add</button>
         <button onClick={props.handleCancel}>Cancel</button>
       </form>
+    </div>
+  );
+};
+
+const RecipeActions = (props) => {
+  return (
+    <div className="recipe-actions">
+      <span
+        className="recipe-untarget-trigger"
+        role="img"
+        aria-label="back-arrow-icon"
+        onClick={props.UntargetClick}
+      >
+        &#8630;
+      </span>
+      <span
+        className="recipe-edit-trigger"
+        role="img"
+        aria-label="edit-icon"
+        onClick={props.EditClick}
+      >
+        &#9998;
+      </span>
+      <span
+        className="recipe-delete-trigger"
+        role="img"
+        aria-label="close-icon"
+        onClick={props.DeleteClick}
+      >
+        &otimes;
+      </span>
     </div>
   );
 };

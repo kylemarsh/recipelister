@@ -42,6 +42,15 @@ async function updateRecipe(recipeId, formData, auth) {
   return await doAction(resource, requestInit);
 }
 
+async function deleteRecipe(recipeId, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}`;
+  const requestInit = {
+    method: "DELETE",
+    headers: { "x-access-token": auth.token },
+  };
+  return await doAction(resource, requestInit);
+}
+
 /**********
  * LABELS *
  **********/
@@ -148,6 +157,7 @@ export {
   fetchRecipes,
   createRecipe,
   updateRecipe,
+  deleteRecipe,
   fetchLabels,
   createLabel,
   linkLabel,

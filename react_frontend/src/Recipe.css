@@ -9,3 +9,23 @@
 .note-list-title {
   font-weight: bold;
 }
+
+.recipe-actions {
+	position: relative;
+	top: -1rem;
+}
+.recipe-actions > span {
+	cursor: pointer;
+	font-weight: bold;
+	margin-inline: 0.3rem;
+}
+
+.recipe-untarget-trigger {
+	color: navy;
+}
+.recipe-edit-trigger {
+	color: goldenrod;
+}
+.recipe-delete-trigger {
+	color: maroon;
+}
