@@ -11,6 +11,9 @@ async function login(form) {
   return response.token;
 }
 
+/***********
+ * RECIPES *
+ ***********/
 async function fetchRecipes(auth) {
   const endpoint = auth.valid ? "priv/recipes/" : "recipes/";
   const requestInit = auth.valid
@@ -18,10 +21,64 @@ async function fetchRecipes(auth) {
     : {};
   return await doFetch(API_HOST + endpoint, requestInit);
 }
+
+async function createRecipe(formData, auth) {
+  const resource = `${API_HOST}priv/recipe/`;
+  const requestInit = {
+    method: "POST",
+    headers: { "x-access-token": auth.token },
+    body: formData,
+  };
+  return await doFetch(resource, requestInit);
+}
+
+async function updateRecipe(recipeId, formData, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}`;
+  const requestInit = {
+    method: "PUT",
+    headers: { "x-access-token": auth.token },
+    body: formData,
+  };
+  return await doAction(resource, requestInit);
+}
+
+/**********
+ * LABELS *
+ **********/
 async function fetchLabels() {
   return await doFetch(API_HOST + "labels/");
 }
 
+async function createLabel(labelName, auth) {
+  const resource = `${API_HOST}priv/label/${labelName}`;
+  const requestInit = {
+    method: "PUT",
+    headers: { "x-access-token": auth.token },
+  };
+  return await doFetch(resource, requestInit);
+}
+
+async function linkLabel(recipeId, labelId, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
+  const requestInit = {
+    method: "PUT",
+    headers: { "x-access-token": auth.token },
+  };
+  await doAction(resource, requestInit);
+}
+
+async function unlinkLabel(recipeId, labelId, auth) {
+  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
+  const requestInit = {
+    method: "DELETE",
+    headers: { "x-access-token": auth.token },
+  };
+  await doAction(resource, requestInit);
+}
+
+/*********
+ * NOTES *
+ *********/
 async function fetchNotes(recipeId, auth) {
   const resource = `${API_HOST}priv/recipe/${recipeId}/notes/`;
   const requestInit = { headers: { "x-access-token": auth.token } };
@@ -67,34 +124,9 @@ async function deleteNote(noteId, auth) {
   await doAction(resource, requestInit);
 }
 
-async function createLabel(labelName, auth) {
-  const resource = `${API_HOST}priv/label/${labelName}`;
-  const requestInit = {
-    method: "PUT",
-    headers: { "x-access-token": auth.token },
-  };
-  return await doFetch(resource, requestInit);
-}
-
-async function linkLabel(recipeId, labelId, auth) {
-  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
-  const requestInit = {
-    method: "PUT",
-    headers: { "x-access-token": auth.token },
-  };
-  await doAction(resource, requestInit);
-}
-
-async function unlinkLabel(recipeId, labelId, auth) {
-  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
-  const requestInit = {
-    method: "DELETE",
-    headers: { "x-access-token": auth.token },
-  };
-  await doAction(resource, requestInit);
-}
-
-// Helpers
+/***********
+ * Helpers *
+ ***********/
 async function doFetch(resource, requestInit) {
   const response = await fetch(resource, requestInit);
   if (!response.ok) {
@@ -114,6 +146,8 @@ async function doAction(resource, requestInit) {
 export {
   login,
   fetchRecipes,
+  createRecipe,
+  updateRecipe,
   fetchLabels,
   createLabel,
   linkLabel,

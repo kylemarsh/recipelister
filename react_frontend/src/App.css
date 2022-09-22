@@ -31,6 +31,7 @@
   padding: 5px;
 }
 
+/*TODO: allow this to collapse to the side*/
 .search-pane {
   border-right-style: solid;
   border-right-width: thin;
@@ -42,6 +43,7 @@
   .content-container {
     display: block;
   }
+	/*TODO: allow this to collapse upwards*/
   .search-pane {
     border-right: none;
     border-bottom-style: solid;

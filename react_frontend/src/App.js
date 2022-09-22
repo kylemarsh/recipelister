@@ -3,7 +3,7 @@ import "./main.css";
 import LoginComponent from "./LoginComponent";
 import QueryForm from "./QueryForm";
 import ResultList from "./ResultList";
-import Recipe from "./Recipe";
+import { Recipe, NewRecipeForm } from "./Recipe";
 import * as Util from "./Util";
 import * as Api from "./api";
 
@@ -20,6 +20,8 @@ class App extends Component {
       filters: { fragments: "", fullText: false },
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
+      targetRecipe: undefined,
+      showAddrecipe: false,
       showLabelEditor: false,
       showNoteEditor: false,
       showAddNote: false,
@@ -42,30 +44,39 @@ class App extends Component {
               handleClick={this.handleResultClick}
             />
           </div>
-          <Recipe
-            recipes={this.state.allRecipes}
-            availableLabels={this.state.allLabels}
-            targetRecipeId={this.state.targetRecipe}
-            showLabelEditor={this.state.showLabelEditor}
-            showNoteEditor={this.state.showNoteEditor}
-            showAddNote={this.state.showAddNote}
-            noteHandlers={{
-              FlagClick: this.handleNoteFlagClick,
-              EditClick: this.handleNoteEditClick,
-              EditCancel: this.handleNoteEditCancel,
-              EditSubmit: this.handleNoteEditSubmit,
-              DeleteClick: this.handleNoteDeleteClick,
-              AddClick: this.handleNoteAddClick,
-              AddCancel: this.handleNoteAddCancel,
-              AddSubmit: this.handleNoteAddSubmit,
-            }}
-            labelHandlers={{
-              LinkClick: this.handleLabelLinkClick,
-              LinkSubmit: this.handleLabelLinkSubmit,
-              LinkCancel: this.handleLabelLinkCancel,
-              UnlinkClick: this.handleLabelUnlinkClick,
-            }}
-          />
+          {this.state.targetRecipe ? (
+            <Recipe
+              recipes={this.state.allRecipes}
+              availableLabels={this.state.allLabels}
+              targetRecipeId={this.state.targetRecipe}
+              showLabelEditor={this.state.showLabelEditor}
+              showNoteEditor={this.state.showNoteEditor}
+              showAddNote={this.state.showAddNote}
+              noteHandlers={{
+                FlagClick: this.handleNoteFlagClick,
+                EditClick: this.handleNoteEditClick,
+                EditCancel: this.handleNoteEditCancel,
+                EditSubmit: this.handleNoteEditSubmit,
+                DeleteClick: this.handleNoteDeleteClick,
+                AddClick: this.handleNoteAddClick,
+                AddCancel: this.handleNoteAddCancel,
+                AddSubmit: this.handleNoteAddSubmit,
+              }}
+              labelHandlers={{
+                LinkClick: this.handleLabelLinkClick,
+                LinkSubmit: this.handleLabelLinkSubmit,
+                LinkCancel: this.handleLabelLinkCancel,
+                UnlinkClick: this.handleLabelUnlinkClick,
+              }}
+            />
+          ) : this.state.showNewRecipe ? (
+            <NewRecipeForm
+              handleSubmit={this.handleNewRecipeSubmit}
+              handleCancel={this.handleNewRecipeCancel}
+            />
+          ) : (
+            ""
+          )}
         </div>
         <div className="footer">
           <hr />
@@ -74,24 +85,49 @@ class App extends Component {
             username={this.state.login.username}
             handleClick={loggedIn ? this.doLogout : this.doLogin}
           />
+          {loggedIn ? (
+            <button onClick={this.triggerAddRecipe}>New Recipe</button>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     );
   }
 
-  handleFilterChange = (event) => {
-    const newfilters = {
-      ...this.state.filters,
-      [event.target.name]: event.target.value,
-    };
-    this.setState({ filters: newfilters });
+  /******************
+   * RECIPE ACTIONS *
+   ******************/
+  triggerAddRecipe = (event) => {
+    event.preventDefault();
+    this.setState({ showNewRecipe: true, targetRecipe: undefined });
   };
 
-  handleResultClick = (event) => {
-    this.setState({ targetRecipe: event.target.id });
-    this.loadNotes(event);
+  handleNewRecipeCancel = (event) => {
+    event.preventDefault();
+    this.setState({ showNewRecipe: false });
   };
 
+  handleNewRecipeSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    try {
+      const recipe = await Api.createRecipe(formData, this.state.login);
+      this.setState({
+        reloadRecipeList: true,
+        showNewRecipe: false,
+        targetRecipe: recipe.ID,
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: "error adding recipe" });
+    }
+  };
+
+  /*****************
+   * LABEL ACTIONS *
+   *****************/
   handleLabelLinkClick = (event) => this.setState({ showLabelEditor: true });
 
   // TODO: reset this state flag to `false` whenever we move away from the form?
@@ -169,6 +205,9 @@ class App extends Component {
     }
   };
 
+  /*****************
+   * NOTES ACTIONS *
+   *****************/
   handleNoteAddClick = (event) => {
     //FIXME how do we focus to textarea inside the newly-rendered component?
     this.setState({ showAddNote: true });
@@ -281,6 +320,22 @@ class App extends Component {
     }
   };
 
+  /*******************
+   * OTHER FUNCTIONS *
+   *******************/
+  handleFilterChange = (event) => {
+    const newfilters = {
+      ...this.state.filters,
+      [event.target.name]: event.target.value,
+    };
+    this.setState({ filters: newfilters });
+  };
+
+  handleResultClick = (event) => {
+    this.setState({ targetRecipe: event.target.id });
+    this.loadNotes(event);
+  };
+
   doLogin = async (event) => {
     event.preventDefault();
 
@@ -315,10 +370,7 @@ class App extends Component {
   getRecipes = async (event) => {
     try {
       const recipes = await Api.fetchRecipes(this.state.login);
-      this.setState({
-        allRecipes: recipes,
-        results: recipes,
-      });
+      this.setState({ allRecipes: recipes });
     } catch (e) {
       // TODO: handle expired/invalid auth token -- figure out exactly what
       // that error looks like
@@ -358,6 +410,9 @@ class App extends Component {
     }
   };
 
+  /*********************
+   * LIFECYCLE METHODS *
+   *********************/
   componentDidMount() {
     this.getRecipes();
     this.getLabels();
@@ -366,10 +421,7 @@ class App extends Component {
   componentDidUpdate() {
     if (this.state.reloadRecipeList) {
       this.getRecipes();
-      this.setState({
-        ...this.state,
-        reloadRecipeList: false,
-      });
+      this.setState({ reloadRecipeList: false });
     }
   }
 }

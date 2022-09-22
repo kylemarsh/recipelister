@@ -15,7 +15,7 @@ function applyFilters(recipes, filters) {
 
 function selectRecipe(targetId, recipeList) {
   return recipeList.find((recipe) => {
-    return recipe.ID.toString() === targetId;
+    return recipe.ID === parseInt(targetId);
   });
 }
 
