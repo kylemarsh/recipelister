@@ -21,7 +21,7 @@ class App extends Component {
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
       targetRecipe: undefined,
-      showAddrecipe: false,
+      showRecipeEditor: false,
       showLabelEditor: false,
       showNoteEditor: false,
       showAddNote: false,
@@ -44,7 +44,14 @@ class App extends Component {
               handleClick={this.handleResultClick}
             />
           </div>
-          {this.state.targetRecipe ? (
+          {this.state.showRecipeEditor ? (
+            <NewRecipeForm
+              recipeId={this.state.targetRecipe}
+              recipes={this.state.allRecipes}
+              handleSubmit={this.handleNewRecipeSubmit}
+              handleCancel={this.handleNewRecipeCancel}
+            />
+          ) : this.state.targetRecipe ? (
             <Recipe
               loggedIn={loggedIn}
               recipes={this.state.allRecipes}
@@ -53,6 +60,7 @@ class App extends Component {
               showLabelEditor={this.state.showLabelEditor}
               showNoteEditor={this.state.showNoteEditor}
               showAddNote={this.state.showAddNote}
+              handleEditClick={this.triggerEditRecipe}
               noteHandlers={{
                 FlagClick: this.handleNoteFlagClick,
                 EditClick: this.handleNoteEditClick,
@@ -69,11 +77,6 @@ class App extends Component {
                 LinkCancel: this.handleLabelLinkCancel,
                 UnlinkClick: this.handleLabelUnlinkClick,
               }}
-            />
-          ) : this.state.showNewRecipe ? (
-            <NewRecipeForm
-              handleSubmit={this.handleNewRecipeSubmit}
-              handleCancel={this.handleNewRecipeCancel}
             />
           ) : (
             ""
@@ -101,29 +104,40 @@ class App extends Component {
    ******************/
   triggerAddRecipe = (event) => {
     event.preventDefault();
-    this.setState({ showNewRecipe: true, targetRecipe: undefined });
+    this.setState({ showRecipeEditor: true, targetRecipe: undefined });
   };
 
   handleNewRecipeCancel = (event) => {
     event.preventDefault();
-    this.setState({ showNewRecipe: false });
+    this.setState({ showRecipeEditor: false });
   };
 
   handleNewRecipeSubmit = async (event) => {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+    const targetId = this.state.targetRecipe;
+    var recipe;
     try {
-      const recipe = await Api.createRecipe(formData, this.state.login);
+      if (targetId) {
+        await Api.updateRecipe(targetId, formData, this.state.login);
+      } else {
+        recipe = await Api.createRecipe(formData, this.state.login);
+      }
+      const newTarget = recipe ? recipe.ID : targetId;
       this.setState({
         reloadRecipeList: true,
-        showNewRecipe: false,
-        targetRecipe: recipe.ID,
+        showRecipeEditor: false,
+        targetRecipe: newTarget,
       });
     } catch (e) {
       console.error(e);
       this.setState({ error: "error adding recipe" });
     }
+  };
+
+  triggerEditRecipe = (event) => {
+    this.setState({ showRecipeEditor: true });
   };
 
   /*****************
@@ -333,7 +347,10 @@ class App extends Component {
   };
 
   handleResultClick = (event) => {
-    this.setState({ targetRecipe: event.target.id });
+    this.setState({
+      showRecipeEditor: false,
+      targetRecipe: parseInt(event.target.id),
+    });
     if (this.state.login.valid) {
       this.loadNotes(event);
     }

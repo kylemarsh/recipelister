@@ -10,9 +10,18 @@ const Recipe = (props) => {
   }
   const activeTime = recipe.ActiveTime ? `${recipe.ActiveTime}m` : "-";
   const totalTime = recipe.Time ? `${recipe.Time}m` : "-";
+  //FIXME style the edit trigger
   return (
     <div className="recipe-container" data-recipe-id={recipe.ID}>
       <h2>{recipe.Title}</h2>
+      <span
+        className="recipe-edit-trigger"
+        role="img"
+        aria-label="edit-icon"
+        onClick={props.handleEditClick}
+      >
+        &#9998;
+      </span>
       <span className="recipe-timing">
         <div className="active-time">Active Time: {activeTime}</div>
         <div className="total-time">Total Time: {totalTime}</div>
@@ -44,8 +53,11 @@ const Recipe = (props) => {
 };
 
 const NewRecipeForm = (props) => {
-  const recipe = props.recipe ? props.recipe : {};
+  const recipe = props.recipeId
+    ? Util.selectRecipe(props.recipeId, props.recipes)
+    : {};
   //TODO: Add in labels
+  //TODO: label boxes when prefilled?
   //TODO: Use better widgets (react-widgets?)
   //	* number picker for times
   //	* multiselect for labels
@@ -62,13 +74,13 @@ const NewRecipeForm = (props) => {
           name="activeTime"
           type="text"
           placeholder="Active time"
-          defaultValue={recipe.Title}
+          defaultValue={recipe.ActiveTime}
         />
         <input
           name="totalTime"
           type="text"
           placeholder="Total time"
-          defaultValue={recipe.Title}
+          defaultValue={recipe.Time}
         />
         <textarea
           name="body"
