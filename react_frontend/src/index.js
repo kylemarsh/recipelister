@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import "./App.css";
+import "./QueryForm.css";
 import "./Recipe.css";
 import "./Notes.css";
 import "./Tags.css";

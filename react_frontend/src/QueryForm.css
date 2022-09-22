@@ -1,0 +1,9 @@
+.query-form > label {
+	display: inline;
+	font-weight: unset;
+	font-style: italic;
+	font-size: smaller;
+}
+.query-form [type="checkbox"] {
+	margin-inline: 1rem;
+}

@@ -38,6 +38,7 @@ class App extends Component {
               fragments={this.state.filters.fragments}
               handleChange={this.handleFilterChange}
             />
+            <hr />
             <ResultList
               items={this.state.allRecipes}
               filters={this.state.filters}
@@ -351,9 +352,12 @@ class App extends Component {
    * OTHER FUNCTIONS *
    *******************/
   handleFilterChange = (event) => {
+    const control = event.target;
+    const name = control.name;
+    const value = control.type === "checkbox" ? control.checked : control.value;
     const newfilters = {
       ...this.state.filters,
-      [event.target.name]: event.target.value,
+      [name]: value,
     };
     this.setState({ filters: newfilters });
   };
