@@ -51,3 +51,9 @@
     border-bottom-color: gray;
   }
 }
+
+.rw-multiselect-tag-btn:hover {
+	border: none;
+	background: none;
+	color: inherit;
+}

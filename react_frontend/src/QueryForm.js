@@ -28,6 +28,7 @@ const QueryForm = (props) => {
             textField="Label"
             data={props.allLabels}
             value={props.tagsAll}
+            focusFirstItem={true}
             onChange={(value) =>
               props.handleMultiselectUpdate("tagsAll", value)
             }
@@ -41,6 +42,7 @@ const QueryForm = (props) => {
             textField="Label"
             data={props.allLabels}
             value={props.tagsAny}
+            focusFirstItem={true}
             onChange={(value) =>
               props.handleMultiselectUpdate("tagsAny", value)
             }
@@ -54,6 +56,7 @@ const QueryForm = (props) => {
             textField="Label"
             data={props.allLabels}
             value={props.tagsNone}
+            focusFirstItem={true}
             onChange={(value) =>
               props.handleMultiselectUpdate("tagsNone", value)
             }

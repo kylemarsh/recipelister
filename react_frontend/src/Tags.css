@@ -2,12 +2,13 @@
   list-style: none;
 	padding: 0;
 	margin: 0;
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
+  white-space: nowrap;
 }
 
 /*TODO: make this wrap into multiple rows*/
 .tag-list-container {
-	display: flex;
 	align-items: baseline;
 }
 

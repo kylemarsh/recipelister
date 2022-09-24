@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import App from "./App";
+import "react-widgets/styles.css";
 import "./index.css";
 import "./App.css";
 import "./QueryForm.css";
@@ -7,8 +9,6 @@ import "./Recipe.css";
 import "./Notes.css";
 import "./Tags.css";
 import "./ResultList.css";
-import "react-widgets/styles.css";
-import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
