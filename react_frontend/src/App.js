@@ -17,7 +17,13 @@ class App extends Component {
     this.state = {
       allRecipes: [],
       allLabels: [],
-      filters: { fragments: "", fullText: false },
+      filters: {
+        fragments: "",
+        fullText: false,
+        tagsAll: [],
+        tagsAny: [],
+        tagsNone: [],
+      },
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
       targetRecipe: undefined,
@@ -37,6 +43,11 @@ class App extends Component {
             <QueryForm
               fragments={this.state.filters.fragments}
               handleChange={this.handleFilterChange}
+              handleMultiselectUpdate={this.handleMultiselectUpdate}
+              allLabels={this.state.allLabels}
+              tagsAll={this.state.filters.tagsAll}
+              tagsAny={this.state.filters.tagsAny}
+              tagsNone={this.state.filters.tagsNone}
             />
             <hr />
             <ResultList
@@ -359,6 +370,11 @@ class App extends Component {
       ...this.state.filters,
       [name]: value,
     };
+    this.setState({ filters: newfilters });
+  };
+
+  handleMultiselectUpdate = (name, value) => {
+    const newfilters = { ...this.state.filters, [name]: value };
     this.setState({ filters: newfilters });
   };
 

@@ -1,7 +1,7 @@
 function applyFilters(recipes, filters) {
   var results = recipes;
   if (filters.fragments !== "") {
-    //FIXME: make it like slackmoji search, where it can skip characters
+    //TODO: make it like slackmoji search, where it can skip characters?
     results = results.filter(
       (recipe) =>
         recipe.Title.toLowerCase().includes(filters.fragments.toLowerCase()) ||
@@ -9,8 +9,43 @@ function applyFilters(recipes, filters) {
           recipe.Body.toLowerCase().includes(filters.fragments.toLowerCase()))
     );
   }
-  //TODO other filters
+  if (filters.tagsAll && filters.tagsAll.length) {
+    const filterIds = filters.tagsAll.flatMap((x) => x.ID);
+    results = results.filter((recipe) => {
+      const labelIds = recipe.Labels.flatMap((x) => x.ID);
+      return includesAll(labelIds, filterIds);
+    });
+  }
+  if (filters.tagsAny && filters.tagsAny.length) {
+    const filterIds = filters.tagsAny.flatMap((x) => x.ID);
+    results = results.filter((recipe) => {
+      const labelIds = recipe.Labels.flatMap((x) => x.ID);
+      return includesAny(labelIds, filterIds);
+    });
+  }
+  if (filters.tagsNone && filters.tagsNone.length) {
+    const filterIds = filters.tagsNone.flatMap((x) => x.ID);
+    results = results.filter((recipe) => {
+      const labelIds = recipe.Labels.flatMap((x) => x.ID);
+      return includesNone(labelIds, filterIds);
+    });
+  }
   return results;
+}
+
+function includesAny(recipeLabelIds, filterLabelIds) {
+  const x = recipeLabelIds.flatMap((i) => filterLabelIds.includes(i));
+  return x.reduce((a, b) => a || b);
+}
+
+function includesNone(recipeLabelIds, filterLabelIds) {
+  const x = recipeLabelIds.flatMap((i) => !filterLabelIds.includes(i));
+  return x.reduce((a, b) => a && b);
+}
+
+function includesAll(recipeLabelIds, filterLabelIds) {
+  const x = filterLabelIds.flatMap((i) => recipeLabelIds.includes(i));
+  return x.reduce((a, b) => a && b);
 }
 
 function selectRecipe(targetId, recipeList) {

@@ -7,6 +7,7 @@ import "./Recipe.css";
 import "./Notes.css";
 import "./Tags.css";
 import "./ResultList.css";
+import "react-widgets/styles.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 

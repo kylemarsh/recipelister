@@ -1,5 +1,4 @@
-.query-form > label {
-	display: inline;
+.search-options > label {
 	font-weight: unset;
 	font-style: italic;
 	font-size: smaller;
