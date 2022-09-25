@@ -9,6 +9,7 @@ import "./Recipe.css";
 import "./Notes.css";
 import "./Tags.css";
 import "./ResultList.css";
+import "./Alert.css";
 import * as serviceWorker from "./serviceWorker";
 
 const root = createRoot(document.getElementById("root"));

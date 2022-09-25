@@ -3,6 +3,7 @@ import "./main.css";
 import LoginComponent from "./LoginComponent";
 import QueryForm from "./QueryForm";
 import ResultList from "./ResultList";
+import Alert from "./Alert";
 import { Recipe, NewRecipeForm } from "./Recipe";
 import * as Util from "./Util";
 import * as Api from "./api";
@@ -38,6 +39,15 @@ class App extends Component {
     return (
       <div className="medium-container">
         <h1>Liz's Recipe Database</h1>
+        {this.state.error ? (
+          <Alert
+            type="error"
+            message={this.state.error}
+            handleClose={this.handleAlertClose}
+          />
+        ) : (
+          ""
+        )}
         <div className="content-container">
           <div className="search-pane">
             <QueryForm
@@ -362,6 +372,10 @@ class App extends Component {
   /*******************
    * OTHER FUNCTIONS *
    *******************/
+  handleAlertClose = (event) => {
+    this.setState({ error: undefined });
+  };
+
   handleFilterChange = (event) => {
     const control = event.target;
     const name = control.name;
