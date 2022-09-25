@@ -157,8 +157,7 @@ class App extends Component {
         targetRecipe: newTarget,
       });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error adding recipe" });
+      this.handleError(e, "error adding recipe");
     }
   };
 
@@ -169,8 +168,7 @@ class App extends Component {
       const recipes = this.state.allRecipes.filter((x) => x.ID !== recipeId);
       this.setState({ allRecipes: recipes, targetRecipe: undefined });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "could not delete recipe" });
+      this.handleError(e, "could not delete recipe");
     }
   };
 
@@ -228,8 +226,8 @@ class App extends Component {
         showLabelEditor: false,
       });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error editing note", showLabelEditor: false });
+      this.handleError(e, "error adding label");
+      this.setState({ showLabelEditor: false });
     }
   };
 
@@ -249,8 +247,7 @@ class App extends Component {
       recipe.Labels = newTags;
       this.setState({ allRecipes: this.state.allRecipes });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error unlinking label from recipe" });
+      this.handleError(e, "error unlinking label from recipe");
     }
   };
 
@@ -294,8 +291,7 @@ class App extends Component {
         this.setState({ allRecipes: this.state.allRecipes });
       }
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error editing note" });
+      this.handleError(e, "error adding note");
     }
     this.setState({ showAddNote: false });
   };
@@ -315,8 +311,7 @@ class App extends Component {
       note.Flagged = newFlag;
       this.setState({ allRecipes: this.state.allRecipes });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error flagging note" });
+      this.handleError(e, "error flagging note");
     }
   };
 
@@ -345,8 +340,7 @@ class App extends Component {
       noteData.Note = formData.get("text");
       this.setState({ allRecipes: this.state.allRecipes });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error editing note" });
+      this.handleError(e, "error editing note");
     }
     this.setState({ showNoteEditor: false });
   };
@@ -364,8 +358,7 @@ class App extends Component {
       recipe.Notes = newNotes;
       this.setState({ allRecipes: this.state.allRecipes });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error deleting note" });
+      this.handleError(e, "error deleting note");
     }
   };
 
@@ -416,15 +409,14 @@ class App extends Component {
       localStorage.setItem("username", username);
       localStorage.setItem("token", token);
     } catch (e) {
-      // TODO: make UI react to invalid auth
-      console.error(e.name);
-      console.error(e.message);
-      this.setState({ error: "error logging in" });
+      this.handleError(e, "error logging in");
     }
   };
 
   doLogout = (event) => {
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
     localStorage.removeItem("username", "");
     localStorage.removeItem("token", "");
     this.setState({
@@ -438,16 +430,7 @@ class App extends Component {
       const recipes = await Api.fetchRecipes(this.state.login);
       this.setState({ allRecipes: recipes });
     } catch (e) {
-      // TODO: handle expired/invalid auth token -- figure out exactly what
-      // that error looks like
-      //if(e.message == "bad token") {
-      //  console.error("invalid authentication; logging out")
-      //  this.doLogout() //fixme can I do this without an event?
-      //  this.getRecipes(event); // try again to just get the titles/tags
-      //  this.setState({ error: "login expired" });
-      //}
-      console.error(e);
-      this.setState({ error: "error fetching recipe list" });
+      this.handleError(e, "error fetching recipe list");
     }
   };
 
@@ -456,8 +439,7 @@ class App extends Component {
       const labels = await Api.fetchLabels();
       this.setState({ allLabels: labels });
     } catch (e) {
-      console.error(e);
-      this.setState({ error: "error fetching label list" });
+      this.handleError(e, "error fetching label list");
     }
   };
 
@@ -470,9 +452,18 @@ class App extends Component {
       recipe.Notes = notes;
       this.setState({ allRecipes: recipes });
     } catch (e) {
-      console.error(e.name);
-      console.error(e.message);
-      this.setState({ error: `could not fetch notes for recipe ${recipeId}` });
+      this.handleError(e, `could not fetch notes for recipe ${recipeId}`);
+    }
+  };
+
+  handleError = (error, message) => {
+    console.error(error);
+    if (error.message.includes("401")) {
+      // we only use 401 to indicate missing / expired auth
+      this.setState({ error: "You have been logged out. Please log in again" });
+      this.doLogout();
+    } else {
+      this.setState({ error: message });
     }
   };
 

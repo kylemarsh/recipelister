@@ -140,7 +140,7 @@ async function doFetch(resource, requestInit) {
   const response = await fetch(resource, requestInit);
   if (!response.ok) {
     const error = await response.text();
-    throw Error(error);
+    throw Error(response.status + ": " + error);
   }
   return await response.json();
 }
