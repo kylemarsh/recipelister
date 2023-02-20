@@ -21,6 +21,7 @@ class App extends Component {
       filters: {
         fragments: "",
         fullText: false,
+        showAdvancedOptions: false,
         tagsAll: [],
         tagsAny: [],
         tagsNone: [],
@@ -36,9 +37,25 @@ class App extends Component {
   }
   render() {
     const loggedIn = this.state.login.valid;
+    const searchClass = this.state.targetRecipe
+      ? "search-pane recipe-selected"
+      : "search-pane";
     return (
       <div className="medium-container">
         <h1>Liz's Recipe Database</h1>
+        <div className="topnav">
+          <LoginComponent
+            loggedIn={loggedIn}
+            username={this.state.login.username}
+            handleClick={loggedIn ? this.doLogout : this.doLogin}
+          />
+          {loggedIn ? (
+            <button onClick={this.triggerAddRecipe}>New Recipe</button>
+          ) : (
+            ""
+          )}
+        </div>
+        <hr />
         {this.state.error ? (
           <Alert
             type="error"
@@ -49,7 +66,7 @@ class App extends Component {
           ""
         )}
         <div className="content-container">
-          <div className="search-pane">
+          <div className={searchClass}>
             <QueryForm
               fragments={this.state.filters.fragments}
               handleChange={this.handleFilterChange}
@@ -58,6 +75,7 @@ class App extends Component {
               tagsAll={this.state.filters.tagsAll}
               tagsAny={this.state.filters.tagsAny}
               tagsNone={this.state.filters.tagsNone}
+              showAdvancedOptions={this.state.filters.showAdvancedOptions}
             />
             <hr />
             <ResultList
@@ -104,19 +122,6 @@ class App extends Component {
                 UnlinkClick: this.handleLabelUnlinkClick,
               }}
             />
-          ) : (
-            ""
-          )}
-        </div>
-        <div className="footer">
-          <hr />
-          <LoginComponent
-            loggedIn={loggedIn}
-            username={this.state.login.username}
-            handleClick={loggedIn ? this.doLogout : this.doLogin}
-          />
-          {loggedIn ? (
-            <button onClick={this.triggerAddRecipe}>New Recipe</button>
           ) : (
             ""
           )}

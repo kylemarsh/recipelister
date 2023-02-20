@@ -4,6 +4,7 @@ import App from "./App";
 import "react-widgets/styles.css";
 import "./index.css";
 import "./App.css";
+import "./LoginComponent.css";
 import "./QueryForm.css";
 import "./Recipe.css";
 import "./Notes.css";

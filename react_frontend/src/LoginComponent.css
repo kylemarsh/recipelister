@@ -1,0 +1,26 @@
+.login-container {
+	float: right;
+}
+
+.login-container input[type=text], .login-container input[type=password] {
+	width: 150px;
+	background: #fff;
+	display: inline-block;
+}
+
+.login-container button {
+	margin: 1px;
+}
+
+@media screen and (max-width:600px) {
+	.topnav .login-container{
+		float: none;
+	}
+	.topnav button, .login-container input[type=text], .login-container input[type=password], .login-container button {
+		float: none;
+		display: block;
+		text-align: left;
+		width: 100%;
+		margin: 1;
+	}
+}

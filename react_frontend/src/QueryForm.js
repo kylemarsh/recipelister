@@ -1,5 +1,5 @@
 import React from "react";
-import Multiselect from "react-widgets/Multiselect";
+import AdvancedQuery from "./AdvancedQuery.js";
 
 const QueryForm = (props) => {
   return (
@@ -22,47 +22,25 @@ const QueryForm = (props) => {
           Search full recipe text
         </label>
         <label>
-          All
-          <Multiselect
-            dataKey="ID"
-            textField="Label"
-            data={props.allLabels}
-            value={props.tagsAll}
-            focusFirstItem={true}
-            onChange={(value) =>
-              props.handleMultiselectUpdate("tagsAll", value)
-            }
-            placeholder="recipes having ALL these labels"
+          <input
+            name="showAdvancedOptions"
+            type="checkbox"
+            checked={props.advancedQuery}
+            onChange={props.handleChange}
           />
+          Advanced
         </label>
-        <label>
-          Any
-          <Multiselect
-            dataKey="ID"
-            textField="Label"
-            data={props.allLabels}
-            value={props.tagsAny}
-            focusFirstItem={true}
-            onChange={(value) =>
-              props.handleMultiselectUpdate("tagsAny", value)
-            }
-            placeholder="recipes having ANY of these labels"
+        {props.showAdvancedOptions ? (
+          <AdvancedQuery
+            allLabels={props.allLabels}
+            tagsAll={props.tagsAll}
+            tagsAny={props.tagsAny}
+            tagsNone={props.tagsNone}
+            handleMultiselectUpdate={props.handleMultiselectUpdate}
           />
-        </label>
-        <label>
-          None
-          <Multiselect
-            dataKey="ID"
-            textField="Label"
-            data={props.allLabels}
-            value={props.tagsNone}
-            focusFirstItem={true}
-            onChange={(value) =>
-              props.handleMultiselectUpdate("tagsNone", value)
-            }
-            placeholder="recipes having NONE of these labels"
-          />
-        </label>
+        ) : (
+          ""
+        )}
       </div>
     </form>
   );
