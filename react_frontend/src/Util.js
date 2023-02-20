@@ -12,6 +12,9 @@ function applyFilters(recipes, filters) {
   if (filters.tagsAll && filters.tagsAll.length) {
     const filterIds = filters.tagsAll.flatMap((x) => x.ID);
     results = results.filter((recipe) => {
+      if (!recipe.Labels || !recipe.Labels.length) {
+        return false;
+      }
       const labelIds = recipe.Labels.flatMap((x) => x.ID);
       return includesAll(labelIds, filterIds);
     });
@@ -19,6 +22,9 @@ function applyFilters(recipes, filters) {
   if (filters.tagsAny && filters.tagsAny.length) {
     const filterIds = filters.tagsAny.flatMap((x) => x.ID);
     results = results.filter((recipe) => {
+      if (!recipe.Labels || !recipe.Labels.length) {
+        return false;
+      }
       const labelIds = recipe.Labels.flatMap((x) => x.ID);
       return includesAny(labelIds, filterIds);
     });
@@ -26,6 +32,9 @@ function applyFilters(recipes, filters) {
   if (filters.tagsNone && filters.tagsNone.length) {
     const filterIds = filters.tagsNone.flatMap((x) => x.ID);
     results = results.filter((recipe) => {
+      if (!recipe.Labels || !recipe.Labels.length) {
+        return true;
+      }
       const labelIds = recipe.Labels.flatMap((x) => x.ID);
       return includesNone(labelIds, filterIds);
     });
