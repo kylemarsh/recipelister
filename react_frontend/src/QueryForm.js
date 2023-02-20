@@ -3,7 +3,7 @@ import AdvancedQuery from "./AdvancedQuery.js";
 
 const QueryForm = (props) => {
   return (
-    <form className="query-form">
+    <form className="query-form" onSubmit={suppressSubmit}>
       <input
         placeholder="Search recipe titles"
         name="fragments"
@@ -12,15 +12,6 @@ const QueryForm = (props) => {
         onChange={props.handleChange}
       />
       <div className="search-options">
-        <label>
-          <input
-            name="fullText"
-            type="checkbox"
-            checked={props.fullText}
-            onChange={props.handleChange}
-          />
-          Search full recipe text
-        </label>
         <label>
           <input
             name="showAdvancedOptions"
@@ -32,6 +23,8 @@ const QueryForm = (props) => {
         </label>
         {props.showAdvancedOptions ? (
           <AdvancedQuery
+            fullText={props.fullText}
+            handleChange={props.handleChange}
             allLabels={props.allLabels}
             tagsAll={props.tagsAll}
             tagsAny={props.tagsAny}
@@ -46,4 +39,7 @@ const QueryForm = (props) => {
   );
 };
 
+const suppressSubmit = (e) => {
+  e.preventDefault();
+};
 export default QueryForm;

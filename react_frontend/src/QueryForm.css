@@ -1,4 +1,4 @@
-.search-options > label {
+.search-options > label, .advanced-options > label {
 	font-weight: unset;
 	font-style: italic;
 	font-size: smaller;

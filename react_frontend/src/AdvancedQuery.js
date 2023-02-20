@@ -5,6 +5,15 @@ const AdvancedQuery = (props) => {
   return (
     <div className="advanced-options">
       <label>
+        <input
+          name="fullText"
+          type="checkbox"
+          checked={props.fullText}
+          onChange={props.handleChange}
+        />
+        Search full recipe text
+      </label>
+      <label>
         All
         <Multiselect
           dataKey="ID"
