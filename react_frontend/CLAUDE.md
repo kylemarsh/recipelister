@@ -1,7 +1,8 @@
 # OVERVIEW
 Recipelister's react_frontend is a single-page web application to provide
 access to a database of recipes. It's written in react and the production
-deployment is hosted at https://eats.dashery.xyz
+deployment is hosted at `https://eats.dashery.xyz`. Communication with the
+database is with an API layer using JSON over REST.
 
 
 # Structure
@@ -24,18 +25,18 @@ performs a search against recipe titles and a checkbox to enable advanced
 searching. When checked, additional form fields appear giving advanced search
 options:
  - "Search full recipe text": checkbox; changes search behavior to search full
- text of recipes instead of just the titles
+   text of recipes instead of just the titles
  - "All": multiselect drop-down that lets the user select labels. Labels in
- this box are combined with "AND" logic so recipes must match all labels
- selected in order to appear in search.
+   this box are combined with "AND" logic so recipes must match all labels
+   selected in order to appear in search.
  - "Any": multiselect drop-down that lets the user select labels. Labels in
- this box are combined with "OR" logic so recipes must match at least one of
- the labels selected in order to appear in search.
+   this box are combined with "OR" logic so recipes must match at least one of
+   the labels selected in order to appear in search.
  - "None": multiselect drop-down that lets the user select labels. Labels in
- this box are inverted and combined with "OR" logic so recipes cannot match any
- labels selected in order to appear in search. The search form operates as a
- filter on the recipe list in the List Pane (below) and applies as the user
- types/clicks; the user does not need to click a submit button.
+   this box are inverted and combined with "OR" logic so recipes cannot match
+   any labels selected in order to appear in search. The search form operates
+   as a filter on the recipe list in the List Pane (below) and applies as the
+   user types/clicks; the user does not need to click a submit button.
 
 Below the query form is another horizontal rule and below that the list of all
 recipes matching the current search (when nothing is searched, the list
@@ -53,29 +54,30 @@ displayed. Recipes are structured in 6 parts:
 
  1. Title -- this is a header at the top of the pane
  2. Action Buttons -- buttons to close the recipe pane, edit the recipe, and
- delete the recipe
+    delete the recipe
  3. Timing -- two lines indicating how long the recipe takes to cook. Active
- time is how long the cook needs to be working on it; total time is the amount
- of time the recipe needs from start to finish, including cooking or resting
- time when the cook can be focusing on other things.
+    time is how long the cook needs to be working on it; total time is the
+    amount of time the recipe needs from start to finish, including cooking or
+    resting time when the cook can be focusing on other things.
  4. Recipe Body -- a free-form text section containing the ingredients and
- instructions for the recipe. Some are plain text, some are markdown. By
- convention a recipe starts with a list of ingredients, one per line. After the
- ingredients is usually a blank line, and then the recipe instructions, usually
- one step per line. Sometimes there are multiple parts (a dish and its sauce,
- for instance) and these are usually separated by blank lines and header lines.
+    instructions for the recipe. Some are plain text, some are markdown. By
+    convention a recipe starts with a list of ingredients, one per line. After
+    the ingredients is usually a blank line, and then the recipe instructions,
+    usually one step per line. Sometimes there are multiple parts (a dish and
+    its sauce, for instance) and these are usually separated by blank lines and
+    header lines.
  5. Tags -- Recipes can be tagged for easier searching. All of a recipes' tags
- appear here, along with a button that reads "+ add label" to add a new tag
- to the recipe. When clicked, that tag becomes a text box that, when submitted,
- tags the recipe with the provided label. If the label does not exist yet it
- is created.
+    appear here, along with a button that reads "+ add label" to add a new tag
+    to the recipe. When clicked, that tag becomes a text box that, when
+    submitted, tags the recipe with the provided label. If the label does not
+    exist yet it is created.
  6. Notes -- Similar to tags, recipes can have notes. Notes can be added with
- "+ Add Note" button and once added they appear in a list. Each note shows the
- date it was added, buttons to flag, edit, and delete the note, and the body
- of the note itself. Flagging a note causes it to be displayed with a different
- background color (the intention is that some notes may be things that should
- be incorporated into the main body of the recipe eventually, and they can be
- marked as flagged once that's done).
+    "+ Add Note" button and once added they appear in a list. Each note shows
+    the date it was added, buttons to flag, edit, and delete the note, and the
+    body of the note itself. Flagging a note causes it to be displayed with a
+    different background color (the intention is that some notes may be things
+    that should be incorporated into the main body of the recipe eventually,
+    and they can be marked as flagged once that's done).
 
 The new recipe form also appears in the Recipe Pane, and has fields for:
  - Title
@@ -93,6 +95,27 @@ database's API, implemented in `api.js`. This file provides functions that the
 application can call to make requests to the database's API, grouped roughly
 by model -- there are functions that operate on recipes, labels, and notes,
 as well as some helpers.
+
+The API server returns data in respons bodies in JSON format when there is data
+to be returned.
+
+### Auth
+Authentication is handled by the `doLogin` and `doLogout` functions in
+`App.js`. The log in method calls `Api.login` which POSTs a request to
+`$api_host/login/` including the username and password in the request body.
+Upon successful login the response body contains a JWT in the `token` field.
+The JWT and username are stored in local storage.
+
+When making a request that requires authentication (these are identified by
+endpoints containing `priv/` in the route) the api function will include the
+JWT as the value for the `x-access-token` header.
+
+
+## Libraries
+This project uses
+ - "react"
+ - "react-widgets"
+ - "react-dom'
 
 ## Components
 The top-level application is in `App.js` (bootstrapped by `index.js`). This
@@ -135,6 +158,17 @@ additional Components:
  - TagList
  - NoteList -- rendered inside the `notes-section` div.
 
+A "recipe" object has the following properties:
+ - `ID` (int): the primary identifier for this recipe
+ - `Title` (string): the recipe's title, displayed in a search list
+ - `Body` (string): the builk of the recipe as a free text field. This usually includes
+   ingredients and instructions both
+ - `Time` (int): how long this recipe takes to cook
+ - `ActiveTime` (int): how long the cook needs to spend working on this this recipe
+   (chopping, stirring, etc.)
+ - `Labels` (array): array of `Label` structures this recipe is tagged with
+ - `Notes` (array): array of `Note` structures attached to this recipe
+
 ### NewRecipeForm Component
 Defined in `Recipe.js`. This component renders the form that lets users add a
 new recipe to the database. It does not currently support adding labels to a
@@ -151,12 +185,38 @@ Defined in `Notes.js`. This renders an unordered list of `NoteListItem`
 Componeents followed by the `AddNoteTrigger` or `EditNoteForm` Component to
 allow a user to add a new note.
 
+A "note" object has the following properties:
+ - `ID` (int): the primary identifier for this note
+ - `RecipeId` (int): the RecipeId for the recipe this note belongs to
+ - `Created` (int): the unix timestamp of the date this note was created (used
+   for sorting the notes)
+ - `Note` (string): the text body of the note
+ - `Flagged` (boolean): marks a note as incorporated into the recipe
+
 ### TagList Component
 Defined in `Tags.js`. This renders an unordered list of `TagListItem`
 components in a div with class `tag-list-container` to show the tags that are
 linked to a recipe. Each TagListItem has a button to un-link the tag from the
 recipe, and the list ends with a `LinkTagTrigger` or `LinkTagForm` component to
 add new tags to the recipe.
+
+A tag is some kind of informative tag to use for filtering recipes. Examples
+ are:
+  - "chicken"
+  - "beef"
+  - "soup"
+  - "dessert"
+  - "mexican"
+  - "thai"
+  - "GlutenFree"
+  - "vegan"
+
+Note: tags are called "labels" in the backend database.
+
+A "tag" object has the following properties:
+ - `ID` (int): the primary identifierfor this tag
+ - `Label` (string): the tag's name
+
 
 ## Helpers
 `Util.js` contains helper functions for querying/filtering the recipe list
@@ -187,13 +247,36 @@ requests originating from other domains).
 See TODO.md for a description of bugs to be fixed and features to be added.
 
 # Making Changes
-When making changes:
- - ALWAYS create a new branch for the feature or bugfix with
-   a descriptive name.
- - NEVER develop directly on the `main` branch.
- - NEVER merge feature branches in to `main`
- - NEVER push to the remotes.
+##Before making any changes
+ 1. Explore the repository structure
+ 2. Identify relevant files
+ 3. Explain the current implementation
+ 4. Propose changes. Do not write code until the user signs-off on the plan
 
-After making a change:
- - Update this document so that it reflects the new structure of the project
- - Update the TODO.md file to remove the feature request or bugfix
+
+##When making changes
+ - ALWAYS create a new branch for the feature of bugfix with a descriptive name
+ - NEVER develop directly on the `main` branch
+ - NEVER merge feature branches in to `main`
+ - NEVER push to the remote repository
+ - Prefer to Follow existing patterns in the repository. Do not introduce new
+   frameworks or patterns unless asked to do so. If you think a different
+   pattern or framework is the best way to accomplish something, ask the user
+   whether you should use it or not, explain why this pattern is correct, and
+   whether or not existing code should be updated to match
+ - Once on the correct feature branch, BEGIN by proposing new or updated tests
+   model and contain records that populate any new fields.
+ - Run through edge cases
+ - Verify imports
+ - Check for compilation errors
+ - Confirm tests compile and pass
+
+##After making a change
+Once the user has accepted changes:
+ 1. Explore the repository structure again
+ 2. Identify changes made; DO NOT assume that the changes made are exactly what
+    was discussed in the current context. Look at the diff between the feature
+    branch and `main`.
+ 3. Update this document and any other documentation to reflect the new
+    structure of the project
+ 4. Update the TODO.md file to remove the feature request

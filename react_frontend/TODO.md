@@ -101,6 +101,22 @@ component, but rather the icons should be passed in as part of the Labels so
 that it's easy to update a label icon in just a single place and have that
 updated everywhere.
 
+## Guest Users
+We should enable the concept of a "guest" user who can view but not edit the
+database. Possible implementation details are:
+ - Generate revokable tokens that allow viewing one specific recipe
+ - Create non-administrator logins that can see all recipes
+ - Provide a list of recipes a given non-administrator user can see
+ - Provide an interface for an admin user to create a guest user or a sharable
+ link
+
+## Indicate "new" recipes and mark them as tried
+The Recipe model has a "new" field intended to indicate that a recipe has
+been added to the database but not yet tried. We should use this to visually
+flag recipes in the List Pane and the Recipe Pane, and provide a button to
+"mark as cooked" in the recipe pane (plus a new API call to send that update
+to the database).
+
 ## Direct Links to Recipes
 There's no URL routing currently, which means the entire application can
 operate without reloading the page, but also means there's no way to link
