@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "json5": "^2.2.3",
+    "minimatch": "^10.2.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-scripts": "^5.0.1",
-    "react-widgets": "^5.8.6"
+    "react-widgets": "^5.8.6",
+    "recursive-readdir": "^2.2.3",
+    "webpack": "^5.105.4"
   },
   "scripts": {
     "start": "react-scripts start",
