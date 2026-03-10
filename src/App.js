@@ -178,9 +178,15 @@ class App extends Component {
     try {
       await Api.deleteRecipe(recipeId, this.state.login);
       const recipes = this.state.allRecipes.filter((x) => x.ID !== recipeId);
-      this.setState({ allRecipes: recipes, targetRecipe: undefined });
+      // Auto-dismiss deleteRecipe errors on successful deletion
+      const updates = { allRecipes: recipes, targetRecipe: undefined };
+      if (this.state.errorContext === "deleteRecipe") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "could not delete recipe");
+      this.handleError(e, "could not delete recipe", "deleteRecipe");
     }
   };
 
@@ -232,13 +238,19 @@ class App extends Component {
       if (labelIsNew) {
         allLabels.push(labelData);
       }
-      this.setState({
+      // Auto-dismiss addLabel errors on successful label addition
+      const updates = {
         allLabels: allLabels,
         allRecipes: this.state.allRecipes,
         showTaggingForm: false,
-      });
+      };
+      if (this.state.errorContext === "addLabel") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error adding label");
+      this.handleError(e, "error adding label", "addLabel");
       this.setState({ showTaggingForm: false });
     }
   };
@@ -257,9 +269,15 @@ class App extends Component {
       );
       const newTags = recipe.Labels.filter((x) => x.ID !== parseInt(labelId));
       recipe.Labels = newTags;
-      this.setState({ allRecipes: this.state.allRecipes });
+      // Auto-dismiss unlinkLabel errors on successful unlinking
+      const updates = { allRecipes: this.state.allRecipes };
+      if (this.state.errorContext === "unlinkLabel") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error unlinking label from recipe");
+      this.handleError(e, "error unlinking label from recipe", "unlinkLabel");
     }
   };
 
@@ -300,10 +318,16 @@ class App extends Component {
         } else {
           recipe.Notes = [newNote];
         }
-        this.setState({ allRecipes: this.state.allRecipes });
+        // Auto-dismiss addNote errors on successful note addition
+        const updates = { allRecipes: this.state.allRecipes };
+        if (this.state.errorContext === "addNote") {
+          updates.error = null;
+          updates.errorContext = null;
+        }
+        this.setState(updates);
       }
     } catch (e) {
-      this.handleError(e, "error adding note");
+      this.handleError(e, "error adding note", "addNote");
     }
     this.setState({ showAddNote: false });
   };
@@ -321,9 +345,15 @@ class App extends Component {
       );
       const note = recipe.Notes.find((n) => n.ID === parseInt(noteData.noteId));
       note.Flagged = newFlag;
-      this.setState({ allRecipes: this.state.allRecipes });
+      // Auto-dismiss flagNote errors on successful flag toggle
+      const updates = { allRecipes: this.state.allRecipes };
+      if (this.state.errorContext === "flagNote") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error flagging note");
+      this.handleError(e, "error flagging note", "flagNote");
     }
   };
 
@@ -350,9 +380,15 @@ class App extends Component {
       );
       var noteData = recipe.Notes.find((x) => x.ID === parseInt(noteId));
       noteData.Note = formData.get("text");
-      this.setState({ allRecipes: this.state.allRecipes });
+      // Auto-dismiss editNote errors on successful note edit
+      const updates = { allRecipes: this.state.allRecipes };
+      if (this.state.errorContext === "editNote") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error editing note");
+      this.handleError(e, "error editing note", "editNote");
     }
     this.setState({ showNoteEditor: false });
   };
@@ -368,9 +404,15 @@ class App extends Component {
       );
       const newNotes = recipe.Notes.filter((x) => x.ID !== parseInt(noteId));
       recipe.Notes = newNotes;
-      this.setState({ allRecipes: this.state.allRecipes });
+      // Auto-dismiss deleteNote errors on successful note deletion
+      const updates = { allRecipes: this.state.allRecipes };
+      if (this.state.errorContext === "deleteNote") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error deleting note");
+      this.handleError(e, "error deleting note", "deleteNote");
     }
   };
 
@@ -446,18 +488,30 @@ class App extends Component {
   getRecipes = async (event) => {
     try {
       const recipes = await Api.fetchRecipes(this.state.login);
-      this.setState({ allRecipes: recipes });
+      // Auto-dismiss fetchRecipes errors on successful fetch
+      const updates = { allRecipes: recipes };
+      if (this.state.errorContext === "fetchRecipes") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error fetching recipe list");
+      this.handleError(e, "error fetching recipe list", "fetchRecipes");
     }
   };
 
   getLabels = async (event) => {
     try {
       const labels = await Api.fetchLabels();
-      this.setState({ allLabels: labels });
+      // Auto-dismiss fetchLabels errors on successful fetch
+      const updates = { allLabels: labels };
+      if (this.state.errorContext === "fetchLabels") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error fetching label list");
+      this.handleError(e, "error fetching label list", "fetchLabels");
     }
   };
 
@@ -468,9 +522,15 @@ class App extends Component {
       const recipes = this.state.allRecipes;
       const recipe = Util.selectRecipe(recipeId, recipes);
       recipe.Notes = notes;
-      this.setState({ allRecipes: recipes });
+      // Auto-dismiss fetchNotes errors on successful fetch
+      const updates = { allRecipes: recipes };
+      if (this.state.errorContext === "fetchNotes") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, `could not fetch notes for recipe ${recipeId}`);
+      this.handleError(e, `could not fetch notes for recipe ${recipeId}`, "fetchNotes");
     }
   };
 
