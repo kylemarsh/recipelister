@@ -28,29 +28,6 @@ Specifically, when adding a new recipe, invalid values in the "Active Time" or
 but the actual message received from the API is "activeTime must be an
 integer".  Include more detail in the error alerts
 
-## Auto-dismiss alerts - Additional Error Contexts
-Auto-dismiss alerts are now implemented for login errors and recipe creation
-errors. Extend this functionality to automatically dismiss the remaining error
-types when they become stale:
-
-- Label-related errors:
-  - "error adding label" should clear when a label is successfully added
-  - "error unlinking label from recipe" should clear when a label is successfully unlinked
-
-- Note-related errors:
-  - "error adding note" should clear when a note is successfully added
-  - "error editing note" should clear when a note is successfully edited
-  - "error deleting note" should clear when a note is successfully deleted
-  - "error flagging note" should clear when a note is successfully flagged/unflagged
-
-- Recipe-related errors:
-  - "could not delete recipe" should clear when a recipe is successfully deleted
-
-- Data fetching errors:
-  - "error fetching recipe list" should clear when recipes are successfully fetched
-  - "error fetching label list" should clear when labels are successfully fetched
-  - "could not fetch notes for recipe X" should clear when notes are successfully loaded
-
 ## Meta-Labels
 Labels should have meta-information. For instance, the "main", "dessert",
 "breakfast" labels are all dish types, while "asian", "mexican", "ethiopian"
