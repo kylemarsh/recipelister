@@ -38,11 +38,18 @@ options:
    as a filter on the recipe list in the List Pane (below) and applies as the
    user types/clicks; the user does not need to click a submit button.
 
+Below the advanced search options are three sort buttons that control the order
+of the recipe list:
+ - 🔤 (Alphabetic): Sorts recipes A-Z by title (default)
+ - 📅 (Newest): Sorts recipes by ID descending (most recently added first)
+ - 🔀 (Shuffle): Randomizes the recipe list with a stable shuffle that persists
+   across filter changes until another sort option is selected
+
+The active sort option is visually indicated with a blue border and background.
+
 Below the query form is another horizontal rule and below that the list of all
 recipes matching the current search (when nothing is searched, the list
-contains all recipes in the database). This list is unsorted, so the sort order
-defaults to the order of retrieval from the database, which defaults to the
-order recipes were added to the database.
+contains all recipes in the database).
 
 This UI should be reasonable to view on both desktop and mobile. When viewed on
 desktop the query form and list pane should be visible alongside the selected
@@ -150,7 +157,9 @@ the form for logging in. The App renders it inside a div with class `topnav`
 Defined in `QueryForm.js`. This component renders the search form. The App
 renders it inside a div with class `search-pane` and, when the user has
 selected a recipe, adds the `recipe-selected` class. When the "Advanced"
-checkbox is ticked, it renders the `AdvancedQuery` component as well.
+checkbox is ticked, it renders the `AdvancedQuery` component as well. Below
+the advanced search options, it renders three sort buttons (Alphabetic, Newest,
+Shuffle) that control the recipe list sort order.
 
 ### AdvancedQuery Component
 Defined in `AdvancedQuery.js`. This component holds the form for advanced
@@ -239,7 +248,12 @@ A "label" object (used throughout the code and API) has the following properties
 
 
 ## Helpers
-`Util.js` contains helper functions for querying/filtering the recipe list
+`Util.js` contains helper functions for querying/filtering and sorting the
+recipe list:
+ - `applyFilters()`: filters recipes by search text and label selections
+ - `sortRecipes()`: sorts recipes by the selected sort mode (alphabetic, newest,
+   or shuffle with stable random keys)
+ - `selectRecipe()`: finds a recipe by ID from the recipe list
 
 
 # Development
