@@ -9,10 +9,10 @@ database is with an API layer using JSON over REST.
 All of the react code are in the `src/` directory.
 
 ## UI
-The application shows a header at the top of the page with two buttons below:
-"New Recipe" -- which opens a form to add a recipe to the database -- and "Log
-In" which allows a user to log in to view, edit, and add recipes. When logged
-in the "Log In" button becomes "Log Out".
+The application shows a header at the top of the page. When not logged in, there
+is a login form with username and password fields and a "Log In" button. When
+logged in, the login form is replaced with a "Log Out" button, and a "New Recipe"
+button appears which opens a form to add a recipe to the database.
 
 Below the buttons  is a horizontal rule, and below that the screen splits into
 two panes; the right is the Recipe Pane and it is empty until a recipe is
@@ -66,11 +66,12 @@ displayed. Recipes are structured in 6 parts:
     usually one step per line. Sometimes there are multiple parts (a dish and
     its sauce, for instance) and these are usually separated by blank lines and
     header lines.
- 5. Tags -- Recipes can be tagged for easier searching. All of a recipes' tags
-    appear here, along with a button that reads "+ add label" to add a new tag
-    to the recipe. When clicked, that tag becomes a text box that, when
-    submitted, tags the recipe with the provided label. If the label does not
-    exist yet it is created.
+ 5. Tags -- Recipes can be tagged with labels for easier searching. All of the
+    labels a recipe is tagged with appear here, along with a button that reads
+    "+ add label" to tag the recipe with an additional label. When clicked, a
+    text box appears where the user can enter a label name. When submitted, the
+    recipe is tagged with that label. If the label doesn't exist yet, it is
+    created first.
  6. Notes -- Similar to tags, recipes can have notes. Notes can be added with
     "+ Add Note" button and once added they appear in a list. Each note shows
     the date it was added, buttons to flag, edit, and delete the note, and the
@@ -96,8 +97,19 @@ application can call to make requests to the database's API, grouped roughly
 by model -- there are functions that operate on recipes, labels, and notes,
 as well as some helpers.
 
-The API server returns data in respons bodies in JSON format when there is data
+The API server URL is configured via the `REACT_APP_API_HOST` environment
+variable.
+
+The API server returns data in response bodies in JSON format when there is data
 to be returned.
+
+### Data Loading Behavior
+Recipe data loading differs based on authentication status:
+ - **Unauthenticated users**: Can view recipe titles and labels only. Recipe
+   bodies are not loaded or displayed.
+ - **Authenticated users**: Can view full recipe data. Recipe bodies are loaded
+   with the initial recipe list. Notes are loaded on-demand when a user clicks
+   on a recipe (see `App.js:398-401`).
 
 ### Auth
 Authentication is handled by the `doLogin` and `doLogout` functions in
@@ -112,22 +124,27 @@ JWT as the value for the `x-access-token` header.
 
 
 ## Libraries
-This project uses
- - "react"
- - "react-widgets"
- - "react-dom'
+This project uses:
+ - "react" (v19)
+ - "react-dom" (v19)
+ - "react-widgets" (for multiselect dropdowns)
+ - "react-scripts" (Create React App build tooling)
 
 ## Components
-The top-level application is in `App.js` (bootstrapped by `index.js`). This
-Component renders the overall UI and holds state (query form state, selected
-recipe, logged in state, which other Components are visible...).
+The top-level application is in `App.js`, bootstrapped by `index.js` using React
+18's `createRoot` API. This Component renders the overall UI and holds state
+(query form state, selected recipe, logged in state, which other Components are
+visible...).
 
 All of the functions that handle actions (clicks, typing, etc) are defined here
 and passed down into components as props.
 
+Each component has its own CSS file in the `src/` directory (e.g., `App.css`,
+`Recipe.css`, `Tags.css`, etc.) that are imported by `index.js`.
+
 ### LoginComponent
 Defined in `LoginComponent.js`. This component builds the log in/out button and
-the form for logging in. The App renders it inside a div with class `topNav`
+the form for logging in. The App renders it inside a div with class `topnav`
 
 ### QueryForm Component
 Defined in `QueryForm.js`. This component renders the search form. The App
@@ -161,7 +178,7 @@ additional Components:
 A "recipe" object has the following properties:
  - `ID` (int): the primary identifier for this recipe
  - `Title` (string): the recipe's title, displayed in a search list
- - `Body` (string): the builk of the recipe as a free text field. This usually includes
+ - `Body` (string): the bulk of the recipe as a free text field. This usually includes
    ingredients and instructions both
  - `Time` (int): how long this recipe takes to cook
  - `ActiveTime` (int): how long the cook needs to spend working on this this recipe
@@ -173,7 +190,7 @@ A "recipe" object has the following properties:
 Defined in `Recipe.js`. This component renders the form that lets users add a
 new recipe to the database. It does not currently support adding labels to a
 recipe on creation, and throws uninformative errors when the times are left
-blank or use an unexpected format (10m instead of 10, for exmaple).
+blank or use an unexpected format (10m instead of 10, for example).
 
 ### Alert Component
 Defined in `Alert.js`. The app renders this component to display errors --
@@ -182,7 +199,7 @@ red background at the top of the page.
 
 ### NoteList Component
 Defined in `Notes.js`. This renders an unordered list of `NoteListItem`
-Componeents followed by the `AddNoteTrigger` or `EditNoteForm` Component to
+Components followed by the `AddNoteTrigger` or `EditNoteForm` Component to
 allow a user to add a new note.
 
 A "note" object has the following properties:
@@ -200,22 +217,25 @@ linked to a recipe. Each TagListItem has a button to un-link the tag from the
 recipe, and the list ends with a `LinkTagTrigger` or `LinkTagForm` component to
 add new tags to the recipe.
 
-A tag is some kind of informative tag to use for filtering recipes. Examples
- are:
-  - "chicken"
-  - "beef"
-  - "soup"
-  - "dessert"
-  - "mexican"
-  - "thai"
-  - "GlutenFree"
-  - "vegan"
+#### Terminology: Labels vs Tags
+The application uses two related concepts:
+ - **Label**: An object representing a recipe attribute that can be used for
+   categorization and filtering. A label has an `ID` and a `Label` (name) field.
+   Labels exist independently in the database and can be reused across many
+   recipes. Examples: "chicken", "soup", "mexican", "vegan", "GlutenFree".
+ - **Tag**: The association between a recipe and a label. When we say a recipe is
+   "tagged with" a label, we mean there is a tag linking that recipe to that
+   label. In the backend database, tags are represented by a junction table
+   (`recipe_label`) between the `recipe` and `label` tables.
 
-Note: tags are called "labels" in the backend database.
+From an end-user perspective, they primarily interact with "tags" (the act of
+tagging/untagging recipes), while the underlying data structures are "labels".
+The component is named `TagList` because it shows the tags (label associations)
+for a specific recipe.
 
-A "tag" object has the following properties:
- - `ID` (int): the primary identifierfor this tag
- - `Label` (string): the tag's name
+A "label" object (used throughout the code and API) has the following properties:
+ - `ID` (int): the primary identifier for this label
+ - `Label` (string): the label's name
 
 
 ## Helpers

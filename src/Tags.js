@@ -1,5 +1,11 @@
 import React from "react";
 
+// This component manages the display of labels that are tagged to a recipe.
+// Terminology:
+//   - Label: An attribute object (e.g., "chicken", "vegan") that exists in the database
+//   - Tag: The association between a recipe and a label
+// The component is named "TagList" because it shows which labels are tagged to this recipe.
+
 const TagList = (props) => {
   var tags;
   if (props.tags && props.tags.length) {
@@ -20,13 +26,13 @@ const TagList = (props) => {
         {tags}
         {props.loggedIn ? (
           <li>
-            {props.showLabelEditor ? (
-              <LinkTagForm
+            {props.showTaggingForm ? (
+              <TagRecipeForm
                 handleSubmit={props.handlers.LinkSubmit}
                 handleCancel={props.handlers.LinkCancel}
               />
             ) : (
-              <LinkTagTrigger handleTriggerClick={props.handlers.LinkClick} />
+              <AddTagTrigger handleTriggerClick={props.handlers.LinkClick} />
             )}
           </li>
         ) : (
@@ -39,7 +45,7 @@ const TagList = (props) => {
 
 const TagListItem = (props) => {
   return (
-    <li data-tag-id={props.tag.ID} data-tag-name={props.tag.Label}>
+    <li data-label-id={props.tag.ID} data-label-name={props.tag.Label}>
       {props.tag.Label}
       {props.loggedIn ? (
         <span
@@ -57,7 +63,7 @@ const TagListItem = (props) => {
   );
 };
 
-const LinkTagTrigger = (props) => {
+const AddTagTrigger = (props) => {
   return (
     <span className="link-tag-trigger" onClick={props.handleTriggerClick}>
       + add label
@@ -65,7 +71,7 @@ const LinkTagTrigger = (props) => {
   );
 };
 
-const LinkTagForm = (props) => {
+const TagRecipeForm = (props) => {
   return (
     <form className="link-tag-form" onSubmit={props.handleSubmit}>
       <input name="label" type="text" placeholder="label" />

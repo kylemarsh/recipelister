@@ -25,7 +25,7 @@ const Recipe = (props) => {
       <TagList
         loggedIn={props.loggedIn}
         tags={recipe.Labels}
-        showLabelEditor={props.showLabelEditor}
+        showTaggingForm={props.showTaggingForm}
         handlers={props.labelHandlers}
       />
       {props.loggedIn ? (
