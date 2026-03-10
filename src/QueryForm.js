@@ -60,6 +60,15 @@ const QueryForm = (props) => {
         >
           🔀
         </button>
+        <span className="button-divider"></span>
+        <button
+          type="button"
+          className={props.groupBy ? "active" : ""}
+          onClick={props.handleGroupToggle}
+          title="Group by label"
+        >
+          📂
+        </button>
       </div>
     </form>
   );

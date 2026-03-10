@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./main.css";
 import LoginComponent from "./LoginComponent";
 import QueryForm from "./QueryForm";
-import ResultList from "./ResultList";
+import GroupedResultList from "./GroupedResultList";
 import Alert from "./Alert";
 import { Recipe, NewRecipeForm } from "./Recipe";
 import * as Util from "./Util";
@@ -26,8 +26,10 @@ class App extends Component {
         tagsAny: [],
         tagsNone: [],
         sortBy: "alphabetic",
+        groupBy: false,
       },
       shuffleKeys: {},
+      collapsedGroups: {},
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
       errorContext: null,
@@ -75,19 +77,24 @@ class App extends Component {
               handleChange={this.handleFilterChange}
               handleMultiselectUpdate={this.handleMultiselectUpdate}
               handleSortChange={this.handleSortChange}
+              handleGroupToggle={this.handleGroupToggle}
               allLabels={this.state.allLabels}
               tagsAll={this.state.filters.tagsAll}
               tagsAny={this.state.filters.tagsAny}
               tagsNone={this.state.filters.tagsNone}
               showAdvancedOptions={this.state.filters.showAdvancedOptions}
               sortBy={this.state.filters.sortBy}
+              groupBy={this.state.filters.groupBy}
             />
             <hr />
-            <ResultList
+            <GroupedResultList
               items={this.state.allRecipes}
               filters={this.state.filters}
+              groupBy={this.state.filters.groupBy}
               sortBy={this.state.filters.sortBy}
               shuffleKeys={this.state.shuffleKeys}
+              collapsedGroups={this.state.collapsedGroups}
+              handleGroupToggle={this.handleGroupCollapse}
               handleClick={this.handleResultClick}
             />
           </div>
@@ -458,6 +465,17 @@ class App extends Component {
       // Clear shuffle keys when switching to other sort modes
       this.setState({ filters: newfilters, shuffleKeys: {} });
     }
+  };
+
+  handleGroupToggle = () => {
+    const newfilters = { ...this.state.filters, groupBy: !this.state.filters.groupBy };
+    this.setState({ filters: newfilters });
+  };
+
+  handleGroupCollapse = (groupLabel) => {
+    const newCollapsedGroups = { ...this.state.collapsedGroups };
+    newCollapsedGroups[groupLabel] = !newCollapsedGroups[groupLabel];
+    this.setState({ collapsedGroups: newCollapsedGroups });
   };
 
   handleResultClick = (event) => {
