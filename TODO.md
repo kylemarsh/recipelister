@@ -6,11 +6,6 @@ There is currently no indication of what labels already exist in the system
 when you're tagging a recipe with the LinkTagForm. We should make a box that
 drops down with all the labels in the system to be clicked or autocompleted
 
-## Sort Recipe List
-We should be able to sort the recipe list in different ways:
- - Alphabetic (using recipe's title as the sort key)
- - Most recently added (using recipe's ID as the sort key)
-
 ## Group Recipe List By Label
 We should be able to show recipes grouped under specific labels by default.
 Group by the following labels, and display the groups in this order:
