@@ -3,7 +3,8 @@ import * as Util from "./Util";
 
 const ResultList = (props) => {
   const filteredItems = Util.applyFilters(props.items, props.filters);
-  const rows = filteredItems.map((item) => {
+  const sortedItems = Util.sortRecipes(filteredItems, props.sortBy, props.shuffleKeys);
+  const rows = sortedItems.map((item) => {
     return (
       <li key={item.ID} id={item.ID} onClick={props.handleClick}>
         {item.Title}

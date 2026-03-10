@@ -35,6 +35,32 @@ const QueryForm = (props) => {
           ""
         )}
       </div>
+      <div className="sort-buttons">
+        <button
+          type="button"
+          className={props.sortBy === "alphabetic" ? "active" : ""}
+          onClick={() => props.handleSortChange("alphabetic")}
+          title="Sort alphabetically"
+        >
+          🔤
+        </button>
+        <button
+          type="button"
+          className={props.sortBy === "newest" ? "active" : ""}
+          onClick={() => props.handleSortChange("newest")}
+          title="Sort by newest first"
+        >
+          📅
+        </button>
+        <button
+          type="button"
+          className={props.sortBy === "shuffle" ? "active" : ""}
+          onClick={() => props.handleSortChange("shuffle")}
+          title="Shuffle"
+        >
+          🔀
+        </button>
+      </div>
     </form>
   );
 };
