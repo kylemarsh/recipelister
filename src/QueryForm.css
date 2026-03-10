@@ -9,6 +9,7 @@
 
 .sort-buttons {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.5rem;
 	margin-top: 0.5rem;
 	margin-bottom: 0.5rem;
@@ -34,4 +35,20 @@
 .sort-buttons button.active {
 	box-shadow: inset 0 0 0 2px #4a90e2, 0 2px 4px rgba(74, 144, 226, 0.3);
 	background-color: #e3f2fd;
+}
+
+.sort-buttons .button-divider {
+	width: 1px;
+	background-color: #ccc;
+	margin: 0.25rem 0;
+}
+
+@media (max-width: 450px) {
+	.sort-buttons {
+		flex-direction: column-reverse;
+		align-items: center;
+	}
+	.sort-buttons .button-divider {
+		display: none;
+	}
 }

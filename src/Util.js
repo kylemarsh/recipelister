@@ -81,4 +81,17 @@ function selectRecipe(targetId, recipeList) {
   });
 }
 
-export { selectRecipe, applyFilters, sortRecipes };
+function getGroupingLabels() {
+  return ["Main", "Dessert", "Breakfast", "Side", "Appetizer", "Drink"];
+}
+
+function filterRecipesByLabel(recipes, labelName) {
+  return recipes.filter((recipe) => {
+    if (!recipe.Labels || !recipe.Labels.length) {
+      return false;
+    }
+    return recipe.Labels.some((label) => label.Label.toLowerCase() === labelName.toLowerCase());
+  });
+}
+
+export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel };

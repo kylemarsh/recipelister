@@ -6,21 +6,6 @@ There is currently no indication of what labels already exist in the system
 when you're tagging a recipe with the LinkTagForm. We should make a box that
 drops down with all the labels in the system to be clicked or autocompleted
 
-## Group Recipe List By Label
-We should be able to show recipes grouped under specific labels by default.
-Group by the following labels, and display the groups in this order:
- - Main
- - Dessert
- - Breakfast
- - Side
- - Appetizer
- - Drink
-
-Recipes tagged with more than one of these labels should appear once in each
-group they're tagged in.
-
-Label groups should be collapsible in the recipe list.
-
 ## More informative errors
 Sometimes the API replies with more error detail than is included in the alert.
 Specifically, when adding a new recipe, invalid values in the "Active Time" or
