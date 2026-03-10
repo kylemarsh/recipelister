@@ -128,6 +128,10 @@ title. Only the recipe-id should be required for routing.
 ## Better Icons/Buttons
 Beautify the app's use of icons as buttons for actions.
 
+### Style Recipe Action Buttons
+The RecipeActions component (edit, delete, and close buttons in the Recipe Pane)
+needs better styling. Currently uses plain Unicode characters for icons.
+
 ## More responsive UI
 Currently there's no way to hide the list pane in desktop, and the Recipe Pane
 can be too "squashed". We should find a better way to balance this.
@@ -136,3 +140,46 @@ can be too "squashed". We should find a better way to balance this.
 Create a document detailing the steps needed to develop and deploy both parts
 of this application, the react frontend (this repository) and the database /
 api server.
+
+## Improve NewRecipeForm Widgets
+The NewRecipeForm should support:
+ - Adding labels to a recipe during creation (not just after)
+   - Use a multiselect widget for the labels that allows selecting multiple
+     labels from a dropdown list of all labels in the system that filters as you
+     type.
+  - Store chosen labels as strings, then submit them as part of the recipe
+    creation API call (this will require an update to the recipe creation API)
+ - Use a number picker for active time and total time fields that allows either
+   typing or selecting from a dropdown of 5-minute increments (5, 10, 15, etc.)
+   up to 180 minutes
+
+## Auto-reset Tag Form State
+The showTaggingForm state flag should automatically reset to false when the user
+moves away from the tagging form, specifically:
+ - When pressing Esc inside the form
+ - When the form loses focus
+If the tagging form is reactivated before the current recipe is deselected, the
+form should present the value previously typed rather than resetting to blank.
+Once the user moves away from the current recipe the form should reset to
+blank.
+
+Currently it is only hidden when you click the `X` button, and resets to blank
+immediately.
+
+## Tab Key Submission in Tag Form
+When tagging recipes, the "Tab" keypress should submit the form and then reopen
+the tag form for another label, automatically focusing the text input field
+providing faster keyboard-based tagging workflow.
+
+## Auto-focus Note and Tag Textarea
+When the user clicks "+ Add Note", the textarea in the EditNoteForm should
+automatically receive focus so they can start typing immediately without
+needing to click again.
+
+The tag form shoula sl also auto-focus the text area when opened (after
+clicking the "+ add label" button).
+
+## Fuzzy Search for Recipe Titles
+Improve the recipe search to support fuzzy matching similar to Slack's emoji
+search, where the search can match characters even if there are other characters
+in between (e.g., searching "chkn" would match "chicken").
