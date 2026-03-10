@@ -206,6 +206,20 @@ Defined in `Alert.js`. The app renders this component to display errors --
 usually API failures. It wraps the error message in a box that appears with a
 red background at the top of the page.
 
+The App component manages error state including auto-dismiss functionality.
+Errors are stored with an optional context (e.g., "login", "addRecipe") that
+identifies what type of error occurred. When the action that caused the error
+succeeds, the error is automatically dismissed if its context matches. This
+prevents stale errors from remaining visible after the user has resolved the
+issue.
+
+Currently implemented auto-dismiss contexts:
+ - `"login"`: Dismissed when user successfully logs in
+ - `"addRecipe"`: Dismissed when a recipe is successfully created/updated
+ - `"auth"`: Set when 401 errors occur (user logged out)
+
+Users can also manually dismiss any alert by clicking the × button.
+
 ### NoteList Component
 Defined in `Notes.js`. This renders an unordered list of `NoteListItem`
 Components followed by the `AddNoteTrigger` or `EditNoteForm` Component to

@@ -30,6 +30,7 @@ class App extends Component {
       shuffleKeys: {},
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
+      errorContext: null,
       targetRecipe: undefined,
       showRecipeEditor: false,
       showTaggingForm: false,
@@ -162,13 +163,19 @@ class App extends Component {
         recipe = await Api.createRecipe(formData, this.state.login);
       }
       const newTarget = recipe ? recipe.ID : targetId;
-      this.setState({
+      // Auto-dismiss addRecipe errors on successful submission
+      const updates = {
         reloadRecipeList: true,
         showRecipeEditor: false,
         targetRecipe: newTarget,
-      });
+      };
+      if (this.state.errorContext === "addRecipe") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
     } catch (e) {
-      this.handleError(e, "error adding recipe");
+      this.handleError(e, "error adding recipe", "addRecipe");
     }
   };
 
@@ -377,7 +384,7 @@ class App extends Component {
    * OTHER FUNCTIONS *
    *******************/
   handleAlertClose = (event) => {
-    this.setState({ error: undefined });
+    this.setState({ error: undefined, errorContext: null });
   };
 
   handleFilterChange = (event) => {
@@ -428,14 +435,20 @@ class App extends Component {
     try {
       const token = await Api.login(event.target.form);
 
-      this.setState({
+      // Auto-dismiss login errors on successful login
+      const updates = {
         login: { valid: true, username: username, token: token },
         reloadRecipeList: true,
-      });
+      };
+      if (this.state.errorContext === "login") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
       localStorage.setItem("username", username);
       localStorage.setItem("token", token);
     } catch (e) {
-      this.handleError(e, "error logging in");
+      this.handleError(e, "error logging in", "login");
     }
   };
 
@@ -482,14 +495,14 @@ class App extends Component {
     }
   };
 
-  handleError = (error, message) => {
+  handleError = (error, message, context = null) => {
     console.error(error);
     if (error.message.includes("401")) {
       // we only use 401 to indicate missing / expired auth
-      this.setState({ error: "You have been logged out. Please log in again" });
+      this.setState({ error: "You have been logged out. Please log in again", errorContext: "auth" });
       this.doLogout();
     } else {
-      this.setState({ error: message });
+      this.setState({ error: message, errorContext: context });
     }
   };
 
