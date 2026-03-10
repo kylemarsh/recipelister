@@ -30,7 +30,7 @@ class App extends Component {
       error: null,
       targetRecipe: undefined,
       showRecipeEditor: false,
-      showLabelEditor: false,
+      showTaggingForm: false,
       showNoteEditor: false,
       showAddNote: false,
     };
@@ -97,7 +97,7 @@ class App extends Component {
               recipes={this.state.allRecipes}
               availableLabels={this.state.allLabels}
               targetRecipeId={this.state.targetRecipe}
-              showLabelEditor={this.state.showLabelEditor}
+              showTaggingForm={this.state.showTaggingForm}
               showNoteEditor={this.state.showNoteEditor}
               showAddNote={this.state.showAddNote}
               recipeHandlers={{
@@ -180,14 +180,14 @@ class App extends Component {
   /*****************
    * LABEL ACTIONS *
    *****************/
-  handleLabelLinkClick = (event) => this.setState({ showLabelEditor: true });
+  handleLabelLinkClick = (event) => this.setState({ showTaggingForm: true });
 
   // TODO: reset this state flag to `false` whenever we move away from the form?
   //	* <esc> keypress inside the form
   //	* form (whole thing, not any individual component) losing focus)
   handleLabelLinkCancel = (event) => {
     event.preventDefault();
-    this.setState({ showLabelEditor: false });
+    this.setState({ showTaggingForm: false });
   };
 
   // TODO: bind to <tab> keypress inside the form?
@@ -228,17 +228,17 @@ class App extends Component {
       this.setState({
         allLabels: allLabels,
         allRecipes: this.state.allRecipes,
-        showLabelEditor: false,
+        showTaggingForm: false,
       });
     } catch (e) {
       this.handleError(e, "error adding label");
-      this.setState({ showLabelEditor: false });
+      this.setState({ showTaggingForm: false });
     }
   };
 
   handleLabelUnlinkClick = async (event) => {
     const labelTag = event.target.parentElement;
-    const labelId = labelTag.dataset.tagId;
+    const labelId = labelTag.dataset.labelId;
     const recipeTag = labelTag.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
 
