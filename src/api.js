@@ -53,6 +53,8 @@ async function deleteRecipe(recipeId, auth) {
 
 /**********
  * LABELS *
+ * Labels are recipe attributes (e.g., "chicken", "vegan").
+ * When we "link" a label to a recipe, we create a "tag" (the association).
  **********/
 async function fetchLabels() {
   return await doFetch(API_HOST + "labels/");
