@@ -25,7 +25,9 @@ class App extends Component {
         tagsAll: [],
         tagsAny: [],
         tagsNone: [],
+        sortBy: "alphabetic",
       },
+      shuffleKeys: {},
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
       targetRecipe: undefined,
@@ -71,16 +73,20 @@ class App extends Component {
               fragments={this.state.filters.fragments}
               handleChange={this.handleFilterChange}
               handleMultiselectUpdate={this.handleMultiselectUpdate}
+              handleSortChange={this.handleSortChange}
               allLabels={this.state.allLabels}
               tagsAll={this.state.filters.tagsAll}
               tagsAny={this.state.filters.tagsAny}
               tagsNone={this.state.filters.tagsNone}
               showAdvancedOptions={this.state.filters.showAdvancedOptions}
+              sortBy={this.state.filters.sortBy}
             />
             <hr />
             <ResultList
               items={this.state.allRecipes}
               filters={this.state.filters}
+              sortBy={this.state.filters.sortBy}
+              shuffleKeys={this.state.shuffleKeys}
               handleClick={this.handleResultClick}
             />
           </div>
@@ -388,6 +394,21 @@ class App extends Component {
   handleMultiselectUpdate = (name, value) => {
     const newfilters = { ...this.state.filters, [name]: value };
     this.setState({ filters: newfilters });
+  };
+
+  handleSortChange = (sortBy) => {
+    const newfilters = { ...this.state.filters, sortBy };
+    if (sortBy === "shuffle") {
+      // Generate stable shuffle keys for all recipes
+      const shuffleKeys = {};
+      this.state.allRecipes.forEach((recipe) => {
+        shuffleKeys[recipe.ID] = Math.random();
+      });
+      this.setState({ filters: newfilters, shuffleKeys });
+    } else {
+      // Clear shuffle keys when switching to other sort modes
+      this.setState({ filters: newfilters, shuffleKeys: {} });
+    }
   };
 
   handleResultClick = (event) => {

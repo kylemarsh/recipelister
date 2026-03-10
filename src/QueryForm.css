@@ -6,3 +6,32 @@
 .query-form [type="checkbox"] {
 	margin-inline: 1rem;
 }
+
+.sort-buttons {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.sort-buttons button {
+	padding: 0.5rem 1rem;
+	font-size: 1.2rem;
+	border: none !important;
+	background-color: #fff;
+	cursor: pointer;
+	border-radius: 4px;
+	box-shadow: inset 0 0 0 2px #ccc;
+	transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sort-buttons button:hover {
+	border: none !important;
+	box-shadow: inset 0 0 0 2px #999;
+	background-color: #f5f5f5;
+}
+
+.sort-buttons button.active {
+	box-shadow: inset 0 0 0 2px #4a90e2, 0 2px 4px rgba(74, 144, 226, 0.3);
+	background-color: #e3f2fd;
+}

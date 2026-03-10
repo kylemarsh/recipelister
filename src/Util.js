@@ -57,10 +57,28 @@ function includesAll(recipeLabelIds, filterLabelIds) {
   return x.reduce((a, b) => a && b);
 }
 
+function sortRecipes(recipes, sortBy, shuffleKeys = {}) {
+  if (sortBy === "alphabetic") {
+    return [...recipes].sort((a, b) =>
+      a.Title.toLowerCase().localeCompare(b.Title.toLowerCase())
+    );
+  } else if (sortBy === "newest") {
+    return [...recipes].sort((a, b) => b.ID - a.ID);
+  } else if (sortBy === "shuffle") {
+    // Use stable shuffle keys for consistent random order
+    return [...recipes].sort((a, b) => {
+      const keyA = shuffleKeys[a.ID] || 0;
+      const keyB = shuffleKeys[b.ID] || 0;
+      return keyA - keyB;
+    });
+  }
+  return recipes;
+}
+
 function selectRecipe(targetId, recipeList) {
   return recipeList.find((recipe) => {
     return recipe.ID === parseInt(targetId);
   });
 }
 
-export { selectRecipe, applyFilters };
+export { selectRecipe, applyFilters, sortRecipes };
