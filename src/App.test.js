@@ -112,9 +112,32 @@ describe('NewRecipeForm checkbox', () => {
       );
     });
 
-    const checkbox = div.querySelector('input[name="new"]');
+    // Verify toggle structure exists
+    const toggleContainer = div.querySelector('.toggle-container');
+    expect(toggleContainer).toBeTruthy();
+
+    const track = div.querySelector('.toggle-track');
+    expect(track).toBeTruthy();
+
+    const circle = div.querySelector('.toggle-circle');
+    expect(circle).toBeTruthy();
+
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
     expect(checkbox).toBeTruthy();
     expect(checkbox.checked).toBe(false);
+
+    // Verify both text labels exist with correct classes
+    const offLabel = div.querySelector('.toggle-text-off');
+    const onLabel = div.querySelector('.toggle-text-on');
+    expect(offLabel).toBeTruthy();
+    expect(offLabel.textContent).toBe("I haven't tried this yet");
+    expect(onLabel).toBeTruthy();
+    expect(onLabel.textContent).toBe("I've tried it!");
+
+    // Note: CSS controls visibility; toggle-text-off is visible when unchecked
+    // (In browser, toggle-text-on would have display:none via CSS)
+
     act(() => {
       root.unmount();
     });
@@ -142,8 +165,25 @@ describe('NewRecipeForm checkbox', () => {
       );
     });
 
-    const checkbox = div.querySelector('input[name="new"]');
+    // Verify toggle structure
+    const toggleContainer = div.querySelector('.toggle-container');
+    expect(toggleContainer).toBeTruthy();
+
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
     expect(checkbox.checked).toBe(true);
+
+    // Verify both text labels exist with correct classes
+    const offLabel = div.querySelector('.toggle-text-off');
+    const onLabel = div.querySelector('.toggle-text-on');
+    expect(offLabel).toBeTruthy();
+    expect(offLabel.textContent).toBe("I haven't tried this yet");
+    expect(onLabel).toBeTruthy();
+    expect(onLabel.textContent).toBe("I've tried it!");
+
+    // Note: CSS controls visibility; toggle-text-on is visible when checked
+    // (In browser, toggle-text-off would have display:none via CSS)
+
     act(() => {
       root.unmount();
     });
@@ -171,8 +211,13 @@ describe('NewRecipeForm checkbox', () => {
       );
     });
 
-    const checkbox = div.querySelector('input[name="new"]');
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
     expect(checkbox.checked).toBe(false);
+
+    // Verify text label shows OFF state
+    expect(div.textContent).toContain("I haven't tried this yet");
+
     act(() => {
       root.unmount();
     });
@@ -201,8 +246,13 @@ describe('NewRecipeForm checkbox', () => {
       );
     });
 
-    const checkbox = div.querySelector('input[name="new"]');
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
     expect(checkbox.checked).toBe(false);
+
+    // Verify text label
+    expect(div.textContent).toContain("I haven't tried this yet");
+
     act(() => {
       root.unmount();
     });
