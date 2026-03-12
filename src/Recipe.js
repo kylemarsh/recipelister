@@ -75,6 +75,15 @@ const NewRecipeForm = (props) => {
           placeholder="Total time"
           defaultValue={recipe.Time}
         />
+        {/* Inverted: checked = "has been cooked" = New: false */}
+        <label>
+          <input
+            name="new"
+            type="checkbox"
+            defaultChecked={recipe.New === false}
+          />
+          This recipe has been cooked
+        </label>
         <textarea
           name="body"
           placeholder="Type Recipe Here..."
