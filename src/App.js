@@ -161,6 +161,16 @@ class App extends Component {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+    // Invert checkbox logic for backend expectations
+    // Checkbox checked (toggle ON, "tried") → omit field
+    // Checkbox unchecked (toggle OFF, "new") → send new=1
+    if (formData.has('new')) {
+      // Checkbox is checked (user tried it), omit the field
+      formData.delete('new');
+    } else {
+      // Checkbox is unchecked (recipe is new), send new=1
+      formData.set('new', '1');
+    }
     const targetId = this.state.targetRecipe;
     var recipe;
     try {
