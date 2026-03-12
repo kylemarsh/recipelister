@@ -36,8 +36,8 @@ const GroupedResultList = (props) => {
       return null;
     }
 
-    const isCollapsed = props.collapsedGroups[labelName] || false;
-    const icon = isCollapsed ? "▶" : "▼";
+    const isExpanded = props.expandedGroups[labelName] || false;
+    const icon = isExpanded ? "▼" : "▶";
 
     return (
       <div key={labelName} className="group-section">
@@ -49,7 +49,7 @@ const GroupedResultList = (props) => {
           <span className="group-label">{labelName}</span>
           <span className="group-count">({recipes.length})</span>
         </div>
-        {!isCollapsed && (
+        {isExpanded && (
           <ResultList
             items={recipes}
             sortBy={props.sortBy}

@@ -26,10 +26,10 @@ class App extends Component {
         tagsAny: [],
         tagsNone: [],
         sortBy: "alphabetic",
-        groupBy: false,
+        groupBy: true,
       },
       shuffleKeys: {},
-      collapsedGroups: {},
+			expandedGroups: { Main: true },
       login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
       error: null,
       errorContext: null,
@@ -93,7 +93,7 @@ class App extends Component {
               groupBy={this.state.filters.groupBy}
               sortBy={this.state.filters.sortBy}
               shuffleKeys={this.state.shuffleKeys}
-              collapsedGroups={this.state.collapsedGroups}
+              expandedGroups={this.state.expandedGroups}
               handleGroupToggle={this.handleGroupCollapse}
               handleClick={this.handleResultClick}
             />
@@ -475,9 +475,9 @@ class App extends Component {
   };
 
   handleGroupCollapse = (groupLabel) => {
-    const newCollapsedGroups = { ...this.state.collapsedGroups };
-    newCollapsedGroups[groupLabel] = !newCollapsedGroups[groupLabel];
-    this.setState({ collapsedGroups: newCollapsedGroups });
+    const newExpandedGroups = { ...this.state.expandedGroups };
+    newExpandedGroups[groupLabel] = !newExpandedGroups[groupLabel];
+    this.setState({ expandedGroups: newExpandedGroups });
   };
 
   handleResultClick = (event) => {

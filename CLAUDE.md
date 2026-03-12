@@ -50,11 +50,12 @@ The active sort option is visually indicated with a blue border and background.
 To the right of the sort buttons (separated by a vertical divider on desktop, or
 above the sort buttons on mobile) is a group button:
  - 📂 (Group): Groups recipes by specific labels (Main, Dessert, Breakfast, Side,
-   Appetizer, Drink) with collapsible group headers showing recipe counts. Recipes
-   tagged with multiple grouping labels appear in each relevant group. Recipes
-   without any grouping labels appear in an "Other" group. The selected sort mode
-   applies within each group. Group expand/collapse state persists across filter
-   changes. Label matching is case-insensitive.
+   Appetizer, Drink) with collapsible group headers showing recipe counts. Grouping
+   is enabled by default with all groups collapsed except "Main". Recipes tagged
+   with multiple grouping labels appear in each relevant group. Recipes without
+   any grouping labels appear in an "Other" group. The selected sort mode applies
+   within each group. Group expand/collapse state persists across filter changes.
+   Label matching is case-insensitive.
 
 Below the query form is another horizontal rule and below that the list of all
 recipes matching the current search (when nothing is searched, the list
@@ -193,8 +194,10 @@ then decides how to render based on the `groupBy` prop:
    labels appear in an "Other" group.
 
 Group headers display the group name and recipe count, with expand/collapse
-indicators (▼/▶). The collapse state is managed in App.js via the
-`collapsedGroups` state and `handleGroupCollapse` handler.
+indicators (▼/▶). The expand state is managed in App.js via the
+`expandedGroups` state and `handleGroupCollapse` handler. Groups are collapsed
+by default (not present in expandedGroups) except for "Main" which is expanded
+on initial load.
 
 ### ResultList Component
 Defined in `ResultList.js`. This is a pure presentation component that sorts
