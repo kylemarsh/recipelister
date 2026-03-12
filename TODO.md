@@ -39,40 +39,6 @@ manage them. Management includes:
  - Adding a new label
  - Viewing titles for all recipes tagged with a label, and unlinking them
 
-## Indicate Labels on Recipe List
-The recipe list should use label icons after the recipe title to indicate what
-labels the recipe is tagged with. Hovering over a label (or tapping on mobile)
-should pop up a tooltip with the label name.
-
-If we don't have database support for label
-icons yet, use the following to begin:
- - Beef: 🐄
- - Chicken: 🐓
- - Pork: 🐖
- - Fish: 🐟
- - Lamb: 🐑
- - Vegetarian: 🥦
- - Vegan: Ⓥ
- - SoupStew: 🍜
- - soup: 🍜
- - Salad: 🥬
- - Mexican: 🇲
- - Asian: 🥟
- - MiddleEast: 🫓
- - Dessert: 🍦
- - Bread: 🍞
- - Cake: 🎂
- - Fruit: 🍏
- - GlutenFree: 🅶
- - Spicy: 🌶️
- - Quick: ⏱️
- - Main: 🍽️
-
-Logic to choose Label icons should not be add added to the recipe list
-component, but rather the icons should be passed in as part of the Labels so
-that it's easy to update a label icon in just a single place and have that
-updated everywhere.
-
 ## Guest Users
 We should enable the concept of a "guest" user who can view but not edit the
 database. Possible implementation details are:

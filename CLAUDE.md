@@ -203,11 +203,17 @@ on initial load.
 Defined in `ResultList.js`. This is a pure presentation component that sorts
 and renders a list of recipes. It receives pre-filtered recipes as props,
 applies the selected sort mode (via `Util.sortRecipes`), and renders them as
-an unordered list. Recipes with the `New` field set to true (untried recipes)
-are displayed with a bullet point (•) before the title. The list styling removes
-default CSS bullets (list-style-type: none) so the bullet indicator is controlled
-explicitly in the component. It does not handle filtering - that's done by
-GroupedResultList.
+an unordered list.
+
+Recipes with the `New` field set to true (untried recipes) are displayed with
+a bullet point (•) before the title. After the title, label icons are displayed
+for any labels that have an `Icon` field. The icons use native browser tooltips
+(via the `title` attribute) to show the label name on hover (desktop) or tap
+(mobile).
+
+The list styling removes default CSS bullets (list-style-type: none) so the
+bullet indicator is controlled explicitly in the component. It does not handle
+filtering - that's done by GroupedResultList.
 
 ### Recipe Component
 Defined in `Recipe.js`. This component renders the currently seleted recipe in
