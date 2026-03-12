@@ -13,7 +13,7 @@ const Recipe = (props) => {
   //FIXME style the edit trigger
   return (
     <div className="recipe-container" data-recipe-id={recipe.ID}>
-      <h2>{recipe.Title}</h2>
+      <h2>{recipe.Title}{recipe.New ? " (New!)" : ""}</h2>
       <RecipeActions type="recipe" {...props.recipeHandlers} />
       <div className="recipe-timing">
         <div className="active-time">Active Time: {activeTime}</div>
