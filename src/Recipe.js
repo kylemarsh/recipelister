@@ -75,15 +75,22 @@ const NewRecipeForm = (props) => {
           placeholder="Total time"
           defaultValue={recipe.Time}
         />
-        {/* Inverted: checked = "has been cooked" = New: false */}
-        <label>
+        <div className="toggle-container">
           <input
+            id="new-toggle"
             name="new"
             type="checkbox"
+            className="toggle-checkbox"
             defaultChecked={recipe.New === false}
           />
-          This recipe has been cooked
-        </label>
+          <label htmlFor="new-toggle" className="toggle-label">
+            <span className="toggle-track">
+              <span className="toggle-circle"></span>
+            </span>
+            <span className="toggle-text-off">I haven't tried this yet</span>
+            <span className="toggle-text-on">I've tried it!</span>
+          </label>
+        </div>
         <textarea
           name="body"
           placeholder="Type Recipe Here..."
