@@ -234,10 +234,16 @@ A "recipe" object has the following properties:
 
 ### NewRecipeForm Component
 Defined in `Recipe.js`. This component renders the form that lets users add a
-new recipe to the database. The form includes a checkbox labeled "This recipe
-has been cooked" that controls the `New` field on the recipe. When checked, the
-recipe is created with New set to false (has been cooked). When unchecked
-(default), the recipe is created with New set to true (has not been cooked yet).
+new recipe to the database. The form includes a toggle control that manages the
+`New` field on the recipe.
+
+**Toggle Control:**
+- Visual sliding toggle for marking recipes as tried/untried
+- Toggle ON ("I've tried it!"): Recipe marked as tried (New: false)
+- Toggle OFF ("I haven't tried this yet"): Recipe marked as new (New: true)
+- Implemented as styled checkbox with value transformation in form submission
+- Maintains accessibility through hidden checkbox element
+
 The form does not currently support adding labels to a recipe on creation, and
 throws uninformative errors when the times are left blank or use an unexpected
 format (10m instead of 10, for example).
@@ -322,6 +328,8 @@ recipe list:
    (Main, Dessert, Breakfast, Side, Appetizer, Drink)
  - `filterRecipesByLabel()`: filters recipes that have a specific label
    (case-insensitive matching)
+ - `transformNewField()`: transforms the "new recipe" toggle value from the form
+   to the correct `New` field value for API submission
 
 
 # Development
