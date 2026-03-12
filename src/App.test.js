@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { act } from "react";
 import App from "./App";
 import { Recipe, NewRecipeForm } from "./Recipe";
+import ResultList from "./ResultList";
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
@@ -202,6 +203,64 @@ describe('NewRecipeForm checkbox', () => {
 
     const checkbox = div.querySelector('input[name="new"]');
     expect(checkbox.checked).toBe(false);
+    act(() => {
+      root.unmount();
+    });
+  });
+});
+
+describe('ResultList new indicator', () => {
+  const mockHandlers = {
+    handleClick: jest.fn()
+  };
+
+  test('displays bullet point for new recipes', () => {
+    const recipes = [
+      { ID: 1, Title: 'New Recipe', New: true },
+      { ID: 2, Title: 'Old Recipe', New: false }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('• New Recipe');
+    expect(div.textContent).toContain('Old Recipe');
+    expect(div.textContent).not.toContain('• Old Recipe');
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('does not display bullet when New is undefined', () => {
+    const recipes = [
+      { ID: 3, Title: 'Recipe Without Field' }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('Recipe Without Field');
+    expect(div.textContent).not.toContain('•');
     act(() => {
       root.unmount();
     });
