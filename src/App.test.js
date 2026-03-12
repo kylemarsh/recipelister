@@ -473,3 +473,148 @@ describe('Recipe New Indicator - Integration', () => {
     });
   });
 });
+
+describe('ResultList label icons', () => {
+  const mockHandlers = {
+    handleClick: jest.fn()
+  };
+
+  test('displays icons for labels that have Icon field', () => {
+    const recipes = [
+      {
+        ID: 1,
+        Title: 'Chicken Soup',
+        Labels: [
+          { ID: 1, Label: 'Chicken', Icon: '🐓' },
+          { ID: 2, Label: 'SoupStew', Icon: '🍜' }
+        ]
+      }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('Chicken Soup');
+    expect(div.textContent).toContain('🐓');
+    expect(div.textContent).toContain('🍜');
+
+    const icons = div.querySelectorAll('.recipe-icon');
+    expect(icons.length).toBe(2);
+    expect(icons[0].getAttribute('title')).toBe('Chicken');
+    expect(icons[1].getAttribute('title')).toBe('SoupStew');
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('skips labels without Icon field', () => {
+    const recipes = [
+      {
+        ID: 1,
+        Title: 'Test Recipe',
+        Labels: [
+          { ID: 1, Label: 'HasIcon', Icon: '🍕' },
+          { ID: 2, Label: 'NoIcon', Icon: null },
+          { ID: 3, Label: 'EmptyIcon', Icon: '' }
+        ]
+      }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('🍕');
+    const icons = div.querySelectorAll('.recipe-icon');
+    expect(icons.length).toBe(1);
+    expect(icons[0].textContent).toBe('🍕');
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('handles recipes without labels', () => {
+    const recipes = [
+      { ID: 1, Title: 'No Labels Recipe', Labels: [] },
+      { ID: 2, Title: 'Undefined Labels Recipe' }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('No Labels Recipe');
+    expect(div.textContent).toContain('Undefined Labels Recipe');
+    const icons = div.querySelectorAll('.recipe-icon');
+    expect(icons.length).toBe(0);
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('displays icons after New indicator', () => {
+    const recipes = [
+      {
+        ID: 1,
+        Title: 'New Recipe',
+        New: true,
+        Labels: [
+          { ID: 1, Label: 'Test', Icon: '🧪' }
+        ]
+      }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('• New Recipe');
+    expect(div.textContent).toContain('🧪');
+    const icons = div.querySelectorAll('.recipe-icon');
+    expect(icons.length).toBe(1);
+
+    act(() => {
+      root.unmount();
+    });
+  });
+});
