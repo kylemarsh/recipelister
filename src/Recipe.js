@@ -13,7 +13,7 @@ const Recipe = (props) => {
   //FIXME style the edit trigger
   return (
     <div className="recipe-container" data-recipe-id={recipe.ID}>
-      <h2>{recipe.Title}</h2>
+      <h2>{recipe.Title}{recipe.New ? " (New!)" : ""}</h2>
       <RecipeActions type="recipe" {...props.recipeHandlers} />
       <div className="recipe-timing">
         <div className="active-time">Active Time: {activeTime}</div>
@@ -75,6 +75,22 @@ const NewRecipeForm = (props) => {
           placeholder="Total time"
           defaultValue={recipe.Time}
         />
+        <div className="toggle-container">
+          <input
+            id="new-toggle"
+            name="new"
+            type="checkbox"
+            className="toggle-checkbox"
+            defaultChecked={recipe.New === false}
+          />
+          <label htmlFor="new-toggle" className="toggle-label">
+            <span className="toggle-track">
+              <span className="toggle-circle"></span>
+            </span>
+            <span className="toggle-text-off">I haven't tried this yet</span>
+            <span className="toggle-text-on">I've tried it!</span>
+          </label>
+        </div>
         <textarea
           name="body"
           placeholder="Type Recipe Here..."

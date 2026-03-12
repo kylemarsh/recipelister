@@ -1,9 +1,475 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
+import { act } from "react";
 import App from "./App";
+import { Recipe, NewRecipeForm } from "./Recipe";
+import ResultList from "./ResultList";
+import * as Util from "./Util";
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
-  ReactDOM.render(<App />, div);
-  ReactDOM.unmountComponentAtNode(div);
+  const root = createRoot(div);
+  act(() => {
+    root.render(<App />);
+  });
+  act(() => {
+    root.unmount();
+  });
+});
+
+describe('Recipe new indicator', () => {
+  const mockHandlers = {
+    recipeHandlers: { EditClick: jest.fn(), UntargetClick: jest.fn(), DeleteClick: jest.fn() },
+    noteHandlers: {},
+    labelHandlers: {}
+  };
+
+  test('displays "(New!)" for untried recipes', () => {
+    const newRecipe = {
+      ID: 1,
+      Title: 'Test Recipe',
+      New: true,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Test body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[newRecipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('Test Recipe (New!)');
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('does not display "(New!)" for tried recipes', () => {
+    const triedRecipe = {
+      ID: 2,
+      Title: 'Tried Recipe',
+      New: false,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Test body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[triedRecipe]}
+          availableLabels={[]}
+          targetRecipeId={2}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('Tried Recipe');
+    expect(div.textContent).not.toContain('(New!)');
+    act(() => {
+      root.unmount();
+    });
+  });
+});
+
+describe('NewRecipeForm checkbox', () => {
+  const mockHandlers = {
+    handleSubmit: jest.fn(),
+    handleCancel: jest.fn()
+  };
+
+  test('renders unchecked checkbox when creating new recipe', () => {
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <NewRecipeForm
+          recipeId={undefined}
+          recipes={[]}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    // Verify toggle structure exists
+    const toggleContainer = div.querySelector('.toggle-container');
+    expect(toggleContainer).toBeTruthy();
+
+    const track = div.querySelector('.toggle-track');
+    expect(track).toBeTruthy();
+
+    const circle = div.querySelector('.toggle-circle');
+    expect(circle).toBeTruthy();
+
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
+    expect(checkbox).toBeTruthy();
+    expect(checkbox.checked).toBe(false);
+
+    // Verify both text labels exist with correct classes
+    const offLabel = div.querySelector('.toggle-text-off');
+    const onLabel = div.querySelector('.toggle-text-on');
+    expect(offLabel).toBeTruthy();
+    expect(offLabel.textContent).toBe("I haven't tried this yet");
+    expect(onLabel).toBeTruthy();
+    expect(onLabel.textContent).toBe("I've tried it!");
+
+    // Note: CSS controls visibility; toggle-text-off is visible when unchecked
+    // (In browser, toggle-text-on would have display:none via CSS)
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('renders checked checkbox when editing tried recipe', () => {
+    const triedRecipe = {
+      ID: 1,
+      Title: 'Test',
+      New: false,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Body'
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <NewRecipeForm
+          recipeId={1}
+          recipes={[triedRecipe]}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    // Verify toggle structure
+    const toggleContainer = div.querySelector('.toggle-container');
+    expect(toggleContainer).toBeTruthy();
+
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
+    expect(checkbox.checked).toBe(true);
+
+    // Verify both text labels exist with correct classes
+    const offLabel = div.querySelector('.toggle-text-off');
+    const onLabel = div.querySelector('.toggle-text-on');
+    expect(offLabel).toBeTruthy();
+    expect(offLabel.textContent).toBe("I haven't tried this yet");
+    expect(onLabel).toBeTruthy();
+    expect(onLabel.textContent).toBe("I've tried it!");
+
+    // Note: CSS controls visibility; toggle-text-on is visible when checked
+    // (In browser, toggle-text-off would have display:none via CSS)
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('renders unchecked checkbox when editing new recipe', () => {
+    const newRecipe = {
+      ID: 2,
+      Title: 'Test',
+      New: true,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Body'
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <NewRecipeForm
+          recipeId={2}
+          recipes={[newRecipe]}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
+    expect(checkbox.checked).toBe(false);
+
+    // Verify text label shows OFF state
+    expect(div.textContent).toContain("I haven't tried this yet");
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('renders unchecked checkbox when New field is undefined', () => {
+    const recipeWithoutNewField = {
+      ID: 3,
+      Title: 'Old Recipe',
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Body'
+      // Note: No New field
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <NewRecipeForm
+          recipeId={3}
+          recipes={[recipeWithoutNewField]}
+          handleSubmit={jest.fn()}
+          handleCancel={jest.fn()}
+        />
+      );
+    });
+
+    // Verify checkbox state
+    const checkbox = div.querySelector('.toggle-checkbox');
+    expect(checkbox.checked).toBe(false);
+
+    // Verify text label
+    expect(div.textContent).toContain("I haven't tried this yet");
+
+    act(() => {
+      root.unmount();
+    });
+  });
+});
+
+describe('Toggle form submission', () => {
+  test('checked toggle omits new field from FormData', () => {
+    // Simulate FormData with checked checkbox
+    const formData = new FormData();
+    formData.set('title', 'Test Recipe');
+    formData.set('new', 'on');
+
+    // Apply transformation logic from production code
+    Util.transformNewField(formData);
+
+    // Verify field is omitted
+    expect(formData.has('new')).toBe(false);
+    expect(formData.get('title')).toBe('Test Recipe');
+  });
+
+  test('unchecked toggle sends new=1 in FormData', () => {
+    // Simulate FormData with unchecked checkbox
+    const formData = new FormData();
+    formData.set('title', 'Test Recipe');
+    // 'new' field not present (unchecked)
+
+    // Apply transformation logic from production code
+    Util.transformNewField(formData);
+
+    // Verify new=1 is added
+    expect(formData.get('new')).toBe('1');
+    expect(formData.get('title')).toBe('Test Recipe');
+  });
+});
+
+describe('ResultList new indicator', () => {
+  const mockHandlers = {
+    handleClick: jest.fn()
+  };
+
+  test('displays bullet point for new recipes', () => {
+    const recipes = [
+      { ID: 1, Title: 'New Recipe', New: true },
+      { ID: 2, Title: 'Old Recipe', New: false }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('• New Recipe');
+    expect(div.textContent).toContain('Old Recipe');
+    expect(div.textContent).not.toContain('• Old Recipe');
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('does not display bullet when New is undefined', () => {
+    const recipes = [
+      { ID: 3, Title: 'Recipe Without Field' }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    expect(div.textContent).toContain('Recipe Without Field');
+    expect(div.textContent).not.toContain('•');
+    act(() => {
+      root.unmount();
+    });
+  });
+});
+
+describe('Recipe New Indicator - Integration', () => {
+  test('new recipe shows all indicators throughout app', () => {
+    const newRecipe = {
+      ID: 1,
+      Title: 'Fresh Recipe',
+      New: true,
+      ActiveTime: 15,
+      Time: 30,
+      Body: 'Test recipe body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+
+    act(() => {
+      root.render(
+        <ResultList
+          items={[newRecipe]}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+        />
+      );
+    });
+
+    // Should show bullet in list
+    expect(div.textContent).toContain('• Fresh Recipe');
+
+    act(() => {
+      root.unmount();
+    });
+
+    // Now test Recipe component
+    const div2 = document.createElement("div");
+    const root2 = createRoot(div2);
+
+    act(() => {
+      root2.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[newRecipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          recipeHandlers={{ EditClick: jest.fn(), UntargetClick: jest.fn(), DeleteClick: jest.fn() }}
+          noteHandlers={{}}
+          labelHandlers={{}}
+        />
+      );
+    });
+
+    // Should show (New!) in title
+    expect(div2.textContent).toContain('Fresh Recipe (New!)');
+
+    act(() => {
+      root2.unmount();
+    });
+  });
+
+  test('tried recipe shows no indicators', () => {
+    const triedRecipe = {
+      ID: 2,
+      Title: 'Old Recipe',
+      New: false,
+      ActiveTime: 15,
+      Time: 30,
+      Body: 'Test recipe body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+
+    act(() => {
+      root.render(
+        <ResultList
+          items={[triedRecipe]}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+        />
+      );
+    });
+
+    // Should NOT show bullet in list
+    expect(div.textContent).toContain('Old Recipe');
+    expect(div.textContent).not.toContain('•');
+
+    act(() => {
+      root.unmount();
+    });
+
+    // Now test Recipe component
+    const div2 = document.createElement("div");
+    const root2 = createRoot(div2);
+
+    act(() => {
+      root2.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[triedRecipe]}
+          availableLabels={[]}
+          targetRecipeId={2}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          recipeHandlers={{ EditClick: jest.fn(), UntargetClick: jest.fn(), DeleteClick: jest.fn() }}
+          noteHandlers={{}}
+          labelHandlers={{}}
+        />
+      );
+    });
+
+    // Should NOT show (New!) in title
+    expect(div2.textContent).toContain('Old Recipe');
+    expect(div2.textContent).not.toContain('(New!)');
+
+    act(() => {
+      root2.unmount();
+    });
+  });
 });

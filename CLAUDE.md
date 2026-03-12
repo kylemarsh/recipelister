@@ -68,7 +68,9 @@ recipe. On Mobile the selected recipe should fill the page.
 On the right side of the page is the Recipe Pane, where the selected recipe is
 displayed. Recipes are structured in 6 parts:
 
- 1. Title -- this is a header at the top of the pane
+ 1. Title -- this is a header at the top of the pane. If the recipe has not been
+    cooked yet (recipe.New is true), the title is followed by "(New!)" to indicate
+    this is an untried recipe
  2. Action Buttons -- buttons to close the recipe pane, edit the recipe, and
     delete the recipe
  3. Timing -- two lines indicating how long the recipe takes to cook. Active
@@ -198,7 +200,10 @@ indicators (▼/▶). The collapse state is managed in App.js via the
 Defined in `ResultList.js`. This is a pure presentation component that sorts
 and renders a list of recipes. It receives pre-filtered recipes as props,
 applies the selected sort mode (via `Util.sortRecipes`), and renders them as
-an unordered list. It does not handle filtering - that's done by
+an unordered list. Recipes with the `New` field set to true (untried recipes)
+are displayed with a bullet point (•) before the title. The list styling removes
+default CSS bullets (list-style-type: none) so the bullet indicator is controlled
+explicitly in the component. It does not handle filtering - that's done by
 GroupedResultList.
 
 ### Recipe Component
@@ -221,14 +226,27 @@ A "recipe" object has the following properties:
  - `Time` (int): how long this recipe takes to cook
  - `ActiveTime` (int): how long the cook needs to spend working on this this recipe
    (chopping, stirring, etc.)
+ - `New` (boolean): indicates whether the recipe has been cooked yet. When true, the
+   recipe has not been cooked and is displayed with visual indicators ("(New!)" in
+   the recipe title, bullet point in the recipe list)
  - `Labels` (array): array of `Label` structures this recipe is tagged with
  - `Notes` (array): array of `Note` structures attached to this recipe
 
 ### NewRecipeForm Component
 Defined in `Recipe.js`. This component renders the form that lets users add a
-new recipe to the database. It does not currently support adding labels to a
-recipe on creation, and throws uninformative errors when the times are left
-blank or use an unexpected format (10m instead of 10, for example).
+new recipe to the database. The form includes a toggle control that manages the
+`New` field on the recipe.
+
+**Toggle Control:**
+- Visual sliding toggle for marking recipes as tried/untried
+- Toggle ON ("I've tried it!"): Recipe marked as tried (New: false)
+- Toggle OFF ("I haven't tried this yet"): Recipe marked as new (New: true)
+- Implemented as styled checkbox with value transformation in form submission
+- Maintains accessibility through hidden checkbox element
+
+The form does not currently support adding labels to a recipe on creation, and
+throws uninformative errors when the times are left blank or use an unexpected
+format (10m instead of 10, for example).
 
 ### Alert Component
 Defined in `Alert.js`. The app renders this component to display errors --
@@ -310,6 +328,8 @@ recipe list:
    (Main, Dessert, Breakfast, Side, Appetizer, Drink)
  - `filterRecipesByLabel()`: filters recipes that have a specific label
    (case-insensitive matching)
+ - `transformNewField()`: transforms the "new recipe" toggle value from the form
+   to the correct `New` field value for API submission
 
 
 # Development

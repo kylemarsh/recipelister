@@ -161,6 +161,8 @@ class App extends Component {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+    // Transform new field for backend expectations
+    Util.transformNewField(formData);
     const targetId = this.state.targetRecipe;
     var recipe;
     try {

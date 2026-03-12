@@ -6,7 +6,7 @@ const ResultList = (props) => {
   const rows = sortedItems.map((item) => {
     return (
       <li key={item.ID} id={item.ID} onClick={props.handleClick}>
-        {item.Title}
+        {item.New && "• "}{item.Title}
       </li>
     );
   });

@@ -1,3 +1,7 @@
+.result-list {
+  list-style-type: none;
+}
+
 .result-list > li {
   cursor: pointer;
 }
