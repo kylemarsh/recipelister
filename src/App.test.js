@@ -266,3 +266,129 @@ describe('ResultList new indicator', () => {
     });
   });
 });
+
+describe('Recipe New Indicator - Integration', () => {
+  test('new recipe shows all indicators throughout app', () => {
+    const newRecipe = {
+      ID: 1,
+      Title: 'Fresh Recipe',
+      New: true,
+      ActiveTime: 15,
+      Time: 30,
+      Body: 'Test recipe body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+
+    act(() => {
+      root.render(
+        <ResultList
+          items={[newRecipe]}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+        />
+      );
+    });
+
+    // Should show bullet in list
+    expect(div.textContent).toContain('• Fresh Recipe');
+
+    act(() => {
+      root.unmount();
+    });
+
+    // Now test Recipe component
+    const div2 = document.createElement("div");
+    const root2 = createRoot(div2);
+
+    act(() => {
+      root2.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[newRecipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          recipeHandlers={{ EditClick: jest.fn(), UntargetClick: jest.fn(), DeleteClick: jest.fn() }}
+          noteHandlers={{}}
+          labelHandlers={{}}
+        />
+      );
+    });
+
+    // Should show (New!) in title
+    expect(div2.textContent).toContain('Fresh Recipe (New!)');
+
+    act(() => {
+      root2.unmount();
+    });
+  });
+
+  test('tried recipe shows no indicators', () => {
+    const triedRecipe = {
+      ID: 2,
+      Title: 'Old Recipe',
+      New: false,
+      ActiveTime: 15,
+      Time: 30,
+      Body: 'Test recipe body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+
+    act(() => {
+      root.render(
+        <ResultList
+          items={[triedRecipe]}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+        />
+      );
+    });
+
+    // Should NOT show bullet in list
+    expect(div.textContent).toContain('Old Recipe');
+    expect(div.textContent).not.toContain('•');
+
+    act(() => {
+      root.unmount();
+    });
+
+    // Now test Recipe component
+    const div2 = document.createElement("div");
+    const root2 = createRoot(div2);
+
+    act(() => {
+      root2.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[triedRecipe]}
+          availableLabels={[]}
+          targetRecipeId={2}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          recipeHandlers={{ EditClick: jest.fn(), UntargetClick: jest.fn(), DeleteClick: jest.fn() }}
+          noteHandlers={{}}
+          labelHandlers={{}}
+        />
+      );
+    });
+
+    // Should NOT show (New!) in title
+    expect(div2.textContent).toContain('Old Recipe');
+    expect(div2.textContent).not.toContain('(New!)');
+
+    act(() => {
+      root2.unmount();
+    });
+  });
+});
