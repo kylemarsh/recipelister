@@ -29,3 +29,76 @@
 .recipe-delete-trigger {
 	color: maroon;
 }
+
+/* Toggle container layout */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+/* Hide the real checkbox */
+.toggle-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Toggle track (the pill) */
+.toggle-track {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  background-color: #ccc;
+  border-radius: 12px;
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+.toggle-checkbox:checked + .toggle-label .toggle-track {
+  background-color: #4CAF50;
+}
+
+/* Toggle circle (the slider) */
+.toggle-circle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-checkbox:checked + .toggle-label .toggle-circle {
+  /* Slide right: track 50px - circle 20px - padding 2*2px = 26px */
+  transform: translateX(26px);
+}
+
+/* Text labels (conditional display) */
+.toggle-text-off,
+.toggle-text-on {
+  font-size: 14px;
+}
+
+.toggle-text-off {
+  color: #666;
+}
+
+.toggle-text-on {
+  color: #4CAF50;
+  display: none;
+}
+
+.toggle-checkbox:checked + .toggle-label .toggle-text-off {
+  display: none;
+}
+
+.toggle-checkbox:checked + .toggle-label .toggle-text-on {
+  display: inline;
+}
