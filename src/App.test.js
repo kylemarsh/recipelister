@@ -4,6 +4,7 @@ import { act } from "react";
 import App from "./App";
 import { Recipe, NewRecipeForm } from "./Recipe";
 import ResultList from "./ResultList";
+import * as Util from "./Util";
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
@@ -256,6 +257,36 @@ describe('NewRecipeForm checkbox', () => {
     act(() => {
       root.unmount();
     });
+  });
+});
+
+describe('Toggle form submission', () => {
+  test('checked toggle omits new field from FormData', () => {
+    // Simulate FormData with checked checkbox
+    const formData = new FormData();
+    formData.set('title', 'Test Recipe');
+    formData.set('new', 'on');
+
+    // Apply transformation logic from production code
+    Util.transformNewField(formData);
+
+    // Verify field is omitted
+    expect(formData.has('new')).toBe(false);
+    expect(formData.get('title')).toBe('Test Recipe');
+  });
+
+  test('unchecked toggle sends new=1 in FormData', () => {
+    // Simulate FormData with unchecked checkbox
+    const formData = new FormData();
+    formData.set('title', 'Test Recipe');
+    // 'new' field not present (unchecked)
+
+    // Apply transformation logic from production code
+    Util.transformNewField(formData);
+
+    // Verify new=1 is added
+    expect(formData.get('new')).toBe('1');
+    expect(formData.get('title')).toBe('Test Recipe');
   });
 });
 
