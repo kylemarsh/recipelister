@@ -49,13 +49,16 @@ The active sort option is visually indicated with a blue border and background.
 
 To the right of the sort buttons (separated by a vertical divider on desktop, or
 above the sort buttons on mobile) is a group button:
- - 📂 (Group): Groups recipes by specific labels (Main, Dessert, Breakfast, Side,
-   Appetizer, Drink) with collapsible group headers showing recipe counts. Grouping
-   is enabled by default with all groups collapsed except "Main". Recipes tagged
-   with multiple grouping labels appear in each relevant group. Recipes without
-   any grouping labels appear in an "Other" group. The selected sort mode applies
-   within each group. Group expand/collapse state persists across filter changes.
-   Label matching is case-insensitive.
+ - 📂 (Group): Groups recipes by labels with type="course" (Main, Dessert,
+   Breakfast, Side, Appetizer, Drink) with collapsible group headers showing
+   recipe counts. Grouping is enabled by default with all groups collapsed
+   except "Main". Recipes tagged with multiple course labels appear in each
+   relevant group. Recipes without any course labels appear in an "Other"
+   group. The selected sort mode applies within each group. Group
+   expand/collapse state persists across filter changes.
+
+   The grouping dynamically uses labels where Type="course" from the API, so
+   new course labels automatically appear as groups without code changes.
 
 Below the query form is another horizontal rule and below that the list of all
 recipes matching the current search (when nothing is searched, the list
@@ -186,12 +189,15 @@ the `search-pane` div.
 
 This component applies all search and label filters (via `Util.applyFilters`),
 then decides how to render based on the `groupBy` prop:
- - When `groupBy` is false: Renders a single `ResultList` component with all
-   filtered recipes
- - When `groupBy` is true: Groups recipes by specific labels (Main, Dessert,
-   Breakfast, Side, Appetizer, Drink) with collapsible group headers. Each
-   group renders its own `ResultList` component. Recipes without grouping
-   labels appear in an "Other" group.
+ - When `groupBy` is "" (empty string): Renders a single `ResultList` component
+   with all filtered recipes
+ - When `groupBy` is "course": Groups recipes by labels where Type="course"
+   (dynamically determined from API data) with collapsible group headers. Each
+   group renders its own `ResultList` component. Recipes without course labels
+   appear in an "Other" group.
+
+The `groupBy` prop is a string indicating the label Type to group by, or ""
+for no grouping.
 
 Group headers display the group name and recipe count, with expand/collapse
 indicators (▼/▶). The expand state is managed in App.js via the
@@ -334,8 +340,8 @@ recipe list:
  - `sortRecipes()`: sorts recipes by the selected sort mode (alphabetic, newest,
    or shuffle with stable random keys)
  - `selectRecipe()`: finds a recipe by ID from the recipe list
- - `getGroupingLabels()`: returns the ordered list of labels used for grouping
-   (Main, Dessert, Breakfast, Side, Appetizer, Drink)
+ - `getGroupingLabels(allLabels, groupBy)`: Returns array of label names that
+   match the specified type. Filters labels where Type === groupBy.
  - `filterRecipesByLabel()`: filters recipes that have a specific label
    (case-insensitive matching)
  - `transformNewField()`: transforms the "new recipe" toggle value from the form
