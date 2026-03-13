@@ -26,7 +26,7 @@ class App extends Component {
         tagsAny: [],
         tagsNone: [],
         sortBy: "alphabetic",
-        groupBy: true,
+        groupBy: "course",
       },
       shuffleKeys: {},
 			expandedGroups: { Main: true },
@@ -470,7 +470,8 @@ class App extends Component {
   };
 
   handleGroupToggle = () => {
-    const newfilters = { ...this.state.filters, groupBy: !this.state.filters.groupBy };
+    const newGroupBy = this.state.filters.groupBy === "" ? "course" : "";
+    const newfilters = { ...this.state.filters, groupBy: newGroupBy };
     this.setState({ filters: newfilters });
   };
 
