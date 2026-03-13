@@ -618,3 +618,48 @@ describe('ResultList label icons', () => {
     });
   });
 });
+
+describe('getGroupingLabels with type filtering', () => {
+  test('filters labels by Type field', () => {
+    const labels = [
+      { ID: 1, Label: 'main', Type: 'course' },
+      { ID: 2, Label: 'dessert', Type: 'course' },
+      { ID: 3, Label: 'chicken', Type: 'protein' },
+      { ID: 4, Label: 'mexican', Type: 'cuisine' },
+    ];
+
+    const courseLabels = Util.getGroupingLabels(labels, 'course');
+    expect(courseLabels).toEqual(['main', 'dessert']);
+
+    const proteinLabels = Util.getGroupingLabels(labels, 'protein');
+    expect(proteinLabels).toEqual(['chicken']);
+  });
+
+  test('returns empty array when groupBy is empty string', () => {
+    const labels = [
+      { ID: 1, Label: 'main', Type: 'course' },
+    ];
+
+    const result = Util.getGroupingLabels(labels, '');
+    expect(result).toEqual([]);
+  });
+
+  test('returns empty array when no labels match type', () => {
+    const labels = [
+      { ID: 1, Label: 'main', Type: 'course' },
+    ];
+
+    const result = Util.getGroupingLabels(labels, 'nonexistent');
+    expect(result).toEqual([]);
+  });
+
+  test('handles labels without Type field', () => {
+    const labels = [
+      { ID: 1, Label: 'main', Type: 'course' },
+      { ID: 2, Label: 'noType' }, // missing Type
+    ];
+
+    const result = Util.getGroupingLabels(labels, 'course');
+    expect(result).toEqual(['main']);
+  });
+});
