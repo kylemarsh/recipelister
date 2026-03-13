@@ -89,6 +89,7 @@ class App extends Component {
             <hr />
             <GroupedResultList
               items={this.state.allRecipes}
+              labels={this.state.allLabels}
               filters={this.state.filters}
               groupBy={this.state.filters.groupBy}
               sortBy={this.state.filters.sortBy}
