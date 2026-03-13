@@ -81,8 +81,12 @@ function selectRecipe(targetId, recipeList) {
   });
 }
 
-function getGroupingLabels() {
-  return ["Main", "Dessert", "Breakfast", "Side", "Appetizer", "Drink"];
+function getGroupingLabels(allLabels, groupBy) {
+  if (!groupBy) return [];
+
+  return allLabels
+    .filter(label => label.Type === groupBy)
+    .map(label => label.Label);
 }
 
 function filterRecipesByLabel(recipes, labelName) {
