@@ -7,6 +7,17 @@ const ResultList = (props) => {
     return (
       <li key={item.ID} id={item.ID} onClick={props.handleClick}>
         {item.New && "• "}{item.Title}
+        {item.Labels && item.Labels.map(label =>
+          label.Icon ? (
+            <span
+              key={label.ID}
+              className="recipe-icon"
+              title={label.Label}
+            >
+              {label.Icon}
+            </span>
+          ) : null
+        )}
       </li>
     );
   });
