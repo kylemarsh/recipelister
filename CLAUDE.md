@@ -367,6 +367,11 @@ requests originating from other domains).
 See TODO.md for a description of bugs to be fixed and features to be added.
 
 # Making Changes
+ - ALWAYS create a new branch for the feature of bugfix with a descriptive name
+ - NEVER develop directly on the `main` branch
+ - NEVER merge feature branches in to `main`
+ - NEVER push to the remote repository
+
 ##Before making any changes
  1. Explore the repository structure
  2. Identify relevant files
@@ -375,10 +380,6 @@ See TODO.md for a description of bugs to be fixed and features to be added.
 
 
 ##When making changes
- - ALWAYS create a new branch for the feature of bugfix with a descriptive name
- - NEVER develop directly on the `main` branch
- - NEVER merge feature branches in to `main`
- - NEVER push to the remote repository
  - Prefer to Follow existing patterns in the repository. Do not introduce new
    frameworks or patterns unless asked to do so. If you think a different
    pattern or framework is the best way to accomplish something, ask the user
