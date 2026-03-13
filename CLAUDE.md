@@ -324,6 +324,7 @@ for a specific recipe.
 A "label" object (used throughout the code and API) has the following properties:
  - `ID` (int): the primary identifier for this label
  - `Label` (string): the label's name
+ - `Icon` (string, optional): an emoji or character used as a visual icon for this label in the recipe list
 
 
 ## Helpers
