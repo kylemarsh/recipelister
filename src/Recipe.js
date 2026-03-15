@@ -14,7 +14,7 @@ const Recipe = (props) => {
   return (
     <div className="recipe-container" data-recipe-id={recipe.ID}>
       <h2>{recipe.Title}{recipe.New ? " (New!)" : ""}</h2>
-      <RecipeActions type="recipe" {...props.recipeHandlers} />
+      <RecipeActions type="recipe" isAdmin={props.isAdmin} {...props.recipeHandlers} />
       <div className="recipe-timing">
         <div className="active-time">Active Time: {activeTime}</div>
         <div className="total-time">Total Time: {totalTime}</div>
@@ -113,20 +113,28 @@ const RecipeActions = (props) => {
       >
         ←
       </button>
-      <button
-        className="recipe-action-button recipe-edit-trigger"
-        onClick={props.EditClick}
-        aria-label="Edit recipe"
-      >
-        &#9998;
-      </button>
-      <button
-        className="recipe-action-button recipe-delete-trigger"
-        onClick={props.DeleteClick}
-        aria-label="Delete recipe"
-      >
-        🗑
-      </button>
+      {props.isAdmin ? (
+        <button
+          className="recipe-action-button recipe-edit-trigger"
+          onClick={props.EditClick}
+          aria-label="Edit recipe"
+        >
+          &#9998;
+        </button>
+      ) : (
+        ""
+      )}
+      {props.isAdmin ? (
+        <button
+          className="recipe-action-button recipe-delete-trigger"
+          onClick={props.DeleteClick}
+          aria-label="Delete recipe"
+        >
+          🗑
+        </button>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
