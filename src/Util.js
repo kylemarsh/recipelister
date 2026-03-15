@@ -111,4 +111,41 @@ function transformNewField(formData) {
   }
 }
 
-export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField };
+function getAvailableTypes(allLabels) {
+  // Extract unique Type values from labels, filtering out undefined/null
+  const types = allLabels
+    .map(label => label.Type)
+    .filter(type => type !== undefined && type !== null);
+
+  // Return unique types, with "Course" first if it exists
+  const uniqueTypes = [...new Set(types)];
+  const courseIndex = uniqueTypes.indexOf('Course');
+
+  if (courseIndex > 0) {
+    // Move "Course" to the front
+    uniqueTypes.splice(courseIndex, 1);
+    uniqueTypes.unshift('Course');
+  }
+
+  return uniqueTypes;
+}
+
+function titleCase(str) {
+  // Capitalizes first letter after whitespace; replaces all whitespace with single spaces
+  if (!str) return str;
+  return str
+    .split(/\s+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function formatLabelsForDisplay(labels) {
+  // Title-case Label and Type fields for display
+  return labels.map(label => ({
+    ...label,
+    Label: titleCase(label.Label),
+    Type: label.Type ? titleCase(label.Type) : label.Type
+  }));
+}
+
+export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField, getAvailableTypes, formatLabelsForDisplay };
