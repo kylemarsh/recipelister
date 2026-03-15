@@ -246,8 +246,10 @@ or the `NewRecipeForm` component in the `content-container` div just after the
 `search-pane` div). This component renders the recipe inside a div with class
 `recipe-container`. In addition to the details of the recipe, it renders three
 additional Components:
- - RecipeActions -- defined in `Recipe.js`; holds the buttons for
-   editing/deleting a recipe and deselecting the recipe
+ - RecipeActions -- defined in `Recipe.js`; renders three button controls:
+   back (←, navy), edit (✎, goldenrod), delete (🗑, maroon). Uses semantic
+   `<button>` elements with descriptive aria-labels and keyboard navigation
+   support. Visual styling matches sort button design language.
  - TagList
  - NoteList -- rendered inside the `notes-section` div.
 
