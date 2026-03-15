@@ -54,7 +54,7 @@ class App extends Component {
             username={this.state.login.username}
             handleClick={loggedIn ? this.doLogout : this.doLogin}
           />
-          {loggedIn ? (
+          {loggedIn && this.state.login.isAdmin ? (
             <button onClick={this.triggerAddRecipe}>New Recipe</button>
           ) : (
             ""
