@@ -109,6 +109,7 @@ class App extends Component {
           ) : this.state.targetRecipe ? (
             <Recipe
               loggedIn={loggedIn}
+              isAdmin={this.state.login.isAdmin}
               recipes={this.state.allRecipes}
               availableLabels={this.state.allLabels}
               targetRecipeId={this.state.targetRecipe}
