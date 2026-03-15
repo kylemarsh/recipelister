@@ -33,6 +33,7 @@ const Recipe = (props) => {
         <div className="notes-section">
           <span className="note-list-title">Notes</span>
           <NoteList
+            isAdmin={props.isAdmin}
             notes={recipe.Notes}
             showNoteEditor={props.showNoteEditor}
             showAddNote={props.showAddNote}
