@@ -1,8 +1,14 @@
 # Admin Role Support Design
 
+**Status:** ✅ IMPLEMENTED (2026-03-15)
+**Branch:** feature/admin-role-support
+**Commits:** 6ac0949 through a329fb8
+
 ## Overview
 
 Add support for admin/non-admin user roles in the recipe lister frontend. The API now returns JWTs with an `is_admin` boolean claim. The frontend should decode this claim and hide edit controls (buttons that trigger PUT/POST/DELETE requests) for non-admin users while still allowing them to view full recipe data.
+
+**Implementation Result:** All requirements met. Admin users have full edit access, non-admin users have read-only access to all content.
 
 ## Requirements
 
@@ -150,7 +156,7 @@ This ensures controls are only shown when BOTH conditions are true:
 
 ## What Won't Change
 
-- **API layer** (`api.js`): No changes needed - API already enforces auth on server side
+- ~~**API layer** (`api.js`): No changes needed - API already enforces auth on server side~~
 - **Data fetching**: Authenticated non-admins still fetch full recipe bodies and notes (use `priv/` endpoints)
 - **Error handling**: 401 errors still trigger logout (unchanged behavior)
 - **Visual design**: No new CSS styles needed, just hiding existing elements
@@ -163,3 +169,44 @@ This ensures controls are only shown when BOTH conditions are true:
 - Client-side flag is for UI convenience only; server enforces actual permissions
 - If client-side check is bypassed (e.g., via browser console), API will still reject unauthorized requests
 - The `is_admin` claim is already present in JWTs from the API - this is purely a frontend change
+
+## Actual Implementation Changes
+
+### API Route Updates (Discovered During Implementation)
+The API routes changed from `/priv/*` to `/admin/*` for mutation operations:
+- **Changed:** All POST, PUT, DELETE operations now use `/admin/*` routes
+- **Unchanged:** Read operations continue to use `/priv/*` for authenticated access
+- **Files modified:** `src/api.js` - updated endpoints for:
+  - createRecipe, updateRecipe, deleteRecipe
+  - createLabel, linkLabel, unlinkLabel
+  - createNote, editNote, deleteNote, toggleNote
+
+### Bugs Fixed During Implementation
+
+**Duplicate Labels Bug (commit 6cec4d0):**
+- **Issue:** When linking existing labels to recipes, case-sensitive comparison failed to find title-cased labels
+- **Root cause:** User input lowercased ("main"), but search compared against title-cased labels ("Main")
+- **Symptom:** Duplicate entries in `allLabels`, causing duplicate groups in grouped view
+- **Fix:** Changed `x.Label === labelName` to `x.Label.toLowerCase() === labelName` in `handleLabelLinkSubmit`
+
+### Testing Results
+
+**Test Coverage:** 48/48 tests passing
+- Added integration tests for JWT decoding
+- Added tests for constructor admin flag behavior
+- Added tests for doLogin/doLogout admin flag handling
+- All existing tests updated to pass `isAdmin` prop where needed
+- RecipeActions button rendering tests verify conditional display
+
+**Manual Testing:** All scenarios verified working
+- ✅ Admin user login shows all edit controls
+- ✅ Non-admin user login hides all edit controls, shows content
+- ✅ Page reload preserves admin/non-admin state
+- ✅ Invalid tokens gracefully degrade to non-admin
+- ✅ Logout resets admin flag
+
+### Documentation Updates
+
+- **CLAUDE.md:** Auth section, component prop documentation, API route organization
+- **TODO.md:** Guest Users section marked partially complete
+- **Feature doc:** `docs/features/admin-role-support.md` created with comprehensive details
