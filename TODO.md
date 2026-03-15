@@ -13,21 +13,6 @@ Specifically, when adding a new recipe, invalid values in the "Active Time" or
 but the actual message received from the API is "activeTime must be an
 integer".  Include more detail in the error alerts
 
-## Meta-Labels
-Labels should have meta-information. For instance, the "main", "dessert",
-"breakfast" labels are all dish types, while "asian", "mexican", "ethiopian"
-are all cuisine cultures and "vegan", "vegetarian", "gluten free" are allergen
-labels. We should have a way to identify the different kinds of labels.
-
-NOTE: This requires coordination with the database and database's API first.
-
-## Label Icons
-Labels should have an "icon" field where we can choose an emoji to indicate
-that label in a compact way (for instance the label "mexican" could use 🇲 and
-the label "vegan" could use Ⓥ ).
-
-NOTE: This requires coordination with the database and database's API first.
-
 ## Label Manager Interface
 We should have an interface that, when active, replaces the List Pane and
 Recipe Pane and instead shows all the labels in the system and allows us to
@@ -55,13 +40,6 @@ directly to a specific recipe. We should add routing so that loading a recipe
 populates the URL bar with a direct link to the recipe. The URL format should
 be `.../{recipe-id}/{slug}` where the slug is a url-safe version of the recipe
 title. Only the recipe-id should be required for routing.
-
-## Better Icons/Buttons
-Beautify the app's use of icons as buttons for actions.
-
-### Style Recipe Action Buttons
-The RecipeActions component (edit, delete, and close buttons in the Recipe Pane)
-needs better styling. Currently uses plain Unicode characters for icons.
 
 ## More responsive UI
 Currently there's no way to hide the list pane in desktop, and the Recipe Pane
