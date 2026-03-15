@@ -106,30 +106,27 @@ const NewRecipeForm = (props) => {
 const RecipeActions = (props) => {
   return (
     <div className="recipe-actions">
-      <span
-        className="recipe-untarget-trigger"
-        role="img"
-        aria-label="back-arrow-icon"
+      <button
+        className="recipe-action-button recipe-untarget-trigger"
         onClick={props.UntargetClick}
+        aria-label="Go back to recipe list"
       >
-        &#8630;
-      </span>
-      <span
-        className="recipe-edit-trigger"
-        role="img"
-        aria-label="edit-icon"
+        ←
+      </button>
+      <button
+        className="recipe-action-button recipe-edit-trigger"
         onClick={props.EditClick}
+        aria-label="Edit recipe"
       >
         &#9998;
-      </span>
-      <span
-        className="recipe-delete-trigger"
-        role="img"
-        aria-label="close-icon"
+      </button>
+      <button
+        className="recipe-action-button recipe-delete-trigger"
         onClick={props.DeleteClick}
+        aria-label="Delete recipe"
       >
-        &otimes;
-      </span>
+        🗑
+      </button>
     </div>
   );
 };
