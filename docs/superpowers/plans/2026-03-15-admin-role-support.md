@@ -29,7 +29,13 @@ Run: `npm list jwt-decode`
 
 Expected: Shows jwt-decode@4.x.x (or latest version)
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Verify package can be imported**
+
+Run: `npm start` (let it compile, then stop with Ctrl+C)
+
+Expected: No import errors, app compiles successfully
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add package.json package-lock.json
@@ -41,12 +47,15 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ### Task 2: Add JWT decode helper function
 
 **Files:**
-- Modify: `src/App.js:1-10` (add import and helper before class)
+- Modify: `src/App.js` (add import at top, add helper function before class definition)
 - Test: `src/App.test.js`
 
 - [ ] **Step 1: Write failing test for decodeAdminFlag helper**
 
-Add to `src/App.test.js` at the top (after imports, before existing tests):
+Note: `src/App.test.js` already has imports for `createRoot` from 'react-dom/client' and `act` from 'react' at the top.
+We just need to add the jwt-decode import and mock.
+
+Add to `src/App.test.js` at the top (after existing imports, before existing tests):
 
 ```javascript
 import { jwtDecode } from 'jwt-decode';
@@ -313,7 +322,12 @@ Expected: Tests FAIL - New Recipe button appears even for non-admin (isAdmin not
 
 - [ ] **Step 3: Update constructor to decode isAdmin**
 
-Modify `src/App.js` constructor (lines 12-42):
+Modify `src/App.js` constructor. Add one line before state initialization:
+`const isAdmin = decodeAdminFlag(savedJwt);`
+
+Then add `isAdmin` to the login state object (ES6 shorthand).
+
+Full constructor for reference:
 
 ```javascript
 constructor(props) {
@@ -546,7 +560,12 @@ Expected: Tests FAIL - New Recipe button appears even after non-admin login (isA
 
 - [ ] **Step 3: Update doLogin to decode isAdmin**
 
-Modify `src/App.js` doLogin method (lines 515-537):
+Modify `src/App.js` doLogin method. Add one line after getting token:
+`const isAdmin = decodeAdminFlag(token);`
+
+Then add `isAdmin` to the login state object (ES6 shorthand for all three properties).
+
+Full method for reference:
 
 ```javascript
 doLogin = async (event) => {
@@ -668,7 +687,10 @@ Expected: Test FAILS - New Recipe button remains visible after logout (isAdmin n
 
 - [ ] **Step 3: Update doLogout to reset isAdmin**
 
-Modify `src/App.js` doLogout method (lines 539-549):
+Modify `src/App.js` doLogout method. Add `isAdmin: false` to the login state object in setState.
+Also remove the empty string parameter from localStorage.removeItem calls (not needed).
+
+Full method for reference:
 
 ```javascript
 doLogout = (event) => {
