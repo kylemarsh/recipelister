@@ -411,6 +411,11 @@ See TODO.md for a description of bugs to be fixed and features to be added.
  - NEVER merge feature branches in to `main`
  - NEVER push to the remote repository
 
+Use the superpowers plugin's brainstorming capabilities to plan out your
+changes before writing any code, and to write a design document / spec, but do
+not use the superpowers plugin to write or review code. I will review the code
+as you write it.
+
 ##Before making any changes
  1. Explore the repository structure
  2. Identify relevant files
