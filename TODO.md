@@ -92,3 +92,5 @@ clicking the "+ add label" button).
 Improve the recipe search to support fuzzy matching similar to Slack's emoji
 search, where the search can match characters even if there are other characters
 in between (e.g., searching "chkn" would match "chicken").
+
+## Render markdown in the recipe pane
