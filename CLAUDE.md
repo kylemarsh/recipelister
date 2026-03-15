@@ -257,14 +257,24 @@ Defined in `Recipe.js`. This component renders the currently seleted recipe in
 the Recipe Pane (the Recipe Pane is rendered as either the `Recipe` component
 or the `NewRecipeForm` component in the `content-container` div just after the
 `search-pane` div). This component renders the recipe inside a div with class
-`recipe-container`. In addition to the details of the recipe, it renders three
-additional Components:
- - RecipeActions -- defined in `Recipe.js`; renders three button controls:
-   back (←, navy), edit (✎, goldenrod), delete (🗑). Uses semantic
-   `<button>` elements with descriptive aria-labels and keyboard navigation
-   support. Visual styling matches sort button design language.
- - TagList
- - NoteList -- rendered inside the `notes-section` div.
+`recipe-container`.
+
+The Recipe component receives an `isAdmin` prop from App.js that controls the
+visibility of admin-only UI elements. This prop is passed down to child
+components (RecipeActions, TagList, NoteList) to conditionally render mutation
+controls.
+
+In addition to the details of the recipe, it renders three additional Components:
+ - RecipeActions -- defined in `Recipe.js`; renders button controls. The back
+   button (←, navy) is always visible. Edit (✎, goldenrod) and delete (🗑)
+   buttons are only rendered when `isAdmin` is true. Uses semantic `<button>`
+   elements with descriptive aria-labels and keyboard navigation support.
+   Visual styling matches sort button design language.
+ - TagList -- receives `isAdmin` prop to conditionally render "+ add label"
+   button and label unlink (×) buttons
+ - NoteList -- rendered inside the `notes-section` div; receives `isAdmin` prop
+   to conditionally render "+ Add Note" button and note action buttons (flag,
+   edit, delete)
 
 A "recipe" object has the following properties:
  - `ID` (int): the primary identifier for this recipe
@@ -329,6 +339,10 @@ Defined in `Notes.js`. This renders an unordered list of `NoteListItem`
 Components followed by the `AddNoteTrigger` or `EditNoteForm` Component to
 allow a user to add a new note.
 
+The component receives an `isAdmin` prop and only renders the "+ Add Note"
+button and note action controls (flag, edit, delete) when `isAdmin` is true.
+Non-admin users can view notes but cannot modify them.
+
 A "note" object has the following properties:
  - `ID` (int): the primary identifier for this note
  - `RecipeId` (int): the RecipeId for the recipe this note belongs to
@@ -340,9 +354,13 @@ A "note" object has the following properties:
 ### TagList Component
 Defined in `Tags.js`. This renders an unordered list of `TagListItem`
 components in a div with class `tag-list-container` to show the tags that are
-linked to a recipe. Each TagListItem has a button to un-link the tag from the
-recipe, and the list ends with a `LinkTagTrigger` or `LinkTagForm` component to
-add new tags to the recipe.
+linked to a recipe.
+
+The component receives an `isAdmin` prop and only renders the "+ add label"
+button and label unlink (×) buttons when `isAdmin` is true. Non-admin users can
+view labels but cannot add or remove them. When adding a label, the component
+performs a case-insensitive search against existing labels to prevent
+duplicates.
 
 #### Terminology: Labels vs Tags
 The application uses two related concepts:
