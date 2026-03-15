@@ -775,3 +775,244 @@ describe('formatLabelsForDisplay', () => {
     expect(result[0].Type).toBe('Dietary Restriction');
   });
 });
+
+describe('RecipeActions buttons', () => {
+  const mockHandlers = {
+    recipeHandlers: {
+      EditClick: jest.fn(),
+      UntargetClick: jest.fn(),
+      DeleteClick: jest.fn()
+    },
+    noteHandlers: {},
+    labelHandlers: {}
+  };
+
+  test('renders three button elements instead of spans', () => {
+    const recipe = {
+      ID: 1,
+      Title: 'Test Recipe',
+      New: false,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Test body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[recipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    const buttons = div.querySelectorAll('.recipe-actions button');
+    expect(buttons.length).toBe(3);
+
+    // Verify no spans with role="img" remain
+    const roleImgSpans = div.querySelectorAll('.recipe-actions span[role="img"]');
+    expect(roleImgSpans.length).toBe(0);
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('buttons have correct CSS classes', () => {
+    const recipe = {
+      ID: 1,
+      Title: 'Test Recipe',
+      New: false,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Test body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[recipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    const untargetBtn = div.querySelector('.recipe-untarget-trigger');
+    expect(untargetBtn.tagName).toBe('BUTTON');
+    expect(untargetBtn.classList.contains('recipe-action-button')).toBe(true);
+
+    const editBtn = div.querySelector('.recipe-edit-trigger');
+    expect(editBtn.tagName).toBe('BUTTON');
+    expect(editBtn.classList.contains('recipe-action-button')).toBe(true);
+
+    const deleteBtn = div.querySelector('.recipe-delete-trigger');
+    expect(deleteBtn.tagName).toBe('BUTTON');
+    expect(deleteBtn.classList.contains('recipe-action-button')).toBe(true);
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('buttons have descriptive aria-labels', () => {
+    const recipe = {
+      ID: 1,
+      Title: 'Test Recipe',
+      New: false,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Test body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[recipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    const untargetBtn = div.querySelector('.recipe-untarget-trigger');
+    expect(untargetBtn.getAttribute('aria-label')).toBe('Go back to recipe list');
+
+    const editBtn = div.querySelector('.recipe-edit-trigger');
+    expect(editBtn.getAttribute('aria-label')).toBe('Edit recipe');
+
+    const deleteBtn = div.querySelector('.recipe-delete-trigger');
+    expect(deleteBtn.getAttribute('aria-label')).toBe('Delete recipe');
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('buttons have updated icons', () => {
+    const recipe = {
+      ID: 1,
+      Title: 'Test Recipe',
+      New: false,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Test body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[recipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          {...mockHandlers}
+        />
+      );
+    });
+
+    const untargetBtn = div.querySelector('.recipe-untarget-trigger');
+    expect(untargetBtn.textContent).toBe('←');
+
+    const editBtn = div.querySelector('.recipe-edit-trigger');
+    expect(editBtn.textContent).toBe('✎');
+
+    const deleteBtn = div.querySelector('.recipe-delete-trigger');
+    expect(deleteBtn.textContent).toBe('🗑');
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('buttons trigger correct handlers', () => {
+    const handlers = {
+      EditClick: jest.fn(),
+      UntargetClick: jest.fn(),
+      DeleteClick: jest.fn()
+    };
+
+    const recipe = {
+      ID: 1,
+      Title: 'Test Recipe',
+      New: false,
+      ActiveTime: 10,
+      Time: 30,
+      Body: 'Test body',
+      Labels: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          recipes={[recipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          recipeHandlers={handlers}
+          noteHandlers={{}}
+          labelHandlers={{}}
+        />
+      );
+    });
+
+    const untargetBtn = div.querySelector('.recipe-untarget-trigger');
+    const editBtn = div.querySelector('.recipe-edit-trigger');
+    const deleteBtn = div.querySelector('.recipe-delete-trigger');
+
+    act(() => {
+      untargetBtn.click();
+    });
+    expect(handlers.UntargetClick).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      editBtn.click();
+    });
+    expect(handlers.EditClick).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      deleteBtn.click();
+    });
+    expect(handlers.DeleteClick).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      root.unmount();
+    });
+  });
+});
