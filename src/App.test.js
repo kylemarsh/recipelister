@@ -41,6 +41,7 @@ describe('Recipe new indicator', () => {
       root.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[newRecipe]}
           availableLabels={[]}
           targetRecipeId={1}
@@ -75,6 +76,7 @@ describe('Recipe new indicator', () => {
       root.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[triedRecipe]}
           availableLabels={[]}
           targetRecipeId={2}
@@ -389,6 +391,7 @@ describe('Recipe New Indicator - Integration', () => {
       root2.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[newRecipe]}
           availableLabels={[]}
           targetRecipeId={1}
@@ -451,6 +454,7 @@ describe('Recipe New Indicator - Integration', () => {
       root2.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[triedRecipe]}
           availableLabels={[]}
           targetRecipeId={2}
@@ -804,6 +808,7 @@ describe('RecipeActions buttons', () => {
       root.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[recipe]}
           availableLabels={[]}
           targetRecipeId={1}
@@ -844,6 +849,7 @@ describe('RecipeActions buttons', () => {
       root.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[recipe]}
           availableLabels={[]}
           targetRecipeId={1}
@@ -889,6 +895,7 @@ describe('RecipeActions buttons', () => {
       root.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[recipe]}
           availableLabels={[]}
           targetRecipeId={1}
@@ -931,6 +938,7 @@ describe('RecipeActions buttons', () => {
       root.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[recipe]}
           availableLabels={[]}
           targetRecipeId={1}
@@ -979,6 +987,7 @@ describe('RecipeActions buttons', () => {
       root.render(
         <Recipe
           loggedIn={true}
+          isAdmin={true}
           recipes={[recipe]}
           availableLabels={[]}
           targetRecipeId={1}

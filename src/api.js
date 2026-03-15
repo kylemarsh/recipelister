@@ -23,7 +23,7 @@ async function fetchRecipes(auth) {
 }
 
 async function createRecipe(formData, auth) {
-  const resource = `${API_HOST}priv/recipe/`;
+  const resource = `${API_HOST}admin/recipe/`;
   const requestInit = {
     method: "POST",
     headers: { "x-access-token": auth.token },
@@ -33,7 +33,7 @@ async function createRecipe(formData, auth) {
 }
 
 async function updateRecipe(recipeId, formData, auth) {
-  const resource = `${API_HOST}priv/recipe/${recipeId}`;
+  const resource = `${API_HOST}admin/recipe/${recipeId}`;
   const requestInit = {
     method: "PUT",
     headers: { "x-access-token": auth.token },
@@ -43,7 +43,7 @@ async function updateRecipe(recipeId, formData, auth) {
 }
 
 async function deleteRecipe(recipeId, auth) {
-  const resource = `${API_HOST}priv/recipe/${recipeId}`;
+  const resource = `${API_HOST}admin/recipe/${recipeId}`;
   const requestInit = {
     method: "DELETE",
     headers: { "x-access-token": auth.token },
@@ -61,7 +61,7 @@ async function fetchLabels() {
 }
 
 async function createLabel(labelName, auth) {
-  const resource = `${API_HOST}priv/label/${labelName}`;
+  const resource = `${API_HOST}admin/label/${labelName}`;
   const requestInit = {
     method: "PUT",
     headers: { "x-access-token": auth.token },
@@ -70,7 +70,7 @@ async function createLabel(labelName, auth) {
 }
 
 async function linkLabel(recipeId, labelId, auth) {
-  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
+  const resource = `${API_HOST}admin/recipe/${recipeId}/label/${labelId}`;
   const requestInit = {
     method: "PUT",
     headers: { "x-access-token": auth.token },
@@ -79,7 +79,7 @@ async function linkLabel(recipeId, labelId, auth) {
 }
 
 async function unlinkLabel(recipeId, labelId, auth) {
-  const resource = `${API_HOST}priv/recipe/${recipeId}/label/${labelId}`;
+  const resource = `${API_HOST}admin/recipe/${recipeId}/label/${labelId}`;
   const requestInit = {
     method: "DELETE",
     headers: { "x-access-token": auth.token },
@@ -97,7 +97,7 @@ async function fetchNotes(recipeId, auth) {
 }
 
 async function createNote(recipeId, formData, auth) {
-  const resource = `${API_HOST}priv/recipe/${recipeId}/note/`;
+  const resource = `${API_HOST}admin/recipe/${recipeId}/note/`;
   const requestInit = {
     method: "POST",
     headers: { "x-access-token": auth.token },
@@ -108,7 +108,7 @@ async function createNote(recipeId, formData, auth) {
 
 async function toggleNote(noteId, flag, auth) {
   const flagstring = flag ? "flag" : "unflag";
-  const resource = `${API_HOST}priv/note/${noteId}/${flagstring}`;
+  const resource = `${API_HOST}admin/note/${noteId}/${flagstring}`;
   const requestInit = {
     method: "PUT",
     headers: { "x-access-token": auth.token },
@@ -117,7 +117,7 @@ async function toggleNote(noteId, flag, auth) {
 }
 
 async function editNote(noteId, formData, auth) {
-  const resource = `${API_HOST}priv/note/${noteId}`;
+  const resource = `${API_HOST}admin/note/${noteId}`;
   const requestInit = {
     method: "PUT",
     headers: { "x-access-token": auth.token },
@@ -127,7 +127,7 @@ async function editNote(noteId, formData, auth) {
 }
 
 async function deleteNote(noteId, auth) {
-  const resource = `${API_HOST}priv/note/${noteId}`;
+  const resource = `${API_HOST}admin/note/${noteId}`;
   const requestInit = {
     method: "DELETE",
     headers: { "x-access-token": auth.token },

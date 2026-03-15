@@ -8,6 +8,7 @@ const NoteList = (props) => {
         <NoteListItem
           key={note.ID}
           note={note}
+          isAdmin={props.isAdmin}
           showEditor={props.showNoteEditor}
           handleFlagClick={props.handlers.FlagClick}
           handleDeleteClick={props.handlers.DeleteClick}
@@ -21,17 +22,21 @@ const NoteList = (props) => {
   return (
     <ul className="note-list">
       {notes}
-      <li>
-        {props.showAddNote ? (
-          <EditNoteForm
-            showEditor={true}
-            handleSubmit={props.handlers.AddSubmit}
-            handleCancel={props.handlers.AddCancel}
-          />
-        ) : (
-          <AddNoteTrigger handleClick={props.handlers.AddClick} />
-        )}
-      </li>
+      {props.isAdmin ? (
+        <li>
+          {props.showAddNote ? (
+            <EditNoteForm
+              showEditor={true}
+              handleSubmit={props.handlers.AddSubmit}
+              handleCancel={props.handlers.AddCancel}
+            />
+          ) : (
+            <AddNoteTrigger handleClick={props.handlers.AddClick} />
+          )}
+        </li>
+      ) : (
+        ""
+      )}
     </ul>
   );
 };
@@ -50,15 +55,19 @@ const NoteListItem = (props) => {
       data-flagged={note.Flagged ? "1" : ""}
     >
       <span className="note-stamp">{stamp}</span>&nbsp;|&nbsp;
-      <NoteActions
-        noteId={note.ID}
-        flagged={note.Flagged}
-        showEditor={props.showEditor}
-        handleFlagClick={props.handleFlagClick}
-        handleEditClick={props.handleEditClick}
-        handleEditCancel={props.handleEditCancel}
-        handleDeleteClick={props.handleDeleteClick}
-      />
+      {props.isAdmin ? (
+        <NoteActions
+          noteId={note.ID}
+          flagged={note.Flagged}
+          showEditor={props.showEditor}
+          handleFlagClick={props.handleFlagClick}
+          handleEditClick={props.handleEditClick}
+          handleEditCancel={props.handleEditCancel}
+          handleDeleteClick={props.handleDeleteClick}
+        />
+      ) : (
+        ""
+      )}
       <br />
       <hr />
       {props.showEditor === note.ID ? (

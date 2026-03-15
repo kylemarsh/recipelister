@@ -25,13 +25,18 @@ manage them. Management includes:
  - Viewing titles for all recipes tagged with a label, and unlinking them
 
 ## Guest Users
-We should enable the concept of a "guest" user who can view but not edit the
-database. Possible implementation details are:
+**Status: Partially Complete** - Basic read-only user support implemented.
+
+The application now supports admin role-based access control:
+ - JWTs contain an `is_admin` claim that indicates admin privileges
+ - Non-admin users can view all recipes, notes, and labels (read-only)
+ - Admin-only UI elements (edit, delete, add buttons) are hidden for non-admin users
+ - API enforces access control via `/admin/*` routes for mutations
+
+Still needed:
  - Generate revokable tokens that allow viewing one specific recipe
- - Create non-administrator logins that can see all recipes
  - Provide a list of recipes a given non-administrator user can see
- - Provide an interface for an admin user to create a guest user or a sharable
- link
+ - Provide an interface for an admin user to create a guest user or a sharable link
 
 ## Direct Links to Recipes
 There's no URL routing currently, which means the entire application can
