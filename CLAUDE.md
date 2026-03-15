@@ -154,11 +154,23 @@ Authentication is handled by the `doLogin` and `doLogout` functions in
 `App.js`. The log in method calls `Api.login` which POSTs a request to
 `$api_host/login/` including the username and password in the request body.
 Upon successful login the response body contains a JWT in the `token` field.
-The JWT and username are stored in local storage.
+The JWT contains an `is_admin` claim indicating whether the user has admin
+privileges. The JWT and username are stored in local storage.
 
-When making a request that requires authentication (these are identified by
-endpoints containing `priv/` in the route) the api function will include the
-JWT as the value for the `x-access-token` header.
+On page load and successful login, the JWT is decoded using `jwt-decode` to
+extract the `is_admin` claim, which is stored in application state as
+`login.isAdmin`. This flag controls UI visibility of admin-only controls (edit,
+delete, add note, add label, etc.).
+
+API routes are organized by privilege level:
+- **Public routes** (no auth): `/recipes/`, `/labels/`
+- **Authenticated routes** (`/priv/*`): Read-only access requiring valid JWT
+  (e.g., full recipe bodies, notes)
+- **Admin routes** (`/admin/*`): Mutation operations requiring admin privilege
+  (all POST, PUT, DELETE operations)
+
+When making authenticated requests, the api function includes the JWT as the
+value for the `x-access-token` header.
 
 
 ## Libraries
@@ -167,6 +179,7 @@ This project uses:
  - "react-dom" (v19)
  - "react-widgets" (for multiselect dropdowns)
  - "react-scripts" (Create React App build tooling)
+ - "jwt-decode" (for decoding JWTs to extract admin flag)
 
 ## Components
 The top-level application is in `App.js`, bootstrapped by `index.js` using React
