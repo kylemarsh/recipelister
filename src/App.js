@@ -243,7 +243,7 @@ class App extends Component {
     const labelName = formData.get("label").toLowerCase();
     const recipeTag = form.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
-    var labelData = this.state.allLabels.find((x) => x.Label === labelName);
+    var labelData = this.state.allLabels.find((x) => x.Label.toLowerCase() === labelName);
     var labelIsNew = false;
 
     try {
