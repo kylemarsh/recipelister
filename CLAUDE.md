@@ -49,13 +49,21 @@ The active sort option is visually indicated with a blue border and background.
 
 To the right of the sort buttons (separated by a vertical divider on desktop, or
 above the sort buttons on mobile) is a group button:
- - 📂 (Group): Groups recipes by specific labels (Main, Dessert, Breakfast, Side,
-   Appetizer, Drink) with collapsible group headers showing recipe counts. Grouping
-   is enabled by default with all groups collapsed except "Main". Recipes tagged
-   with multiple grouping labels appear in each relevant group. Recipes without
-   any grouping labels appear in an "Other" group. The selected sort mode applies
-   within each group. Group expand/collapse state persists across filter changes.
-   Label matching is case-insensitive.
+ - 📂 (Group): Clicking cycles through available label types for grouping.
+   When active, displays the current grouping type (e.g., "📂 Course", "📂
+   Protein"). Click progression starts at "Course" (default), cycles through
+   all other available label types (determined dynamically from the data), and
+   ends at no grouping before cycling back to "Course". Groups recipes by
+   labels matching the selected Type field with collapsible group headers
+   showing recipe counts. Grouping is enabled by default to "Course" with all
+   groups collapsed except "Main". Recipes tagged with multiple labels of the
+   grouping type appear in each relevant group. Recipes without any labels of
+   the grouping type appear in an "Other" group. The selected sort mode applies
+   within each group. Group expand/collapse state persists across filter
+   changes.
+
+   The grouping dynamically uses label Type values from the API, so new label
+   types automatically become available in the cycle without code changes.
 
 Below the query form is another horizontal rule and below that the list of all
 recipes matching the current search (when nothing is searched, the list
@@ -130,6 +138,17 @@ Recipe data loading differs based on authentication status:
    with the initial recipe list. Notes are loaded on-demand when a user clicks
    on a recipe (see `App.js:398-401`).
 
+### Data Formatting
+Label data is formatted for display after fetching from the API:
+ - `Label` and `Type` fields are title-cased using `Util.formatLabelsForDisplay()`
+ - Formatting is applied in `App.getLabels()` for the label list and
+   `App.getRecipes()` for labels attached to recipes
+ - When new labels are created via the UI, they are formatted before being added
+   to state
+ - This formatting is a presentation concern handled in the application layer,
+   not the API layer. The API returns normalized (lowercase) data suitable for
+   any client; the web app transforms it for display.
+
 ### Auth
 Authentication is handled by the `doLogin` and `doLogout` functions in
 `App.js`. The log in method calls `Api.login` which POSTs a request to
@@ -186,12 +205,17 @@ the `search-pane` div.
 
 This component applies all search and label filters (via `Util.applyFilters`),
 then decides how to render based on the `groupBy` prop:
- - When `groupBy` is false: Renders a single `ResultList` component with all
-   filtered recipes
- - When `groupBy` is true: Groups recipes by specific labels (Main, Dessert,
-   Breakfast, Side, Appetizer, Drink) with collapsible group headers. Each
-   group renders its own `ResultList` component. Recipes without grouping
-   labels appear in an "Other" group.
+ - When `groupBy` is "" (empty string): Renders a single `ResultList` component
+   with all filtered recipes
+ - When `groupBy` contains a label type (e.g., "Course", "Protein", "Cuisine"):
+   Groups recipes by labels where Type matches the groupBy value (dynamically
+   determined from API data) with collapsible group headers. Each group renders
+   its own `ResultList` component. Recipes without labels matching the grouping
+   type appear in an "Other" group.
+
+The `groupBy` prop is a string indicating the label Type to group by (e.g.,
+"Course", "Protein"), or "" for no grouping. The application starts with
+`groupBy="Course"` by default.
 
 Group headers display the group name and recipe count, with expand/collapse
 indicators (▼/▶). The expand state is managed in App.js via the
@@ -308,9 +332,11 @@ add new tags to the recipe.
 #### Terminology: Labels vs Tags
 The application uses two related concepts:
  - **Label**: An object representing a recipe attribute that can be used for
-   categorization and filtering. A label has an `ID` and a `Label` (name) field.
-   Labels exist independently in the database and can be reused across many
-   recipes. Examples: "chicken", "soup", "mexican", "vegan", "GlutenFree".
+   categorization and filtering. A label has an `ID`, a `Label` (name) field,
+   and optionally a `Type` field for grouping. Labels exist independently in the
+   database and can be reused across many recipes. Labels are stored in lowercase
+   in the database (e.g., "chicken", "gluten free") but formatted to title case
+   for display (e.g., "Chicken", "Gluten Free").
  - **Tag**: The association between a recipe and a label. When we say a recipe is
    "tagged with" a label, we mean there is a tag linking that recipe to that
    label. In the backend database, tags are represented by a junction table
@@ -323,8 +349,11 @@ for a specific recipe.
 
 A "label" object (used throughout the code and API) has the following properties:
  - `ID` (int): the primary identifier for this label
- - `Label` (string): the label's name
- - `Icon` (string, optional): an emoji or character used as a visual icon for this label in the recipe list
+ - `Label` (string): the label's name (displayed in title case)
+ - `Type` (string, optional): categorizes the label for grouping purposes (e.g.,
+   "Course", "Protein", "Cuisine"). Displayed in title case.
+ - `Icon` (string, optional): an emoji or character used as a visual icon for
+   this label in the recipe list
 
 
 ## Helpers
@@ -334,12 +363,20 @@ recipe list:
  - `sortRecipes()`: sorts recipes by the selected sort mode (alphabetic, newest,
    or shuffle with stable random keys)
  - `selectRecipe()`: finds a recipe by ID from the recipe list
- - `getGroupingLabels()`: returns the ordered list of labels used for grouping
-   (Main, Dessert, Breakfast, Side, Appetizer, Drink)
+ - `getGroupingLabels(allLabels, groupBy)`: Returns array of label names that
+   match the specified type. Filters labels where Type === groupBy.
  - `filterRecipesByLabel()`: filters recipes that have a specific label
    (case-insensitive matching)
  - `transformNewField()`: transforms the "new recipe" toggle value from the form
    to the correct `New` field value for API submission
+ - `getAvailableTypes(allLabels)`: Extracts unique label Type values from the
+   label list, filtering out undefined/null. Returns array with "Course" first
+   (when present) to maintain the default grouping type.
+ - `formatLabelsForDisplay(labels)`: Title-cases Label and Type fields for
+   display. Applied when labels are loaded from the API. This is a presentation
+   concern (not data transport), so it belongs in Util rather than Api. The API
+   layer returns raw data that could be used by different clients with different
+   formatting needs.
 
 
 # Development

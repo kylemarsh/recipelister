@@ -26,7 +26,7 @@ class App extends Component {
         tagsAny: [],
         tagsNone: [],
         sortBy: "alphabetic",
-        groupBy: true,
+        groupBy: "Course",
       },
       shuffleKeys: {},
 			expandedGroups: { Main: true },
@@ -89,6 +89,7 @@ class App extends Component {
             <hr />
             <GroupedResultList
               items={this.state.allRecipes}
+              labels={this.state.allLabels}
               filters={this.state.filters}
               groupBy={this.state.filters.groupBy}
               sortBy={this.state.filters.sortBy}
@@ -233,6 +234,8 @@ class App extends Component {
       if (!labelData) {
         // Create the label before we can link it
         labelData = await Api.createLabel(labelName, this.state.login);
+        // Format label for display
+        labelData = Util.formatLabelsForDisplay([labelData])[0];
         labelIsNew = true;
       }
       await Api.linkLabel(recipeId, labelData.ID, this.state.login);
@@ -470,7 +473,26 @@ class App extends Component {
   };
 
   handleGroupToggle = () => {
-    const newfilters = { ...this.state.filters, groupBy: !this.state.filters.groupBy };
+    const availableTypes = Util.getAvailableTypes(this.state.allLabels);
+    const currentGroupBy = this.state.filters.groupBy;
+
+    // Cycle through: "" -> first type -> second type -> ... -> ""
+    let newGroupBy;
+    if (currentGroupBy === "") {
+      // Start with first available type (should be "Course" if it exists)
+      newGroupBy = availableTypes.length > 0 ? availableTypes[0] : "";
+    } else {
+      const currentIndex = availableTypes.indexOf(currentGroupBy);
+      if (currentIndex >= 0 && currentIndex < availableTypes.length - 1) {
+        // Move to next type
+        newGroupBy = availableTypes[currentIndex + 1];
+      } else {
+        // Cycle back to no grouping
+        newGroupBy = "";
+      }
+    }
+
+    const newfilters = { ...this.state.filters, groupBy: newGroupBy };
     this.setState({ filters: newfilters });
   };
 
@@ -529,8 +551,13 @@ class App extends Component {
   getRecipes = async (event) => {
     try {
       const recipes = await Api.fetchRecipes(this.state.login);
+      // Format labels within each recipe for display
+      const formattedRecipes = recipes.map(recipe => ({
+        ...recipe,
+        Labels: recipe.Labels ? Util.formatLabelsForDisplay(recipe.Labels) : recipe.Labels
+      }));
       // Auto-dismiss fetchRecipes errors on successful fetch
-      const updates = { allRecipes: recipes };
+      const updates = { allRecipes: formattedRecipes };
       if (this.state.errorContext === "fetchRecipes") {
         updates.error = null;
         updates.errorContext = null;
@@ -544,8 +571,9 @@ class App extends Component {
   getLabels = async (event) => {
     try {
       const labels = await Api.fetchLabels();
+      const formattedLabels = Util.formatLabelsForDisplay(labels);
       // Auto-dismiss fetchLabels errors on successful fetch
-      const updates = { allLabels: labels };
+      const updates = { allLabels: formattedLabels };
       if (this.state.errorContext === "fetchLabels") {
         updates.error = null;
         updates.errorContext = null;

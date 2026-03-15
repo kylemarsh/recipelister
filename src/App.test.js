@@ -618,3 +618,160 @@ describe('ResultList label icons', () => {
     });
   });
 });
+
+describe('getGroupingLabels with type filtering', () => {
+  test('filters labels by Type field', () => {
+    const labels = [
+      { ID: 1, Label: 'Main', Type: 'Course' },
+      { ID: 2, Label: 'Dessert', Type: 'Course' },
+      { ID: 3, Label: 'Chicken', Type: 'Protein' },
+      { ID: 4, Label: 'Mexican', Type: 'Cuisine' },
+    ];
+
+    const courseLabels = Util.getGroupingLabels(labels, 'Course');
+    expect(courseLabels).toEqual(['Main', 'Dessert']);
+
+    const proteinLabels = Util.getGroupingLabels(labels, 'Protein');
+    expect(proteinLabels).toEqual(['Chicken']);
+  });
+
+  test('returns empty array when groupBy is empty string', () => {
+    const labels = [
+      { ID: 1, Label: 'Main', Type: 'Course' },
+    ];
+
+    const result = Util.getGroupingLabels(labels, '');
+    expect(result).toEqual([]);
+  });
+
+  test('returns empty array when no labels match type', () => {
+    const labels = [
+      { ID: 1, Label: 'Main', Type: 'Course' },
+    ];
+
+    const result = Util.getGroupingLabels(labels, 'nonexistent');
+    expect(result).toEqual([]);
+  });
+
+  test('handles labels without Type field', () => {
+    const labels = [
+      { ID: 1, Label: 'Main', Type: 'Course' },
+      { ID: 2, Label: 'Notype' }, // missing Type
+    ];
+
+    const result = Util.getGroupingLabels(labels, 'Course');
+    expect(result).toEqual(['Main']);
+  });
+});
+
+describe('getAvailableTypes', () => {
+  test('extracts unique types from labels', () => {
+    const labels = [
+      { ID: 1, Label: 'Main', Type: 'Course' },
+      { ID: 2, Label: 'Dessert', Type: 'Course' },
+      { ID: 3, Label: 'Chicken', Type: 'Protein' },
+      { ID: 4, Label: 'Mexican', Type: 'Cuisine' },
+    ];
+
+    const result = Util.getAvailableTypes(labels);
+    expect(result).toEqual(['Course', 'Protein', 'Cuisine']);
+  });
+
+  test('puts Course first when present', () => {
+    const labels = [
+      { ID: 1, Label: 'Chicken', Type: 'Protein' },
+      { ID: 2, Label: 'Mexican', Type: 'Cuisine' },
+      { ID: 3, Label: 'Main', Type: 'Course' },
+    ];
+
+    const result = Util.getAvailableTypes(labels);
+    expect(result[0]).toBe('Course');
+    expect(result).toContain('Protein');
+    expect(result).toContain('Cuisine');
+  });
+
+  test('filters out undefined and null types', () => {
+    const labels = [
+      { ID: 1, Label: 'Main', Type: 'Course' },
+      { ID: 2, Label: 'Notype' }, // missing Type
+      { ID: 3, Label: 'Nulltype', Type: null },
+    ];
+
+    const result = Util.getAvailableTypes(labels);
+    expect(result).toEqual(['Course']);
+  });
+
+  test('returns empty array when no labels have types', () => {
+    const labels = [
+      { ID: 1, Label: 'Notype1' },
+      { ID: 2, Label: 'Notype2' },
+    ];
+
+    const result = Util.getAvailableTypes(labels);
+    expect(result).toEqual([]);
+  });
+
+  test('returns empty array for empty label list', () => {
+    const result = Util.getAvailableTypes([]);
+    expect(result).toEqual([]);
+  });
+});
+
+describe('formatLabelsForDisplay', () => {
+  test('title-cases Label field', () => {
+    const labels = [
+      { ID: 1, Label: 'chicken', Type: 'protein' },
+      { ID: 2, Label: 'MEXICAN', Type: 'cuisine' },
+      { ID: 3, Label: 'gluten free', Type: 'dietary' },
+    ];
+
+    const result = Util.formatLabelsForDisplay(labels);
+    expect(result[0].Label).toBe('Chicken');
+    expect(result[1].Label).toBe('Mexican');
+    expect(result[2].Label).toBe('Gluten Free');
+  });
+
+  test('title-cases Type field', () => {
+    const labels = [
+      { ID: 1, Label: 'chicken', Type: 'protein' },
+      { ID: 2, Label: 'mexican', Type: 'cuisine' },
+    ];
+
+    const result = Util.formatLabelsForDisplay(labels);
+    expect(result[0].Type).toBe('Protein');
+    expect(result[1].Type).toBe('Cuisine');
+  });
+
+  test('handles labels without Type field', () => {
+    const labels = [
+      { ID: 1, Label: 'no type' },
+      { ID: 2, Label: 'also no type', Type: null },
+    ];
+
+    const result = Util.formatLabelsForDisplay(labels);
+    expect(result[0].Label).toBe('No Type');
+    expect(result[0].Type).toBeUndefined();
+    expect(result[1].Label).toBe('Also No Type');
+    expect(result[1].Type).toBeNull();
+  });
+
+  test('preserves other label fields', () => {
+    const labels = [
+      { ID: 1, Label: 'chicken', Type: 'protein', Icon: '🐔' },
+    ];
+
+    const result = Util.formatLabelsForDisplay(labels);
+    expect(result[0].ID).toBe(1);
+    expect(result[0].Icon).toBe('🐔');
+  });
+
+  test('normalizes whitespace in labels', () => {
+    const labels = [
+      { ID: 1, Label: 'gluten  free', Type: 'dietary  restriction' },
+    ];
+
+    const result = Util.formatLabelsForDisplay(labels);
+    expect(result[0].Label).toBe('Gluten Free');
+    expect(result[0].Type).toBe('Dietary Restriction');
+  });
+});

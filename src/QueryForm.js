@@ -63,11 +63,11 @@ const QueryForm = (props) => {
         <span className="button-divider"></span>
         <button
           type="button"
-          className={props.groupBy ? "active" : ""}
+          className={props.groupBy !== "" ? "active" : ""}
           onClick={props.handleGroupToggle}
-          title="Group by label"
+          title="Group by label type"
         >
-          📂
+          📂{props.groupBy !== "" ? ` ${props.groupBy}` : ""}
         </button>
       </div>
     </form>
