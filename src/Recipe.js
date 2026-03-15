@@ -24,6 +24,7 @@ const Recipe = (props) => {
       <span className="tag-list-title">Tags</span>
       <TagList
         loggedIn={props.loggedIn}
+        isAdmin={props.isAdmin}
         tags={recipe.Labels}
         showTaggingForm={props.showTaggingForm}
         handlers={props.labelHandlers}
