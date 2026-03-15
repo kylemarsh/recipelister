@@ -154,11 +154,23 @@ Authentication is handled by the `doLogin` and `doLogout` functions in
 `App.js`. The log in method calls `Api.login` which POSTs a request to
 `$api_host/login/` including the username and password in the request body.
 Upon successful login the response body contains a JWT in the `token` field.
-The JWT and username are stored in local storage.
+The JWT contains an `is_admin` claim indicating whether the user has admin
+privileges. The JWT and username are stored in local storage.
 
-When making a request that requires authentication (these are identified by
-endpoints containing `priv/` in the route) the api function will include the
-JWT as the value for the `x-access-token` header.
+On page load and successful login, the JWT is decoded using `jwt-decode` to
+extract the `is_admin` claim, which is stored in application state as
+`login.isAdmin`. This flag controls UI visibility of admin-only controls (edit,
+delete, add note, add label, etc.).
+
+API routes are organized by privilege level:
+- **Public routes** (no auth): `/recipes/`, `/labels/`
+- **Authenticated routes** (`/priv/*`): Read-only access requiring valid JWT
+  (e.g., full recipe bodies, notes)
+- **Admin routes** (`/admin/*`): Mutation operations requiring admin privilege
+  (all POST, PUT, DELETE operations)
+
+When making authenticated requests, the api function includes the JWT as the
+value for the `x-access-token` header.
 
 
 ## Libraries
@@ -167,6 +179,7 @@ This project uses:
  - "react-dom" (v19)
  - "react-widgets" (for multiselect dropdowns)
  - "react-scripts" (Create React App build tooling)
+ - "jwt-decode" (for decoding JWTs to extract admin flag)
 
 ## Components
 The top-level application is in `App.js`, bootstrapped by `index.js` using React
@@ -244,14 +257,24 @@ Defined in `Recipe.js`. This component renders the currently seleted recipe in
 the Recipe Pane (the Recipe Pane is rendered as either the `Recipe` component
 or the `NewRecipeForm` component in the `content-container` div just after the
 `search-pane` div). This component renders the recipe inside a div with class
-`recipe-container`. In addition to the details of the recipe, it renders three
-additional Components:
- - RecipeActions -- defined in `Recipe.js`; renders three button controls:
-   back (←, navy), edit (✎, goldenrod), delete (🗑). Uses semantic
-   `<button>` elements with descriptive aria-labels and keyboard navigation
-   support. Visual styling matches sort button design language.
- - TagList
- - NoteList -- rendered inside the `notes-section` div.
+`recipe-container`.
+
+The Recipe component receives an `isAdmin` prop from App.js that controls the
+visibility of admin-only UI elements. This prop is passed down to child
+components (RecipeActions, TagList, NoteList) to conditionally render mutation
+controls.
+
+In addition to the details of the recipe, it renders three additional Components:
+ - RecipeActions -- defined in `Recipe.js`; renders button controls. The back
+   button (←, navy) is always visible. Edit (✎, goldenrod) and delete (🗑)
+   buttons are only rendered when `isAdmin` is true. Uses semantic `<button>`
+   elements with descriptive aria-labels and keyboard navigation support.
+   Visual styling matches sort button design language.
+ - TagList -- receives `isAdmin` prop to conditionally render "+ add label"
+   button and label unlink (×) buttons
+ - NoteList -- rendered inside the `notes-section` div; receives `isAdmin` prop
+   to conditionally render "+ Add Note" button and note action buttons (flag,
+   edit, delete)
 
 A "recipe" object has the following properties:
  - `ID` (int): the primary identifier for this recipe
@@ -316,6 +339,10 @@ Defined in `Notes.js`. This renders an unordered list of `NoteListItem`
 Components followed by the `AddNoteTrigger` or `EditNoteForm` Component to
 allow a user to add a new note.
 
+The component receives an `isAdmin` prop and only renders the "+ Add Note"
+button and note action controls (flag, edit, delete) when `isAdmin` is true.
+Non-admin users can view notes but cannot modify them.
+
 A "note" object has the following properties:
  - `ID` (int): the primary identifier for this note
  - `RecipeId` (int): the RecipeId for the recipe this note belongs to
@@ -327,9 +354,13 @@ A "note" object has the following properties:
 ### TagList Component
 Defined in `Tags.js`. This renders an unordered list of `TagListItem`
 components in a div with class `tag-list-container` to show the tags that are
-linked to a recipe. Each TagListItem has a button to un-link the tag from the
-recipe, and the list ends with a `LinkTagTrigger` or `LinkTagForm` component to
-add new tags to the recipe.
+linked to a recipe.
+
+The component receives an `isAdmin` prop and only renders the "+ add label"
+button and label unlink (×) buttons when `isAdmin` is true. Non-admin users can
+view labels but cannot add or remove them. When adding a label, the component
+performs a case-insensitive search against existing labels to prevent
+duplicates.
 
 #### Terminology: Labels vs Tags
 The application uses two related concepts:

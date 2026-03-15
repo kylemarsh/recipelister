@@ -16,6 +16,7 @@ const TagList = (props) => {
           tag={tag}
           unlinkHandler={props.handlers.UnlinkClick}
           loggedIn={props.loggedIn}
+          isAdmin={props.isAdmin}
         />
       );
     });
@@ -24,7 +25,7 @@ const TagList = (props) => {
     <div className="tag-list-container">
       <ul className="tag-list">
         {tags}
-        {props.loggedIn ? (
+        {props.loggedIn && props.isAdmin ? (
           <li>
             {props.showTaggingForm ? (
               <TagRecipeForm
@@ -47,7 +48,7 @@ const TagListItem = (props) => {
   return (
     <li data-label-id={props.tag.ID} data-label-name={props.tag.Label}>
       {props.tag.Label}
-      {props.loggedIn ? (
+      {props.loggedIn && props.isAdmin ? (
         <span
           className="tag-unlink"
           role="img"
