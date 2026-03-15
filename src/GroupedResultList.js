@@ -18,7 +18,7 @@ const GroupedResultList = (props) => {
   }
 
   // Grouping is enabled
-  const groupingLabels = Util.getGroupingLabels(props.labels, props.groupBy);
+  const groupingLabels = Util.getGroupingLabels(props.labels, props.groupBy).sort();
 
   // Get recipes that don't have any grouping labels
   const otherRecipes = filteredItems.filter((recipe) => {
