@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { jwtDecode } from "jwt-decode";
 import "./main.css";
 import LoginComponent from "./LoginComponent";
 import QueryForm from "./QueryForm";
@@ -8,12 +9,26 @@ import { Recipe, NewRecipeForm } from "./Recipe";
 import * as Util from "./Util";
 import * as Api from "./api";
 
+function decodeAdminFlag(token) {
+  if (!token) {
+    return false;
+  }
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.is_admin === true;
+  } catch (error) {
+    console.error('Failed to decode admin flag:', error);
+    return false;
+  }
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
 
     const loggedInAs = localStorage.getItem("username");
     const savedJwt = localStorage.getItem("token");
+    const isAdmin = decodeAdminFlag(savedJwt);
 
     this.state = {
       allRecipes: [],
@@ -30,7 +45,7 @@ class App extends Component {
       },
       shuffleKeys: {},
 			expandedGroups: { Main: true },
-      login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt },
+      login: { valid: !!loggedInAs, username: loggedInAs, token: savedJwt, isAdmin },
       error: null,
       errorContext: null,
       targetRecipe: undefined,
@@ -519,10 +534,11 @@ class App extends Component {
     var username = event.target.form.username.value;
     try {
       const token = await Api.login(event.target.form);
+      const isAdmin = decodeAdminFlag(token);
 
       // Auto-dismiss login errors on successful login
       const updates = {
-        login: { valid: true, username: username, token: token },
+        login: { valid: true, username, token, isAdmin },
         reloadRecipeList: true,
       };
       if (this.state.errorContext === "login") {
@@ -544,7 +560,7 @@ class App extends Component {
     localStorage.removeItem("username", "");
     localStorage.removeItem("token", "");
     this.setState({
-      login: { valid: false, username: null, token: null },
+      login: { valid: false, username: null, token: null, isAdmin: false },
       reloadRecipeList: true,
     });
   };
