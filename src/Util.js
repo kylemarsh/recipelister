@@ -148,4 +148,35 @@ function formatLabelsForDisplay(labels) {
   }));
 }
 
-export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField, getAvailableTypes, formatLabelsForDisplay };
+function sortLabelsForMultiselect(labels) {
+  // Separate labels with and without Type
+  const withType = labels.filter(label => label.Type);
+  const withoutType = labels.filter(label => !label.Type);
+
+  // Group labels with Type, preserving original order
+  const typeOrder = [];
+  const grouped = {};
+
+  withType.forEach(label => {
+    const type = label.Type;
+    if (!grouped[type]) {
+      grouped[type] = [];
+      typeOrder.push(type);
+    }
+    grouped[type].push(label);
+  });
+
+  // Sort labels alphabetically within each Type, then flatten
+  const sortedWithType = typeOrder.flatMap(type =>
+    grouped[type].sort((a, b) => a.Label.localeCompare(b.Label))
+  );
+
+  // Add labels without Type at the end, sorted alphabetically, with Type set to "Other"
+  const sortedWithoutType = withoutType
+    .sort((a, b) => a.Label.localeCompare(b.Label))
+    .map(label => ({ ...label, Type: 'Other' }));
+
+  return [...sortedWithType, ...sortedWithoutType];
+}
+
+export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField, getAvailableTypes, formatLabelsForDisplay, sortLabelsForMultiselect };

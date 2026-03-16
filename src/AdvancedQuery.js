@@ -1,7 +1,10 @@
 import React from "react";
 import Multiselect from "react-widgets/Multiselect";
+import * as Util from "./Util";
 
 const AdvancedQuery = (props) => {
+  const sortedLabels = Util.sortLabelsForMultiselect(props.allLabels);
+
   return (
     <div className="advanced-options">
       <label>
@@ -18,7 +21,8 @@ const AdvancedQuery = (props) => {
         <Multiselect
           dataKey="ID"
           textField="Label"
-          data={props.allLabels}
+          groupBy="Type"
+          data={sortedLabels}
           value={props.tagsAll}
           focusFirstItem={true}
           onChange={(value) => props.handleMultiselectUpdate("tagsAll", value)}
@@ -30,7 +34,8 @@ const AdvancedQuery = (props) => {
         <Multiselect
           dataKey="ID"
           textField="Label"
-          data={props.allLabels}
+          groupBy="Type"
+          data={sortedLabels}
           value={props.tagsAny}
           focusFirstItem={true}
           onChange={(value) => props.handleMultiselectUpdate("tagsAny", value)}
@@ -42,7 +47,8 @@ const AdvancedQuery = (props) => {
         <Multiselect
           dataKey="ID"
           textField="Label"
-          data={props.allLabels}
+          groupBy="Type"
+          data={sortedLabels}
           value={props.tagsNone}
           focusFirstItem={true}
           onChange={(value) => props.handleMultiselectUpdate("tagsNone", value)}

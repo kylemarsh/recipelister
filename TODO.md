@@ -6,6 +6,19 @@ There is currently no indication of what labels already exist in the system
 when you're tagging a recipe with the LinkTagForm. We should make a box that
 drops down with all the labels in the system to be clicked or autocompleted
 
+## Tab Key Submission in Tag Form
+When tagging recipes, the "Tab" keypress should submit the form and then reopen
+the tag form for another label, automatically focusing the text input field
+providing faster keyboard-based tagging workflow.
+
+## Auto-focus Note and Tag Textarea
+When the user clicks "+ Add Note", the textarea in the EditNoteForm should
+automatically receive focus so they can start typing immediately without
+needing to click again.
+
+The tag form should also auto-focus the text area when opened (after
+clicking the "+ add label" button).
+
 ## More informative errors
 Sometimes the API replies with more error detail than is included in the alert.
 Specifically, when adding a new recipe, invalid values in the "Active Time" or
@@ -23,20 +36,6 @@ manage them. Management includes:
  - Deleting a label
  - Adding a new label
  - Viewing titles for all recipes tagged with a label, and unlinking them
-
-## Guest Users
-**Status: Partially Complete** - Basic read-only user support implemented.
-
-The application now supports admin role-based access control:
- - JWTs contain an `is_admin` claim that indicates admin privileges
- - Non-admin users can view all recipes, notes, and labels (read-only)
- - Admin-only UI elements (edit, delete, add buttons) are hidden for non-admin users
- - API enforces access control via `/admin/*` routes for mutations
-
-Still needed:
- - Generate revokable tokens that allow viewing one specific recipe
- - Provide a list of recipes a given non-administrator user can see
- - Provide an interface for an admin user to create a guest user or a sharable link
 
 ## Direct Links to Recipes
 There's no URL routing currently, which means the entire application can
@@ -79,19 +78,6 @@ blank.
 
 Currently it is only hidden when you click the `X` button, and resets to blank
 immediately.
-
-## Tab Key Submission in Tag Form
-When tagging recipes, the "Tab" keypress should submit the form and then reopen
-the tag form for another label, automatically focusing the text input field
-providing faster keyboard-based tagging workflow.
-
-## Auto-focus Note and Tag Textarea
-When the user clicks "+ Add Note", the textarea in the EditNoteForm should
-automatically receive focus so they can start typing immediately without
-needing to click again.
-
-The tag form shoula sl also auto-focus the text area when opened (after
-clicking the "+ add label" button).
 
 ## Fuzzy Search for Recipe Titles
 Improve the recipe search to support fuzzy matching similar to Slack's emoji

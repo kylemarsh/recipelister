@@ -210,6 +210,11 @@ Defined in `AdvancedQuery.js`. This component holds the form for advanced
 searching/filtering options, including the `Multiselect` Components from the
 `react-widgets` library that we use for picking labels.
 
+The label multiselects use `groupBy="Type"` to group labels by their Type field
+and display organized dropdowns with group headers. Labels are sorted
+alphabetically within each group using `Util.sortLabelsForMultiselect()`. Labels
+without a Type value are displayed in an "Other" group at the end of the list.
+
 ### GroupedResultList Component
 Defined in `GroupedResultList.js`. This component is the primary list display
 controller that handles filtering and conditional rendering. The App renders
@@ -410,6 +415,11 @@ recipe list:
    concern (not data transport), so it belongs in Util rather than Api. The API
    layer returns raw data that could be used by different clients with different
    formatting needs.
+ - `sortLabelsForMultiselect(labels)`: Prepares labels for display in grouped
+   multiselect dropdowns. Preserves the original order of Type groups while
+   sorting labels alphabetically within each Type. Labels without a Type are
+   mapped to `Type: "Other"` and placed at the end of the list, sorted
+   alphabetically.
 
 
 # Development
