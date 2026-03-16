@@ -1158,3 +1158,191 @@ describe('RecipeActions buttons', () => {
     });
   });
 });
+
+describe('Clickable tag icons in ResultList', () => {
+  test('renders label icons for recipes with icon labels', () => {
+    const recipes = [
+      {
+        ID: 1,
+        Title: 'Chicken Recipe',
+        Labels: [
+          { ID: 10, Label: 'Chicken', Type: 'Protein', Icon: '🐔' },
+          { ID: 11, Label: 'Main', Type: 'Course', Icon: '🍽️' }
+        ]
+      }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+          handleIconClick={jest.fn()}
+        />
+      );
+    });
+
+    const icons = div.querySelectorAll('.recipe-icon');
+    expect(icons.length).toBe(2);
+    expect(icons[0].textContent).toBe('🐔');
+    expect(icons[0].getAttribute('title')).toBe('Chicken');
+    expect(icons[1].textContent).toBe('🍽️');
+    expect(icons[1].getAttribute('title')).toBe('Main');
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('clicking icon calls handleIconClick with correct label', () => {
+    const handleIconClick = jest.fn();
+    const recipes = [
+      {
+        ID: 1,
+        Title: 'Test Recipe',
+        Labels: [
+          { ID: 10, Label: 'Chicken', Type: 'Protein', Icon: '🐔' }
+        ]
+      }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+          handleIconClick={handleIconClick}
+        />
+      );
+    });
+
+    const icon = div.querySelector('.recipe-icon');
+    act(() => {
+      icon.click();
+    });
+
+    expect(handleIconClick).toHaveBeenCalledTimes(1);
+    // Verify it was called with an event and the label object
+    expect(handleIconClick.mock.calls[0][1]).toEqual({
+      ID: 10,
+      Label: 'Chicken',
+      Type: 'Protein',
+      Icon: '🐔'
+    });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('clicking icon does not trigger recipe selection', () => {
+    const handleClick = jest.fn();
+    const handleIconClick = jest.fn((e) => e.stopPropagation());
+    const recipes = [
+      {
+        ID: 1,
+        Title: 'Test Recipe',
+        Labels: [
+          { ID: 10, Label: 'Chicken', Type: 'Protein', Icon: '🐔' }
+        ]
+      }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={handleClick}
+          handleIconClick={handleIconClick}
+        />
+      );
+    });
+
+    const icon = div.querySelector('.recipe-icon');
+    act(() => {
+      icon.click();
+    });
+
+    expect(handleIconClick).toHaveBeenCalledTimes(1);
+    expect(handleClick).not.toHaveBeenCalled();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('does not render icons for labels without Icon field', () => {
+    const recipes = [
+      {
+        ID: 1,
+        Title: 'Test Recipe',
+        Labels: [
+          { ID: 10, Label: 'Chicken', Type: 'Protein' }, // No Icon field
+          { ID: 11, Label: 'Main', Type: 'Course', Icon: '🍽️' }
+        ]
+      }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+          handleIconClick={jest.fn()}
+        />
+      );
+    });
+
+    const icons = div.querySelectorAll('.recipe-icon');
+    expect(icons.length).toBe(1);
+    expect(icons[0].textContent).toBe('🍽️');
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test('handles recipes with no labels', () => {
+    const recipes = [
+      { ID: 1, Title: 'Recipe Without Labels' }
+    ];
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <ResultList
+          items={recipes}
+          sortBy="alphabetic"
+          shuffleKeys={{}}
+          handleClick={jest.fn()}
+          handleIconClick={jest.fn()}
+        />
+      );
+    });
+
+    const icons = div.querySelectorAll('.recipe-icon');
+    expect(icons.length).toBe(0);
+    expect(div.textContent).toContain('Recipe Without Labels');
+
+    act(() => {
+      root.unmount();
+    });
+  });
+});

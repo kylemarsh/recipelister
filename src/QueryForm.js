@@ -16,7 +16,7 @@ const QueryForm = (props) => {
           <input
             name="showAdvancedOptions"
             type="checkbox"
-            checked={props.advancedQuery}
+            checked={props.showAdvancedOptions}
             onChange={props.handleChange}
           />
           Advanced
