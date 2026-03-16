@@ -112,6 +112,7 @@ class App extends Component {
               expandedGroups={this.state.expandedGroups}
               handleGroupToggle={this.handleGroupCollapse}
               handleClick={this.handleResultClick}
+              handleIconClick={this.handleIconClick}
             />
           </div>
           {this.state.showRecipeEditor ? (
@@ -525,6 +526,34 @@ class App extends Component {
     });
     if (this.state.login.valid) {
       this.loadNotes(event);
+    }
+  };
+
+  handleIconClick = (event, label) => {
+    event.stopPropagation(); // Prevent recipe selection
+
+    // Check if label is already in tagsAll
+    const isAlreadySelected = this.state.filters.tagsAll.some(
+      (tag) => tag.ID === label.ID
+    );
+
+    if (!isAlreadySelected) {
+      const newTagsAll = [...this.state.filters.tagsAll, label];
+      const newFilters = {
+        ...this.state.filters,
+        tagsAll: newTagsAll,
+        showAdvancedOptions: true, // Enable advanced options if not already
+      };
+      this.setState({ filters: newFilters });
+    } else {
+      // If already selected, enable advanced options so user can see it
+      if (!this.state.filters.showAdvancedOptions) {
+        const newFilters = {
+          ...this.state.filters,
+          showAdvancedOptions: true,
+        };
+        this.setState({ filters: newFilters });
+      }
     }
   };
 
