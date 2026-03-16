@@ -780,6 +780,139 @@ describe('formatLabelsForDisplay', () => {
   });
 });
 
+describe('sortLabelsForMultiselect', () => {
+  test('sorts labels alphabetically within each type', () => {
+    const labels = [
+      { ID: 1, Label: 'Dessert', Type: 'Course' },
+      { ID: 2, Label: 'Main', Type: 'Course' },
+      { ID: 3, Label: 'Beef', Type: 'Protein' },
+      { ID: 4, Label: 'Chicken', Type: 'Protein' },
+    ];
+
+    const result = Util.sortLabelsForMultiselect(labels);
+
+    // Course labels should be first (original order), sorted alphabetically
+    expect(result[0].Label).toBe('Dessert');
+    expect(result[1].Label).toBe('Main');
+    // Protein labels should be second, sorted alphabetically
+    expect(result[2].Label).toBe('Beef');
+    expect(result[3].Label).toBe('Chicken');
+  });
+
+  test('preserves original order of type groups', () => {
+    const labels = [
+      { ID: 1, Label: 'Beef', Type: 'Protein' },
+      { ID: 2, Label: 'Main', Type: 'Course' },
+      { ID: 3, Label: 'Mexican', Type: 'Cuisine' },
+      { ID: 4, Label: 'Chicken', Type: 'Protein' },
+    ];
+
+    const result = Util.sortLabelsForMultiselect(labels);
+
+    // Types should appear in order: Protein, Course, Cuisine
+    expect(result[0].Type).toBe('Protein');
+    expect(result[1].Type).toBe('Protein');
+    expect(result[2].Type).toBe('Course');
+    expect(result[3].Type).toBe('Cuisine');
+  });
+
+  test('places labels without Type at the end with Type set to "Other"', () => {
+    const labels = [
+      { ID: 1, Label: 'Main', Type: 'Course' },
+      { ID: 2, Label: 'Chicken', Type: 'Protein' },
+      { ID: 3, Label: 'Untyped Label' },
+      { ID: 4, Label: 'Another Untyped' },
+    ];
+
+    const result = Util.sortLabelsForMultiselect(labels);
+
+    // Typed labels should come first
+    expect(result[0].Label).toBe('Main');
+    expect(result[1].Label).toBe('Chicken');
+    // Untyped labels should come last with Type: "Other", sorted alphabetically
+    expect(result[2].Label).toBe('Another Untyped');
+    expect(result[2].Type).toBe('Other');
+    expect(result[3].Label).toBe('Untyped Label');
+    expect(result[3].Type).toBe('Other');
+  });
+
+  test('sorts untyped labels alphabetically in "Other" group', () => {
+    const labels = [
+      { ID: 1, Label: 'Zebra' },
+      { ID: 2, Label: 'Apple' },
+      { ID: 3, Label: 'Mango' },
+    ];
+
+    const result = Util.sortLabelsForMultiselect(labels);
+
+    expect(result[0].Label).toBe('Apple');
+    expect(result[0].Type).toBe('Other');
+    expect(result[1].Label).toBe('Mango');
+    expect(result[1].Type).toBe('Other');
+    expect(result[2].Label).toBe('Zebra');
+    expect(result[2].Type).toBe('Other');
+  });
+
+  test('handles empty label list', () => {
+    const result = Util.sortLabelsForMultiselect([]);
+    expect(result).toEqual([]);
+  });
+
+  test('handles all labels having same type', () => {
+    const labels = [
+      { ID: 1, Label: 'Zebra', Type: 'Course' },
+      { ID: 2, Label: 'Apple', Type: 'Course' },
+      { ID: 3, Label: 'Mango', Type: 'Course' },
+    ];
+
+    const result = Util.sortLabelsForMultiselect(labels);
+
+    expect(result[0].Label).toBe('Apple');
+    expect(result[1].Label).toBe('Mango');
+    expect(result[2].Label).toBe('Zebra');
+    expect(result.every(l => l.Type === 'Course')).toBe(true);
+  });
+
+  test('preserves other label fields', () => {
+    const labels = [
+      { ID: 1, Label: 'Chicken', Type: 'Protein', Icon: '🐔' },
+      { ID: 2, Label: 'Beef', Type: 'Protein', Icon: '🐄' },
+    ];
+
+    const result = Util.sortLabelsForMultiselect(labels);
+
+    expect(result[0].ID).toBe(2);
+    expect(result[0].Icon).toBe('🐄');
+    expect(result[1].ID).toBe(1);
+    expect(result[1].Icon).toBe('🐔');
+  });
+
+  test('does not mutate original array', () => {
+    const labels = [
+      { ID: 1, Label: 'Zebra', Type: 'Course' },
+      { ID: 2, Label: 'Apple', Type: 'Course' },
+    ];
+    const original = [...labels];
+
+    Util.sortLabelsForMultiselect(labels);
+
+    expect(labels).toEqual(original);
+  });
+
+  test('creates new label objects for untyped labels', () => {
+    const labels = [
+      { ID: 1, Label: 'Untyped' },
+    ];
+
+    const result = Util.sortLabelsForMultiselect(labels);
+
+    // Should not mutate the original label
+    expect(labels[0].Type).toBeUndefined();
+    // Result should have Type: "Other"
+    expect(result[0].Type).toBe('Other');
+  });
+});
+
 describe('RecipeActions buttons', () => {
   const mockHandlers = {
     recipeHandlers: {
