@@ -13,6 +13,7 @@ const GroupedResultList = (props) => {
         sortBy={props.sortBy}
         shuffleKeys={props.shuffleKeys}
         handleClick={props.handleClick}
+        handleIconClick={props.handleIconClick}
       />
     );
   }
@@ -55,6 +56,7 @@ const GroupedResultList = (props) => {
             sortBy={props.sortBy}
             shuffleKeys={props.shuffleKeys}
             handleClick={props.handleClick}
+            handleIconClick={props.handleIconClick}
           />
         )}
       </div>

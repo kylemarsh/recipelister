@@ -253,6 +253,12 @@ for any labels that have an `Icon` field. The icons use native browser tooltips
 (via the `title` attribute) to show the label name on hover (desktop) or tap
 (mobile).
 
+**Clickable Icons**: Label icons are clickable and add the label to the advanced
+query "All" filter when clicked. The click handler prevents event bubbling so
+clicking an icon doesn't trigger recipe selection. If advanced options are
+collapsed, clicking an icon automatically expands them. Icons show a pointer
+cursor to indicate they are clickable.
+
 The list styling removes default CSS bullets (list-style-type: none) so the
 bullet indicator is controlled explicitly in the component. It does not handle
 filtering - that's done by GroupedResultList.

@@ -8,6 +8,6 @@
 
 .recipe-icon {
   margin-left: 0.25em;
-  cursor: default;
+  cursor: pointer;
   display: inline;
 }
