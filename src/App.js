@@ -53,6 +53,7 @@ class App extends Component {
       showTaggingForm: false,
       showNoteEditor: false,
       showAddNote: false,
+      recipeJustEdited: false,
     };
   }
   render() {
@@ -134,7 +135,10 @@ class App extends Component {
               showAddNote={this.state.showAddNote}
               recipeHandlers={{
                 EditClick: () => this.setState({ showRecipeEditor: true }),
-                UntargetClick: () => this.setState({ targetRecipe: undefined }),
+                UntargetClick: () => {
+                  this.setState({ targetRecipe: undefined });
+                  this.clearUrl();
+                },
                 DeleteClick: this.handleRecipeDelete,
               }}
               noteHandlers={{
@@ -195,6 +199,7 @@ class App extends Component {
         reloadRecipeList: true,
         showRecipeEditor: false,
         targetRecipe: newTarget,
+        recipeJustEdited: true, // Flag to update URL after recipes reload
       };
       if (this.state.errorContext === "addRecipe") {
         updates.error = null;
@@ -218,6 +223,7 @@ class App extends Component {
         updates.errorContext = null;
       }
       this.setState(updates);
+      this.clearUrl();
     } catch (e) {
       this.handleError(e, "could not delete recipe", "deleteRecipe");
     }
@@ -520,10 +526,25 @@ class App extends Component {
   };
 
   handleResultClick = (event) => {
-    this.setState({
+    const recipeId = parseInt(event.target.id);
+    const recipe = Util.selectRecipe(recipeId, this.state.allRecipes);
+
+    // Auto-dismiss routing errors on successful recipe selection
+    const updates = {
       showRecipeEditor: false,
-      targetRecipe: parseInt(event.target.id),
-    });
+      targetRecipe: recipeId,
+    };
+    if (this.state.errorContext === "routing") {
+      updates.error = null;
+      updates.errorContext = null;
+    }
+    this.setState(updates);
+
+    // Update URL with recipe ID and slug
+    if (recipe) {
+      this.updateUrl(recipeId, recipe.Title);
+    }
+
     if (this.state.login.valid) {
       this.loadNotes(event);
     }
@@ -660,19 +681,104 @@ class App extends Component {
     }
   };
 
+  /******************
+   * URL ROUTING *
+   ******************/
+  updateUrl = (recipeId, recipeTitle) => {
+    const url = Util.buildRecipeUrl(recipeId, recipeTitle);
+    window.history.pushState(null, '', url);
+  };
+
+  clearUrl = () => {
+    window.history.pushState(null, '', '/');
+  };
+
+  validateAndCorrectSlug = (recipeId, recipeTitle) => {
+    const currentPath = window.location.pathname;
+    const correctUrl = Util.buildRecipeUrl(recipeId, recipeTitle);
+
+    if (currentPath !== correctUrl) {
+      window.history.replaceState(null, '', correctUrl);
+    }
+  };
+
+  handlePopState = () => {
+    this.routeToRecipeFromUrl();
+  };
+
+  routeToRecipeFromUrl = () => {
+    const recipeId = Util.parseUrl(window.location.pathname);
+
+    if (recipeId) {
+      // Validate recipe exists
+      const recipe = Util.selectRecipe(recipeId, this.state.allRecipes);
+      if (recipe) {
+        // Auto-dismiss routing errors on successful navigation
+        const updates = { targetRecipe: recipeId };
+        if (this.state.errorContext === "routing") {
+          updates.error = null;
+          updates.errorContext = null;
+        }
+        this.setState(updates);
+        this.validateAndCorrectSlug(recipeId, recipe.Title);
+        if (this.state.login.valid) {
+          this.loadNotes({ target: { id: recipeId } });
+        }
+      } else {
+        // Recipe doesn't exist, show error and clear URL
+        this.setState({
+          error: "Recipe not found",
+          errorContext: "routing",
+          targetRecipe: undefined
+        });
+        this.clearUrl();
+      }
+    } else {
+      // No recipe in URL, clear targetRecipe
+      this.setState({ targetRecipe: undefined });
+    }
+  };
+
   /*********************
    * LIFECYCLE METHODS *
    *********************/
   componentDidMount() {
     this.getRecipes();
     this.getLabels();
+
+    // Add popstate listener for browser back/forward buttons
+    window.addEventListener('popstate', this.handlePopState);
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     if (this.state.reloadRecipeList) {
       this.getRecipes();
       this.setState({ reloadRecipeList: false });
     }
+
+    // Route to recipe from URL after recipes load
+    if (prevState.allRecipes.length === 0 && this.state.allRecipes.length > 0) {
+      this.routeToRecipeFromUrl();
+    }
+
+    // Update URL slug after recipe edit (recipes have been reloaded)
+    if (this.state.recipeJustEdited && prevState.allRecipes !== this.state.allRecipes && this.state.targetRecipe) {
+      const recipe = Util.selectRecipe(this.state.targetRecipe, this.state.allRecipes);
+      if (recipe) {
+        this.validateAndCorrectSlug(this.state.targetRecipe, recipe.Title);
+      }
+      this.setState({ recipeJustEdited: false });
+    }
+
+    // Load notes if user logs in while viewing a recipe
+    if (!prevState.login.valid && this.state.login.valid && this.state.targetRecipe) {
+      this.loadNotes({ target: { id: this.state.targetRecipe } });
+    }
+  }
+
+  componentWillUnmount() {
+    // Remove popstate listener to prevent memory leaks
+    window.removeEventListener('popstate', this.handlePopState);
   }
 }
 

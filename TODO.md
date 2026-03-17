@@ -37,20 +37,10 @@ manage them. Management includes:
  - Adding a new label
  - Viewing titles for all recipes tagged with a label, and unlinking them
 
-## Direct Links to Recipes
-There's no URL routing currently, which means the entire application can
-operate without reloading the page, but also means there's no way to link
-directly to a specific recipe. We should add routing so that loading a recipe
-populates the URL bar with a direct link to the recipe. The URL format should
-be `.../{recipe-id}/{slug}` where the slug is a url-safe version of the recipe
-title. The slug should be optional (only the recipe-id should be required for
-routing).
-
-The application should still operate as a single page application. If it's not
-possible to rewrite the URL dynamically without reloading the page, we can have
-a share button that copies the URL to the clipboard and then we use the url to
-set initial state upon page load, but ideally we should be able to rewrite the
-URL without reloading the page.
+## Query Parameters for Filter State
+Preserve filter/search state in URL query parameters (e.g.,
+?search=chicken&tags=dinner&sort=newest) so direct links can include
+search context. Should work alongside recipe routing.
 
 ## More responsive UI
 Currently there's no way to hide the list pane in desktop, and the Recipe Pane

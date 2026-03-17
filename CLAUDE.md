@@ -4,6 +4,10 @@ access to a database of recipes. It's written in react and the production
 deployment is hosted at `https://eats.dashery.xyz`. Communication with the
 database is with an API layer using JSON over REST.
 
+The application supports direct links to individual recipes via URL routing
+(e.g., `/123/chicken-soup`). URLs update dynamically as users navigate without
+page reloads, and the browser back/forward buttons work within the app.
+
 
 # Structure
 All of the react code are in the `src/` directory.
@@ -172,6 +176,39 @@ API routes are organized by privilege level:
 When making authenticated requests, the api function includes the JWT as the
 value for the `x-access-token` header.
 
+### URL Routing
+The application implements client-side URL routing using the browser History
+API to enable direct links to recipes while maintaining SPA behavior (no page
+reloads).
+
+**URL Format:**
+- Pattern: `/{recipe-id}/{slug}` where slug is optional
+- Examples: `/123/chicken-soup`, `/123`
+- Recipe ID is required; slug is auto-generated from recipe title for readability
+- Invalid slugs are auto-corrected using `replaceState` (no history entry)
+
+**Routing Behavior:**
+- **Recipe selection**: Updates URL via `pushState` to `/{id}/{slug}`
+- **Recipe close**: Clears URL via `pushState` to `/`
+- **Recipe deletion**: Clears URL via `pushState` to `/`
+- **Recipe edit**: Updates slug via `replaceState` (no history entry)
+- **Browser back/forward**: `popstate` event listener routes appropriately
+- **Initial page load**: Parses URL and routes to recipe (if valid ID)
+
+**Deep Linking:**
+- Unauthenticated users can navigate to recipe URLs
+- Recipe displays with title and labels only (existing auth behavior)
+- If user logs in while viewing a recipe, notes load automatically
+- Invalid recipe IDs show "Recipe not found" error and clear URL
+
+**Implementation:**
+- URL parsing/building in `Util.js` (`parseUrl`, `buildRecipeUrl`, `generateSlug`)
+- Routing methods in `App.js` (`updateUrl`, `clearUrl`, `validateAndCorrectSlug`,
+  `routeToRecipeFromUrl`, `handlePopState`)
+- `popstate` event listener added in `componentDidMount`, removed in `componentWillUnmount`
+- URL updates integrated into `handleResultClick`, recipe close/delete handlers,
+  and recipe edit flow
+
 
 ## Libraries
 This project uses:
@@ -184,11 +221,32 @@ This project uses:
 ## Components
 The top-level application is in `App.js`, bootstrapped by `index.js` using React
 18's `createRoot` API. This Component renders the overall UI and holds state
-(query form state, selected recipe, logged in state, which other Components are
-visible...).
+(query form state, selected recipe, logged in state, URL routing state, which
+other Components are visible...).
 
 All of the functions that handle actions (clicks, typing, etc) are defined here
 and passed down into components as props.
+
+**App.js State:**
+- `targetRecipe`: ID of currently selected recipe (or undefined)
+- `recipeJustEdited`: Flag indicating recipe was just edited (triggers URL slug
+  update after recipes reload)
+- Other state: filters, login, errors, UI visibility flags, etc.
+
+**App.js URL Routing Methods:**
+- `updateUrl(recipeId, recipeTitle)`: Updates URL using `pushState`
+- `clearUrl()`: Clears URL to `/` using `pushState`
+- `validateAndCorrectSlug(recipeId, recipeTitle)`: Auto-corrects slug using
+  `replaceState`
+- `handlePopState()`: Handles browser back/forward (delegates to
+  `routeToRecipeFromUrl`)
+- `routeToRecipeFromUrl()`: Routes to recipe from current URL pathname
+
+**App.js Lifecycle Integration:**
+- `componentDidMount`: Adds `popstate` listener for browser navigation
+- `componentDidUpdate`: Routes from URL after recipes load; updates slug after
+  recipe edit; loads notes after login (if viewing recipe)
+- `componentWillUnmount`: Removes `popstate` listener
 
 Each component has its own CSS file in the `src/` directory (e.g., `App.css`,
 `Recipe.css`, `Tags.css`, etc.) that are imported by `index.js`.
@@ -342,6 +400,8 @@ Implemented auto-dismiss contexts:
  - `"fetchLabels"`: Dismissed when labels are successfully fetched
  - `"fetchNotes"`: Dismissed when notes are successfully loaded
  - `"auth"`: Set when 401 errors occur (user logged out)
+ - `"routing"`: Set when recipe ID in URL doesn't exist; dismissed when a recipe
+   is successfully selected (via click or URL navigation)
 
 Users can also manually dismiss any alert by clicking the × button.
 
@@ -401,8 +461,10 @@ A "label" object (used throughout the code and API) has the following properties
 
 
 ## Helpers
-`Util.js` contains helper functions for querying/filtering and sorting the
-recipe list:
+`Util.js` contains helper functions for querying/filtering, sorting, and URL
+routing:
+
+**Recipe Filtering & Sorting:**
  - `applyFilters()`: filters recipes by search text and label selections
  - `sortRecipes()`: sorts recipes by the selected sort mode (alphabetic, newest,
    or shuffle with stable random keys)
@@ -411,11 +473,8 @@ recipe list:
    match the specified type. Filters labels where Type === groupBy.
  - `filterRecipesByLabel()`: filters recipes that have a specific label
    (case-insensitive matching)
- - `transformNewField()`: transforms the "new recipe" toggle value from the form
-   to the correct `New` field value for API submission
- - `getAvailableTypes(allLabels)`: Extracts unique label Type values from the
-   label list, filtering out undefined/null. Returns array with "Course" first
-   (when present) to maintain the default grouping type.
+
+**Label Formatting & Display:**
  - `formatLabelsForDisplay(labels)`: Title-cases Label and Type fields for
    display. Applied when labels are loaded from the API. This is a presentation
    concern (not data transport), so it belongs in Util rather than Api. The API
@@ -426,6 +485,22 @@ recipe list:
    sorting labels alphabetically within each Type. Labels without a Type are
    mapped to `Type: "Other"` and placed at the end of the list, sorted
    alphabetically.
+ - `getAvailableTypes(allLabels)`: Extracts unique label Type values from the
+   label list, filtering out undefined/null. Returns array with "Course" first
+   (when present) to maintain the default grouping type.
+
+**Form Utilities:**
+ - `transformNewField()`: transforms the "new recipe" toggle value from the form
+   to the correct `New` field value for API submission
+
+**URL Routing:**
+ - `generateSlug(title)`: Converts recipe title to URL-safe slug. Lowercases,
+   replaces spaces/special chars with hyphens, removes consecutive hyphens, trims
+   edges. Example: `"Mom's Chicken Soup"` → `"moms-chicken-soup"`
+ - `parseUrl(pathname)`: Extracts recipe ID from URL pathname. Returns integer
+   ID or null. Handles formats like `/123/slug`, `/123`, `/123/`
+ - `buildRecipeUrl(recipeId, recipeTitle)`: Builds complete recipe URL with ID
+   and slug. Returns `/{id}/{slug}` or `/{id}` if title is empty.
 
 
 # Development

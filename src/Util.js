@@ -179,4 +179,31 @@ function sortLabelsForMultiselect(labels) {
   return [...sortedWithType, ...sortedWithoutType];
 }
 
-export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField, getAvailableTypes, formatLabelsForDisplay, sortLabelsForMultiselect };
+function generateSlug(title) {
+  if (!title) return '';
+
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special chars except word chars, spaces, and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Remove consecutive hyphens
+    .replace(/^-+|-+$/g, ''); // Trim leading/trailing hyphens
+}
+
+function parseUrl(pathname) {
+  // Extract recipe ID from pathname like "/123/slug" or "/123"
+  if (!pathname || pathname === '/') return null;
+
+  const parts = pathname.split('/').filter(p => p); // Remove empty parts
+  if (parts.length === 0) return null;
+
+  const id = parseInt(parts[0], 10);
+  return isNaN(id) ? null : id;
+}
+
+function buildRecipeUrl(recipeId, recipeTitle) {
+  const slug = generateSlug(recipeTitle);
+  return slug ? `/${recipeId}/${slug}` : `/${recipeId}`;
+}
+
+export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField, getAvailableTypes, formatLabelsForDisplay, sortLabelsForMultiselect, generateSlug, parseUrl, buildRecipeUrl };
