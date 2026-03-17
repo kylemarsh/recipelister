@@ -43,7 +43,14 @@ operate without reloading the page, but also means there's no way to link
 directly to a specific recipe. We should add routing so that loading a recipe
 populates the URL bar with a direct link to the recipe. The URL format should
 be `.../{recipe-id}/{slug}` where the slug is a url-safe version of the recipe
-title. Only the recipe-id should be required for routing.
+title. The slug should be optional (only the recipe-id should be required for
+routing).
+
+The application should still operate as a single page application. If it's not
+possible to rewrite the URL dynamically without reloading the page, we can have
+a share button that copies the URL to the clipboard and then we use the url to
+set initial state upon page load, but ideally we should be able to rewrite the
+URL without reloading the page.
 
 ## More responsive UI
 Currently there's no way to hide the list pane in desktop, and the Recipe Pane
