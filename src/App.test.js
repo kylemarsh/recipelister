@@ -1159,6 +1159,104 @@ describe('RecipeActions buttons', () => {
   });
 });
 
+describe('generateSlug', () => {
+  test('converts title to lowercase with hyphens', () => {
+    const result = Util.generateSlug("Mom's Chicken Soup");
+    expect(result).toBe('moms-chicken-soup');
+  });
+
+  test('removes special characters', () => {
+    const result = Util.generateSlug("Recipe with @special #chars!");
+    expect(result).toBe('recipe-with-special-chars');
+  });
+
+  test('replaces multiple spaces with single hyphen', () => {
+    const result = Util.generateSlug("Recipe  with   spaces");
+    expect(result).toBe('recipe-with-spaces');
+  });
+
+  test('removes consecutive hyphens', () => {
+    const result = Util.generateSlug("Recipe--with---hyphens");
+    expect(result).toBe('recipe-with-hyphens');
+  });
+
+  test('trims leading and trailing hyphens', () => {
+    const result = Util.generateSlug("-Recipe with edges-");
+    expect(result).toBe('recipe-with-edges');
+  });
+
+  test('handles empty string', () => {
+    const result = Util.generateSlug("");
+    expect(result).toBe('');
+  });
+
+  test('handles string with only special characters', () => {
+    const result = Util.generateSlug("@#$%");
+    expect(result).toBe('');
+  });
+
+  test('preserves numbers', () => {
+    const result = Util.generateSlug("Recipe 123 Test");
+    expect(result).toBe('recipe-123-test');
+  });
+
+  test('handles unicode/emoji characters', () => {
+    const result = Util.generateSlug("Mom's 🍗 Chicken");
+    expect(result).toBe('moms-chicken');
+  });
+});
+
+describe('URL routing utility functions', () => {
+  describe('parseUrl', () => {
+    test('extracts recipe ID from URL with slug', () => {
+      const result = Util.parseUrl('/123/moms-chicken-soup');
+      expect(result).toBe(123);
+    });
+
+    test('extracts recipe ID from URL without slug', () => {
+      const result = Util.parseUrl('/123');
+      expect(result).toBe(123);
+    });
+
+    test('returns null for root path', () => {
+      const result = Util.parseUrl('/');
+      expect(result).toBe(null);
+    });
+
+    test('returns null for empty path', () => {
+      const result = Util.parseUrl('');
+      expect(result).toBe(null);
+    });
+
+    test('returns null for invalid path', () => {
+      const result = Util.parseUrl('/not-a-number/slug');
+      expect(result).toBe(null);
+    });
+
+    test('handles trailing slash', () => {
+      const result = Util.parseUrl('/123/');
+      expect(result).toBe(123);
+    });
+  });
+
+  describe('buildRecipeUrl', () => {
+    test('builds URL with recipe ID and slug', () => {
+      const result = Util.buildRecipeUrl(123, 'Chicken Soup');
+      expect(result).toBe('/123/chicken-soup');
+    });
+
+    test('builds URL with recipe ID and empty title', () => {
+      const result = Util.buildRecipeUrl(123, '');
+      expect(result).toBe('/123');
+    });
+
+    test('builds URL with recipe ID and special characters', () => {
+      const result = Util.buildRecipeUrl(456, "Mom's Special Recipe!");
+      expect(result).toBe('/456/moms-special-recipe');
+    });
+  });
+});
+
 describe('Clickable tag icons in ResultList', () => {
   test('renders label icons for recipes with icon labels', () => {
     const recipes = [
