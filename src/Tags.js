@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 // This component manages the display of labels that are tagged to a recipe.
 // Terminology:
@@ -73,9 +73,18 @@ const AddTagTrigger = (props) => {
 };
 
 const TagRecipeForm = (props) => {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, []);
+
   return (
     <form className="link-tag-form" onSubmit={props.handleSubmit}>
-      <input name="label" type="text" placeholder="label" />
+      <input ref={inputRef} name="label" type="text" placeholder="label" />
       <button className="inline-text-button submit">
         {String.fromCharCode(0x2713)}
       </button>
