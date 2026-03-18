@@ -19,13 +19,6 @@ needing to click again.
 The tag form should also auto-focus the text area when opened (after
 clicking the "+ add label" button).
 
-## More informative errors
-Sometimes the API replies with more error detail than is included in the alert.
-Specifically, when adding a new recipe, invalid values in the "Active Time" or
-"Total Time" field results in an alert that just reads "error adding recipe"
-but the actual message received from the API is "activeTime must be an
-integer".  Include more detail in the error alerts
-
 ## Label Manager Interface
 We should have an interface that, when active, replaces the List Pane and
 Recipe Pane and instead shows all the labels in the system and allows us to

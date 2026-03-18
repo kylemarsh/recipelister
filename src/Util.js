@@ -206,4 +206,49 @@ function buildRecipeUrl(recipeId, recipeTitle) {
   return slug ? `/${recipeId}/${slug}` : `/${recipeId}`;
 }
 
-export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField, getAvailableTypes, formatLabelsForDisplay, sortLabelsForMultiselect, generateSlug, parseUrl, buildRecipeUrl };
+function getStatusLabel(statusCode) {
+  const labels = {
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    404: "Not Found",
+    409: "Conflict",
+    500: "Internal Server Error",
+  };
+  return labels[statusCode] || `Error ${statusCode}`;
+}
+
+function parseApiError(error) {
+  // Try to parse "status: message" format
+  const match = error.message?.match(/^(\d+):\s*(.+)$/);
+  if (match) {
+    const status = parseInt(match[1]);
+    const message = match[2];
+    return {
+      status,
+      message,
+      isApiError: true
+    };
+  }
+  return {
+    status: null,
+    message: error.message || "Unknown error",
+    isApiError: false
+  };
+}
+
+function formatErrorMessage(parsedError) {
+  if (!parsedError.isApiError) {
+    // Network error or unparseable error
+    return parsedError.message;
+  }
+
+  const statusLabel = getStatusLabel(parsedError.status);
+  // Capitalize first letter of API message
+  const capitalizedMessage = parsedError.message.charAt(0).toUpperCase()
+    + parsedError.message.slice(1);
+
+  return `${statusLabel}: ${capitalizedMessage}`;
+}
+
+export { selectRecipe, applyFilters, sortRecipes, getGroupingLabels, filterRecipesByLabel, transformNewField, getAvailableTypes, formatLabelsForDisplay, sortLabelsForMultiselect, generateSlug, parseUrl, buildRecipeUrl, parseApiError, formatErrorMessage };

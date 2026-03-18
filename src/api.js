@@ -150,7 +150,8 @@ async function doFetch(resource, requestInit) {
 async function doAction(resource, requestInit) {
   const response = await fetch(resource, requestInit);
   if (!response.ok) {
-    throw Error(response.status);
+    const error = await response.text();
+    throw Error(response.status + ": " + error);
   }
 }
 
