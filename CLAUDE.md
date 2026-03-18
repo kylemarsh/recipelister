@@ -453,13 +453,11 @@ enhanced tagging experience:
    selected for easy replacement.
  - **Keyboard workflow**: Tab key submits the form and immediately reopens it
    with focus for rapid keyboard-based tagging.
- - **Preserved state**: Input value is preserved when closing via Esc, blur, or
-   cancel button. Reopening the form shows the preserved value. Value clears on
-   successful submit or when changing to a different recipe.
 
 **App State:**
  - `showTaggingForm`: Boolean controlling form visibility
- - `tagFormInputValue`: String storing current/preserved input value
+ - `tagFormInputValue`: String storing current input value (cleared when form closes)
+ - `tagFormTabSubmit`: Boolean flag tracking Tab-initiated submits (for reopening form)
 
 **Component Structure:**
  - `TagRecipeForm`: Main form component with Combobox, submit/cancel buttons

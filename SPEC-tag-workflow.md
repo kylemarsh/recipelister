@@ -115,9 +115,11 @@ const TagRecipeForm = (props) => {
 
 **Combobox ref:** Check `react-widgets` docs for proper ref handling.
 
+**IMPLEMENTATION NOTE:** The preserved state feature (Feature 4) was simplified during implementation. Input values are now cleared when the form closes (Esc/blur/cancel) rather than preserved, to avoid UX inconsistency where preserved text didn't match the Combobox's filtered dropdown state. Tab submit (the primary rapid-tagging workflow) always cleared values, so this change only affects edge cases.
+
 ---
 
-### Feature 4: Auto-reset Tag Form State
+### Feature 4: Auto-reset Tag Form State (MODIFIED)
 
 **State management:**
 - Move from App state to TagRecipeForm local state
