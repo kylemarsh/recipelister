@@ -1,11 +1,6 @@
 # TODO
 This file contains feature or bugfix requests.
 
-## Auto-focus Note Textarea
-When the user clicks "+ Add Note", the textarea in the EditNoteForm should
-automatically receive focus so they can start typing immediately without
-needing to click again.
-
 ## Label Manager Interface
 We should have an interface that, when active, replaces the List Pane and
 Recipe Pane and instead shows all the labels in the system and allows us to

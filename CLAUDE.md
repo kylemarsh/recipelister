@@ -422,6 +422,14 @@ The component receives an `isAdmin` prop and only renders the "+ Add Note"
 button and note action controls (flag, edit, delete) when `isAdmin` is true.
 Non-admin users can view notes but cannot modify them.
 
+**EditNoteForm behavior:**
+The note textarea automatically receives focus when the form opens (either for
+adding a new note or editing an existing one). The form closes when the user
+presses Escape or when focus moves outside the form entirely (checked via
+`event.relatedTarget`). Pressing Tab moves focus between textarea and buttons
+without closing the form. Buttons use `onMouseDown` preventDefault to prevent
+blur from firing when clicked, ensuring submit works correctly.
+
 A "note" object has the following properties:
  - `ID` (int): the primary identifier for this note
  - `RecipeId` (int): the RecipeId for the recipe this note belongs to
@@ -579,6 +587,8 @@ See TODO.md for a description of bugs to be fixed and features to be added.
  2. Identify relevant files
  3. Explain the current implementation
  4. Propose changes. Do not write code until the user signs-off on the plan
+ 5. Write any spec or implementation documents to the same location as other
+    similar documents that already exist.
 
 
 ##When making changes
