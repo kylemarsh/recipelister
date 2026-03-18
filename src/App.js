@@ -242,9 +242,9 @@ class App extends Component {
     this.setState({ showTaggingForm: false });
   };
 
-  // TODO: bind to <tab> keypress inside the form?
   handleLabelLinkSubmit = async (event) => {
     event.preventDefault();
+    const isTabSubmit = event.fromTabKey;
     const form = event.target;
     const formData = new FormData(form);
     const labelName = formData.get("label").toLowerCase();
@@ -283,7 +283,7 @@ class App extends Component {
       const updates = {
         allLabels: allLabels,
         allRecipes: this.state.allRecipes,
-        showTaggingForm: false,
+        showTaggingForm: isTabSubmit, // Reopen form if submitted via Tab
       };
       if (this.state.errorContext === "addLabel") {
         updates.error = null;
