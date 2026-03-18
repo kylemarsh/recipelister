@@ -26,6 +26,7 @@ const Recipe = (props) => {
         loggedIn={props.loggedIn}
         isAdmin={props.isAdmin}
         tags={recipe.Labels}
+        allLabels={props.availableLabels}
         showTaggingForm={props.showTaggingForm}
         handlers={props.labelHandlers}
       />
