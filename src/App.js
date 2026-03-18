@@ -51,6 +51,7 @@ class App extends Component {
       targetRecipe: undefined,
       showRecipeEditor: false,
       showTaggingForm: false,
+      tagFormInputValue: '',
       showNoteEditor: false,
       showAddNote: false,
       recipeJustEdited: false,
@@ -156,7 +157,11 @@ class App extends Component {
                 LinkSubmit: this.handleLabelLinkSubmit,
                 LinkCancel: this.handleLabelLinkCancel,
                 UnlinkClick: this.handleLabelUnlinkClick,
+                InputChange: this.handleTagInputChange,
+                FormBlur: this.handleTagFormBlur,
+                FormEscape: this.handleTagFormEscape,
               }}
+              tagFormInputValue={this.state.tagFormInputValue}
             />
           ) : (
             ""
@@ -234,11 +239,20 @@ class App extends Component {
    *****************/
   handleLabelLinkClick = (event) => this.setState({ showTaggingForm: true });
 
-  // TODO: reset this state flag to `false` whenever we move away from the form?
-  //	* <esc> keypress inside the form
-  //	* form (whole thing, not any individual component) losing focus)
   handleLabelLinkCancel = (event) => {
     event.preventDefault();
+    this.setState({ showTaggingForm: false });
+  };
+
+  handleTagInputChange = (value) => {
+    this.setState({ tagFormInputValue: value });
+  };
+
+  handleTagFormBlur = () => {
+    this.setState({ showTaggingForm: false });
+  };
+
+  handleTagFormEscape = () => {
     this.setState({ showTaggingForm: false });
   };
 
@@ -284,6 +298,7 @@ class App extends Component {
         allLabels: allLabels,
         allRecipes: this.state.allRecipes,
         showTaggingForm: isTabSubmit, // Reopen form if submitted via Tab
+        tagFormInputValue: '', // Clear input value on submit
       };
       if (this.state.errorContext === "addLabel") {
         updates.error = null;
@@ -785,6 +800,11 @@ class App extends Component {
     // Load notes if user logs in while viewing a recipe
     if (!prevState.login.valid && this.state.login.valid && this.state.targetRecipe) {
       this.loadNotes({ target: { id: this.state.targetRecipe } });
+    }
+
+    // Clear tag form input when recipe changes
+    if (prevState.targetRecipe !== this.state.targetRecipe) {
+      this.setState({ tagFormInputValue: '', showTaggingForm: false });
     }
   }
 

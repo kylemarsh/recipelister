@@ -33,8 +33,12 @@ const TagList = (props) => {
               <TagRecipeForm
                 allLabels={props.allLabels}
                 currentTags={props.tags}
+                inputValue={props.tagFormInputValue}
                 handleSubmit={props.handlers.LinkSubmit}
                 handleCancel={props.handlers.LinkCancel}
+                handleInputChange={props.handlers.InputChange}
+                handleBlur={props.handlers.FormBlur}
+                handleEscape={props.handlers.FormEscape}
               />
             ) : (
               <AddTagTrigger handleTriggerClick={props.handlers.LinkClick} />
@@ -124,7 +128,7 @@ const TagRecipeForm = (props) => {
     return <span>{item.Label}</span>;
   };
 
-  // Handle Tab key to submit and reopen form
+  // Handle Tab key to submit and reopen form, Escape to close
   const handleKeyDown = (event) => {
     if (event.key === 'Tab') {
       event.preventDefault();
@@ -132,6 +136,9 @@ const TagRecipeForm = (props) => {
       const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
       submitEvent.fromTabKey = true;
       formRef.current.dispatchEvent(submitEvent);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      props.handleEscape();
     }
   };
 
@@ -144,6 +151,9 @@ const TagRecipeForm = (props) => {
         textField="Label"
         groupBy="Type"
         data={sortedLabels}
+        value={props.inputValue}
+        onChange={props.handleInputChange}
+        onBlur={props.handleBlur}
         onCreate={handleCreate}
         onSelect={handleSelect}
         onKeyDown={handleKeyDown}
