@@ -1444,3 +1444,130 @@ describe('Clickable tag icons in ResultList', () => {
     });
   });
 });
+
+describe('Error handling utilities', () => {
+  describe('parseApiError', () => {
+    test('parses API error with status code and message', () => {
+      const error = new Error('400: title is required');
+      const result = Util.parseApiError(error);
+
+      expect(result).toEqual({
+        status: 400,
+        message: 'title is required',
+        isApiError: true
+      });
+    });
+
+    test('parses 401 error correctly', () => {
+      const error = new Error('401: auth token expired; please log in again');
+      const result = Util.parseApiError(error);
+
+      expect(result).toEqual({
+        status: 401,
+        message: 'auth token expired; please log in again',
+        isApiError: true
+      });
+    });
+
+    test('handles network errors without status code', () => {
+      const error = new Error('Failed to fetch');
+      const result = Util.parseApiError(error);
+
+      expect(result).toEqual({
+        status: null,
+        message: 'Failed to fetch',
+        isApiError: false
+      });
+    });
+
+    test('handles error without message', () => {
+      const error = new Error();
+      const result = Util.parseApiError(error);
+
+      expect(result).toEqual({
+        status: null,
+        message: 'Unknown error',
+        isApiError: false
+      });
+    });
+  });
+
+  describe('formatErrorMessage', () => {
+    test('formats 400 error with capitalized message', () => {
+      const parsedError = {
+        status: 400,
+        message: 'title is required',
+        isApiError: true
+      };
+      const result = Util.formatErrorMessage(parsedError);
+
+      expect(result).toBe('Bad Request: Title is required');
+    });
+
+    test('formats 403 error', () => {
+      const parsedError = {
+        status: 403,
+        message: 'admin access required',
+        isApiError: true
+      };
+      const result = Util.formatErrorMessage(parsedError);
+
+      expect(result).toBe('Forbidden: Admin access required');
+    });
+
+    test('formats 404 error', () => {
+      const parsedError = {
+        status: 404,
+        message: 'recipe does not exist',
+        isApiError: true
+      };
+      const result = Util.formatErrorMessage(parsedError);
+
+      expect(result).toBe('Not Found: Recipe does not exist');
+    });
+
+    test('formats 500 error', () => {
+      const parsedError = {
+        status: 500,
+        message: 'could not create recipe',
+        isApiError: true
+      };
+      const result = Util.formatErrorMessage(parsedError);
+
+      expect(result).toBe('Internal Server Error: Could not create recipe');
+    });
+
+    test('formats unknown status code', () => {
+      const parsedError = {
+        status: 418,
+        message: "i'm a teapot",
+        isApiError: true
+      };
+      const result = Util.formatErrorMessage(parsedError);
+
+      expect(result).toBe("Error 418: I'm a teapot");
+    });
+
+    test('returns network error message as-is', () => {
+      const parsedError = {
+        status: null,
+        message: 'Failed to fetch',
+        isApiError: false
+      };
+      const result = Util.formatErrorMessage(parsedError);
+
+      expect(result).toBe('Failed to fetch');
+    });
+
+    test('capitalizes message that already starts with capital', () => {
+      const parsedError = {
+        status: 400,
+        message: 'ActiveTime must be an integer',
+        isApiError: true
+      };
+      const result = Util.formatErrorMessage(parsedError);
+
+      expect(result).toBe('Bad Request: ActiveTime must be an integer');
+    });
+  });
+});

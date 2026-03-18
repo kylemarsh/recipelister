@@ -670,15 +670,27 @@ class App extends Component {
     }
   };
 
-  handleError = (error, message, context = null) => {
+  handleError = (error, fallbackMessage, context = null) => {
     console.error(error);
-    if (error.message.includes("401")) {
-      // we only use 401 to indicate missing / expired auth
-      this.setState({ error: "You have been logged out. Please log in again", errorContext: "auth" });
+
+    const parsedError = Util.parseApiError(error);
+
+    // Special handling for 401 (authentication)
+    if (parsedError.status === 401) {
+      this.setState({
+        error: "You have been logged out. Please log in again",
+        errorContext: "auth"
+      });
       this.doLogout();
-    } else {
-      this.setState({ error: message, errorContext: context });
+      return;
     }
+
+    // Use formatted API error if available, otherwise use fallback
+    const displayMessage = parsedError.isApiError
+      ? Util.formatErrorMessage(parsedError)
+      : `${fallbackMessage}: ${parsedError.message}`;
+
+    this.setState({ error: displayMessage, errorContext: context });
   };
 
   /******************

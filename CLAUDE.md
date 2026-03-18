@@ -371,14 +371,22 @@ new recipe to the database. The form includes a toggle control that manages the
 - Implemented as styled checkbox with value transformation in form submission
 - Maintains accessibility through hidden checkbox element
 
-The form does not currently support adding labels to a recipe on creation, and
-throws uninformative errors when the times are left blank or use an unexpected
-format (10m instead of 10, for example).
+The form does not currently support adding labels to a recipe on creation.
 
 ### Alert Component
 Defined in `Alert.js`. The app renders this component to display errors --
 usually API failures. It wraps the error message in a box that appears with a
 red background at the top of the page.
+
+**Error Display:** The application displays detailed API error messages to users
+with human-readable status labels and capitalized messages. For example:
+- API returns `"400: title is required"` → User sees `"Bad Request: Title is required"`
+- API returns `"403: admin access required"` → User sees `"Forbidden: Admin access required"`
+- Network errors show the fallback message with error details
+
+Error parsing and formatting is handled by utility functions in `Util.js`
+(`parseApiError()` and `formatErrorMessage()`). Special handling for 401 errors
+logs the user out and displays "You have been logged out. Please log in again".
 
 The App component manages error state including auto-dismiss functionality.
 Errors are stored with an optional context that identifies what type of error
@@ -501,6 +509,16 @@ routing:
    ID or null. Handles formats like `/123/slug`, `/123`, `/123/`
  - `buildRecipeUrl(recipeId, recipeTitle)`: Builds complete recipe URL with ID
    and slug. Returns `/{id}/{slug}` or `/{id}` if title is empty.
+
+**Error Handling:**
+ - `parseApiError(error)`: Parses error objects from API calls. Extracts status
+   code and message from errors in the format `"400: title is required"`. Returns
+   an object with `status`, `message`, and `isApiError` fields. Network errors
+   (no status code) return `isApiError: false`.
+ - `formatErrorMessage(parsedError)`: Formats parsed errors for user display.
+   Converts status codes to human-readable labels (400 → "Bad Request", 403 →
+   "Forbidden", etc.) and capitalizes the first letter of the error message.
+   Example: `{status: 400, message: "title is required"}` → `"Bad Request: Title is required"`
 
 
 # Development
