@@ -159,8 +159,7 @@ class App extends Component {
                 LinkCancel: this.handleLabelLinkCancel,
                 UnlinkClick: this.handleLabelUnlinkClick,
                 InputChange: this.handleTagInputChange,
-                FormBlur: this.handleTagFormBlur,
-                FormEscape: this.handleTagFormEscape,
+                FormClose: this.handleTagFormClose,
                 TabSubmit: this.handleTagFormTabSubmit,
               }}
               tagFormInputValue={this.state.tagFormInputValue}
@@ -250,12 +249,9 @@ class App extends Component {
     this.setState({ tagFormInputValue: value });
   };
 
-  handleTagFormBlur = () => {
-    this.setState({ showTaggingForm: false });
-  };
-
-  handleTagFormEscape = () => {
-    this.setState({ showTaggingForm: false });
+  handleTagFormClose = () => {
+    // Called on blur and Escape - close form and clear input
+    this.setState({ showTaggingForm: false, tagFormInputValue: '' });
   };
 
   handleTagFormTabSubmit = (callback) => {
@@ -285,7 +281,8 @@ class App extends Component {
       labelName = inputValue.toLowerCase();
       labelData = this.state.allLabels.find((x) => x.Label.toLowerCase() === labelName);
     } else {
-      // Empty input - do nothing
+      // Empty input - reset flag and do nothing
+      this.setState({ tagFormTabSubmit: false });
       return;
     }
 
@@ -827,9 +824,9 @@ class App extends Component {
       this.loadNotes({ target: { id: this.state.targetRecipe } });
     }
 
-    // Clear tag form input when recipe changes
-    if (prevState.targetRecipe !== this.state.targetRecipe) {
-      this.setState({ tagFormInputValue: '', showTaggingForm: false });
+    // Close tag form when recipe changes
+    if (prevState.targetRecipe !== this.state.targetRecipe && this.state.showTaggingForm) {
+      this.setState({ showTaggingForm: false, tagFormInputValue: '' });
     }
   }
 
