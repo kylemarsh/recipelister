@@ -124,6 +124,17 @@ const TagRecipeForm = (props) => {
     return <span>{item.Label}</span>;
   };
 
+  // Handle Tab key to submit and reopen form
+  const handleKeyDown = (event) => {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      // Create synthetic submit event with custom flag
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      submitEvent.fromTabKey = true;
+      formRef.current.dispatchEvent(submitEvent);
+    }
+  };
+
   return (
     <form ref={formRef} className="link-tag-form" onSubmit={props.handleSubmit}>
       <Combobox
@@ -135,6 +146,7 @@ const TagRecipeForm = (props) => {
         data={sortedLabels}
         onCreate={handleCreate}
         onSelect={handleSelect}
+        onKeyDown={handleKeyDown}
         renderListItem={renderListItem}
         placeholder="label"
       />
