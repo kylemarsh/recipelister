@@ -28,6 +28,7 @@ const Recipe = (props) => {
         tags={recipe.Labels}
         allLabels={props.availableLabels}
         showTaggingForm={props.showTaggingForm}
+        tagFormInputValue={props.tagFormInputValue}
         handlers={props.labelHandlers}
       />
       {props.loggedIn ? (
