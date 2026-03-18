@@ -87,7 +87,14 @@ const TagRecipeForm = (props) => {
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.select();
+      // Combobox doesn't have .select() method, need to access underlying input
+      // Try to select text if the underlying input element is available
+      setTimeout(() => {
+        const input = inputRef.current?.inputNode;
+        if (input && input.select) {
+          input.select();
+        }
+      }, 0);
     }
   }, []);
 
