@@ -1,23 +1,10 @@
 # TODO
 This file contains feature or bugfix requests.
 
-## Label List and Autocomplete in LinkTagForm
-There is currently no indication of what labels already exist in the system
-when you're tagging a recipe with the LinkTagForm. We should make a box that
-drops down with all the labels in the system to be clicked or autocompleted
-
-## Tab Key Submission in Tag Form
-When tagging recipes, the "Tab" keypress should submit the form and then reopen
-the tag form for another label, automatically focusing the text input field
-providing faster keyboard-based tagging workflow.
-
-## Auto-focus Note and Tag Textarea
+## Auto-focus Note Textarea
 When the user clicks "+ Add Note", the textarea in the EditNoteForm should
 automatically receive focus so they can start typing immediately without
 needing to click again.
-
-The tag form should also auto-focus the text area when opened (after
-clicking the "+ add label" button).
 
 ## Label Manager Interface
 We should have an interface that, when active, replaces the List Pane and
@@ -55,19 +42,6 @@ The NewRecipeForm should support:
  - Use a number picker for active time and total time fields that allows either
    typing or selecting from a dropdown of 5-minute increments (5, 10, 15, etc.)
    up to 180 minutes
-
-## Auto-reset Tag Form State
-The showTaggingForm state flag should automatically reset to false when the user
-moves away from the tagging form, specifically:
- - When pressing Esc inside the form
- - When the form loses focus
-If the tagging form is reactivated before the current recipe is deselected, the
-form should present the value previously typed rather than resetting to blank.
-Once the user moves away from the current recipe the form should reset to
-blank.
-
-Currently it is only hidden when you click the `X` button, and resets to blank
-immediately.
 
 ## Fuzzy Search for Recipe Titles
 Improve the recipe search to support fuzzy matching similar to Slack's emoji
