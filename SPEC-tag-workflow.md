@@ -139,91 +139,60 @@ this.state = {
 }
 ```
 
-**Behavior changes:**
+**Behavior changes (AS IMPLEMENTED):**
 
 | Action | Old Behavior | New Behavior |
 |--------|-------------|--------------|
 | Submit | Close + clear | Close + clear |
-| Cancel button (✗) | Close + clear | Close + preserve |
-| Esc key | N/A | Close + preserve |
-| Blur | N/A | Close + preserve |
-| Reopen (same recipe) | Show blank | Show preserved value |
-| Recipe change | N/A | Clear preserved value |
+| Cancel button (✗) | Close + clear | Close + clear |
+| Esc key | N/A | Close + clear |
+| Blur | N/A | Close + clear |
+| Recipe change | N/A | Close form (if open) |
 
-**Handler updates:**
+**Handler updates (AS IMPLEMENTED):**
 
 `handleLabelLinkClick`:
 - Set `showTaggingForm: true` (unchanged)
 
 `handleLabelLinkCancel`:
 - Set `showTaggingForm: false`
-- Do NOT clear `tagFormInputValue`
+- Clear `tagFormInputValue: ''`
 
 `handleLabelLinkSubmit`:
 - Set `showTaggingForm: false` (unchanged)
 - Clear `tagFormInputValue: ''`
+- Reset `tagFormTabSubmit: false`
 
 **New handlers:**
 
 `handleTagInputChange`:
 - Update `tagFormInputValue` as user types
 
-`handleTagFormBlur`:
+`handleTagFormClose` (merged blur and escape):
 - Set `showTaggingForm: false`
-- Preserve `tagFormInputValue`
+- Clear `tagFormInputValue: ''`
 
-`handleTagFormEscape`:
-- Set `showTaggingForm: false`
-- Preserve `tagFormInputValue`
+`handleTagFormTabSubmit`:
+- Set `tagFormTabSubmit: true`
+- Accept callback to run after state updates
 
-**componentDidUpdate:**
-- Check if `targetRecipe` changed (compare `prevState.targetRecipe !== this.state.targetRecipe`)
-- If changed: Clear `tagFormInputValue: ''` and `showTaggingForm: false`
+**componentDidUpdate (AS IMPLEMENTED):**
+- Check if `targetRecipe` changed and form is open
+- If changed: Close form and clear `tagFormInputValue: ''`
 
-**TagRecipeForm props:**
+**TagRecipeForm props (AS IMPLEMENTED):**
 - Add `value={props.inputValue}`
 - Add `onChange={props.handleInputChange}`
-- Add `onBlur={props.handleBlur}`
-- Add `onKeyDown` for Esc key
+- Add `onBlur={props.handleClose}` (merged handler)
+- Add `onKeyDown` for Tab and Esc keys
+- Add `handleTabSubmit` callback
 
-**For Tab submit (Feature 2):**
-- After Tab triggers submit, do NOT set `showTaggingForm: true`
-- Instead, let existing submit handler close it
-- Then in `componentDidUpdate`, detect successful submit and reopen:
-  - Track previous `showTaggingForm` state
-  - If it was true and submit succeeded, set it back to true
-  - **OR** simpler: Add flag `tagFormShouldReopen: false`
-  - Set to true on Tab submit, false after reopening
-
-**Alternative for Tab submit:**
-- In submit handler, check if Tab was pressed
-- If Tab: After successful submit, immediately set `showTaggingForm: true` and clear `tagFormInputValue`
-- **Problem:** How to detect Tab press in submit handler?
-- **Solution:** Add parameter or state flag
-
-**Revised Tab submit approach:**
-```javascript
-handleKeyDown = (event) => {
-  if (event.key === 'Tab') {
-    event.preventDefault();
-    const form = event.target.closest('form');
-    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-    submitEvent.fromTabKey = true; // Custom flag
-    form.dispatchEvent(submitEvent);
-  }
-}
-```
-
-**In handleLabelLinkSubmit:**
-```javascript
-const isTabSubmit = event.fromTabKey;
-// ... existing submit logic ...
-// On success:
-if (isTabSubmit) {
-  updates.showTaggingForm = true;
-  updates.tagFormInputValue = '';
-}
-```
+**Tab submit implementation (AS IMPLEMENTED):**
+- Uses `tagFormTabSubmit` state flag instead of custom event property
+- `handleKeyDown` sets flag via `handleTabSubmit()` callback
+- Simulates Enter keypress to accept highlighted dropdown item
+- `handleSelect` checks flag to decide whether to reopen form
+- Flag reset after submit completes (success or error)
 
 ## Files to Modify
 
@@ -258,17 +227,21 @@ if (isTabSubmit) {
 
 ## Edge Cases
 
-1. **Multiple labels with same name but different Types**: Case-insensitive comparison in submit handler already handles this (line 253 in App.js)
+1. **Multiple labels with same name but different Types**: Case-insensitive comparison in submit handler handles this
 
 2. **User types label then clicks submit button instead of Tab/Enter**: Standard submit, closes and clears
 
-3. **User types label, clicks elsewhere (blur), then reopens**: Shows preserved value
+3. **User types label, clicks elsewhere (blur)**: Form closes, value clears (simplified from preserve)
 
 4. **User starts typing, switches recipes**: Form closes, value clears
 
-5. **Submit fails (API error)**: Form closes (existing behavior), preserved value cleared
+5. **Submit fails (API error)**: Form closes, value cleared, flag reset
 
-6. **Empty Combobox submit**: Existing validation should handle (or add check)
+6. **Empty Combobox submit**: Early return with flag reset (prevents submission)
+
+7. **Tab with no highlighted item**: Fallback timer submits typed value after brief delay
+
+8. **Tab with highlighted item**: Enter simulation triggers `handleSelect` which submits and reopens
 
 ## Testing Checklist
 
@@ -294,14 +267,13 @@ After each feature:
 - [ ] Text is selected if value is present
 - [ ] Works after Tab submit
 
-**Feature 4 (Preserved State):**
-- [ ] Esc closes form without clearing
-- [ ] Blur closes form without clearing
-- [ ] Cancel button closes form without clearing
-- [ ] Reopening shows preserved value
-- [ ] Changing recipes clears value
-- [ ] Submit clears value
-- [ ] Preserved value is selected when reopened
+**Feature 4 (Form State - AS IMPLEMENTED):**
+- [ ] Esc closes form and clears value
+- [ ] Blur closes form and clears value
+- [ ] Cancel button closes form and clears value
+- [ ] Changing recipes closes form (if open) and clears value
+- [ ] Submit clears value and resets Tab flag
+- [ ] Empty submit doesn't create tag and resets Tab flag
 
 ## Dependencies
 
@@ -316,7 +288,8 @@ After each feature:
 4. Grouping: Same as multiselect (by Type, alphabetically)
 5. Tab from buttons: No, only input
 6. Error behavior: Close form
-7. Blur behavior: Close and preserve
+7. Blur behavior: Close and clear (simplified from preserve due to UX inconsistency)
 8. State location: App state
-9. Cancel vs Esc: Same behavior (close + preserve)
+9. Cancel vs Esc: Same behavior (close + clear), merged into single handler
 10. Submit behavior: Close + clear
+11. Tab detection: State flag instead of custom event property (more reliable)
