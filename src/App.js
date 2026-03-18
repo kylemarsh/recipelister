@@ -260,11 +260,29 @@ class App extends Component {
     event.preventDefault();
     const isTabSubmit = event.fromTabKey;
     const form = event.target;
-    const formData = new FormData(form);
-    const labelName = formData.get("label").toLowerCase();
     const recipeTag = form.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
-    var labelData = this.state.allLabels.find((x) => x.Label.toLowerCase() === labelName);
+
+    // Get label value from state (Combobox doesn't use FormData)
+    const inputValue = this.state.tagFormInputValue;
+
+    // Value could be an object (selected from dropdown) or string (typed)
+    let labelName;
+    let labelData;
+
+    if (typeof inputValue === 'object' && inputValue !== null) {
+      // Selected from dropdown - use the label object directly
+      labelData = inputValue;
+      labelName = inputValue.Label.toLowerCase();
+    } else if (typeof inputValue === 'string' && inputValue.trim()) {
+      // Typed in - search for existing label
+      labelName = inputValue.toLowerCase();
+      labelData = this.state.allLabels.find((x) => x.Label.toLowerCase() === labelName);
+    } else {
+      // Empty input - do nothing
+      return;
+    }
+
     var labelIsNew = false;
 
     try {
