@@ -39,6 +39,7 @@ const TagList = (props) => {
                 handleInputChange={props.handlers.InputChange}
                 handleBlur={props.handlers.FormBlur}
                 handleEscape={props.handlers.FormEscape}
+                handleTabSubmit={props.handlers.TabSubmit}
               />
             ) : (
               <AddTagTrigger handleTriggerClick={props.handlers.LinkClick} />
@@ -138,11 +139,25 @@ const TagRecipeForm = (props) => {
   // Handle Tab key to submit and reopen form, Escape to close
   const handleKeyDown = (event) => {
     if (event.key === 'Tab') {
-      event.preventDefault();
-      // Create synthetic submit event with custom flag
-      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-      submitEvent.fromTabKey = true;
-      formRef.current.dispatchEvent(submitEvent);
+      event.preventDefault(); // Keep focus in form
+
+      // Combobox should have selected the highlighted item by now via its internal Tab handling
+      // But since we prevented default, we need to trigger selection manually
+      // The cleanest way is simulating Enter, which is what Combobox expects for selection
+      const enterEvent = new KeyboardEvent('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        bubbles: true,
+        cancelable: true
+      });
+      event.target.dispatchEvent(enterEvent);
+
+      // Submit after selection is processed
+      setTimeout(() => {
+        props.handleTabSubmit(() => {
+          formRef.current.requestSubmit();
+        });
+      }, 0);
     } else if (event.key === 'Escape') {
       event.preventDefault();
       props.handleEscape();

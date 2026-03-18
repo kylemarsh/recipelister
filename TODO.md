@@ -48,4 +48,9 @@ Improve the recipe search to support fuzzy matching similar to Slack's emoji
 search, where the search can match characters even if there are other characters
 in between (e.g., searching "chkn" would match "chicken").
 
+## Add "undo" option after deleting a recipe
+Use the alert system (but change the background color from red to blue?) to
+render a popup message giving the option to un-delete a recipe after deleting
+a recipe. FIXME: I may need to create a new route in the DB for this
+
 ## Render markdown in the recipe pane

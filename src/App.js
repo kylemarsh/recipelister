@@ -52,6 +52,7 @@ class App extends Component {
       showRecipeEditor: false,
       showTaggingForm: false,
       tagFormInputValue: '',
+      tagFormTabSubmit: false,
       showNoteEditor: false,
       showAddNote: false,
       recipeJustEdited: false,
@@ -160,6 +161,7 @@ class App extends Component {
                 InputChange: this.handleTagInputChange,
                 FormBlur: this.handleTagFormBlur,
                 FormEscape: this.handleTagFormEscape,
+                TabSubmit: this.handleTagFormTabSubmit,
               }}
               tagFormInputValue={this.state.tagFormInputValue}
             />
@@ -256,9 +258,13 @@ class App extends Component {
     this.setState({ showTaggingForm: false });
   };
 
+  handleTagFormTabSubmit = (callback) => {
+    this.setState({ tagFormTabSubmit: true }, callback);
+  };
+
   handleLabelLinkSubmit = async (event) => {
     event.preventDefault();
-    const isTabSubmit = event.fromTabKey;
+    const isTabSubmit = this.state.tagFormTabSubmit;
     const form = event.target;
     const recipeTag = form.closest(".recipe-container");
     const recipeId = recipeTag.dataset.recipeId;
@@ -317,6 +323,7 @@ class App extends Component {
         allRecipes: this.state.allRecipes,
         showTaggingForm: isTabSubmit, // Reopen form if submitted via Tab
         tagFormInputValue: '', // Clear input value on submit
+        tagFormTabSubmit: false, // Reset flag
       };
       if (this.state.errorContext === "addLabel") {
         updates.error = null;
@@ -325,7 +332,7 @@ class App extends Component {
       this.setState(updates);
     } catch (e) {
       this.handleError(e, "error adding label", "addLabel");
-      this.setState({ showTaggingForm: false });
+      this.setState({ showTaggingForm: false, tagFormTabSubmit: false });
     }
   };
 
