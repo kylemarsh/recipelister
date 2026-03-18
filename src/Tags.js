@@ -1,4 +1,6 @@
 import React, { useRef, useEffect } from "react";
+import Combobox from "react-widgets/Combobox";
+import * as Util from "./Util";
 
 // This component manages the display of labels that are tagged to a recipe.
 // Terminology:
@@ -29,6 +31,8 @@ const TagList = (props) => {
           <li>
             {props.showTaggingForm ? (
               <TagRecipeForm
+                allLabels={props.allLabels}
+                currentTags={props.tags}
                 handleSubmit={props.handlers.LinkSubmit}
                 handleCancel={props.handlers.LinkCancel}
               />
@@ -74,6 +78,7 @@ const AddTagTrigger = (props) => {
 
 const TagRecipeForm = (props) => {
   const inputRef = useRef(null);
+  const formRef = useRef(null);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -82,9 +87,57 @@ const TagRecipeForm = (props) => {
     }
   }, []);
 
+  // Filter out labels already tagged to this recipe
+  const currentTagIds = props.currentTags ? props.currentTags.map(t => t.ID) : [];
+  const availableLabels = props.allLabels ? props.allLabels.filter(l => !currentTagIds.includes(l.ID)) : [];
+
+  // Sort labels for display
+  const sortedLabels = Util.sortLabelsForMultiselect(availableLabels);
+
+  // Handle selection from dropdown - auto-submit
+  const handleSelect = (value) => {
+    if (value && typeof value === 'object') {
+      // User selected from dropdown, auto-submit
+      setTimeout(() => {
+        if (formRef.current) {
+          formRef.current.requestSubmit();
+        }
+      }, 0);
+    }
+  };
+
+  // Allow creating new labels
+  const handleCreate = (name) => {
+    return name;
+  };
+
+  // Render list items with "(new)" indicator for typed values that don't exist
+  const renderListItem = ({ item }) => {
+    // Check if this item is a string (newly typed) vs object (existing label)
+    if (typeof item === 'string') {
+      return (
+        <span>
+          {item} <em>(new)</em>
+        </span>
+      );
+    }
+    return <span>{item.Label}</span>;
+  };
+
   return (
-    <form className="link-tag-form" onSubmit={props.handleSubmit}>
-      <input ref={inputRef} name="label" type="text" placeholder="label" />
+    <form ref={formRef} className="link-tag-form" onSubmit={props.handleSubmit}>
+      <Combobox
+        ref={inputRef}
+        name="label"
+        dataKey="ID"
+        textField="Label"
+        groupBy="Type"
+        data={sortedLabels}
+        onCreate={handleCreate}
+        onSelect={handleSelect}
+        renderListItem={renderListItem}
+        placeholder="label"
+      />
       <button className="inline-text-button submit">
         {String.fromCharCode(0x2713)}
       </button>
