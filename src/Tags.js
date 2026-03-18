@@ -37,8 +37,7 @@ const TagList = (props) => {
                 handleSubmit={props.handlers.LinkSubmit}
                 handleCancel={props.handlers.LinkCancel}
                 handleInputChange={props.handlers.InputChange}
-                handleBlur={props.handlers.FormBlur}
-                handleEscape={props.handlers.FormEscape}
+                handleClose={props.handlers.FormClose}
                 handleTabSubmit={props.handlers.TabSubmit}
               />
             ) : (
@@ -84,6 +83,7 @@ const AddTagTrigger = (props) => {
 const TagRecipeForm = (props) => {
   const inputRef = useRef(null);
   const formRef = useRef(null);
+  const isTabSubmitRef = useRef(false);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -112,7 +112,15 @@ const TagRecipeForm = (props) => {
       // User selected from dropdown, auto-submit
       setTimeout(() => {
         if (formRef.current) {
-          formRef.current.requestSubmit();
+          // Check if this was Tab-initiated (reopen form) or click (close form)
+          if (isTabSubmitRef.current) {
+            props.handleTabSubmit(() => {
+              formRef.current.requestSubmit();
+            });
+            isTabSubmitRef.current = false;
+          } else {
+            formRef.current.requestSubmit();
+          }
         }
       }, 0);
     }
@@ -139,11 +147,10 @@ const TagRecipeForm = (props) => {
   // Handle Tab key to submit and reopen form, Escape to close
   const handleKeyDown = (event) => {
     if (event.key === 'Tab') {
-      event.preventDefault(); // Keep focus in form
-
-      // Combobox should have selected the highlighted item by now via its internal Tab handling
-      // But since we prevented default, we need to trigger selection manually
-      // The cleanest way is simulating Enter, which is what Combobox expects for selection
+      event.preventDefault();
+      // Mark as Tab-initiated so handleSelect knows to reopen form
+      isTabSubmitRef.current = true;
+      // Simulate Enter to accept highlighted item (triggers onSelect → handleSelect)
       const enterEvent = new KeyboardEvent('keydown', {
         key: 'Enter',
         code: 'Enter',
@@ -151,16 +158,20 @@ const TagRecipeForm = (props) => {
         cancelable: true
       });
       event.target.dispatchEvent(enterEvent);
-
-      // Submit after selection is processed
+      // If no item was highlighted, Enter simulation won't trigger handleSelect
+      // In that case, submit manually after a delay
       setTimeout(() => {
-        props.handleTabSubmit(() => {
-          formRef.current.requestSubmit();
-        });
-      }, 0);
+        if (isTabSubmitRef.current) {
+          // Still true means handleSelect didn't fire, submit manually
+          isTabSubmitRef.current = false;
+          props.handleTabSubmit(() => {
+            formRef.current.requestSubmit();
+          });
+        }
+      }, 10);
     } else if (event.key === 'Escape') {
       event.preventDefault();
-      props.handleEscape();
+      props.handleClose();
     }
   };
 
@@ -175,7 +186,7 @@ const TagRecipeForm = (props) => {
         data={sortedLabels}
         value={props.inputValue}
         onChange={props.handleInputChange}
-        onBlur={props.handleBlur}
+        onBlur={props.handleClose}
         onCreate={handleCreate}
         onSelect={handleSelect}
         onKeyDown={handleKeyDown}
