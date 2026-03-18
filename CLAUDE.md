@@ -441,6 +441,31 @@ view labels but cannot add or remove them. When adding a label, the component
 performs a case-insensitive search against existing labels to prevent
 duplicates.
 
+**Tagging Workflow:**
+The tag form (`TagRecipeForm`) uses `react-widgets` Combobox to provide an
+enhanced tagging experience:
+ - **Autocomplete**: Shows dropdown of available labels grouped by Type,
+   alphabetically sorted within groups. Filters out labels already tagged to the
+   recipe. Typing filters the list. Non-existent labels show "(new)" indicator.
+ - **Auto-submit**: Clicking a label from the dropdown immediately submits the
+   form and adds the tag.
+ - **Auto-focus**: Input automatically receives focus when form opens, with text
+   selected for easy replacement.
+ - **Keyboard workflow**: Tab key submits the form and immediately reopens it
+   with focus for rapid keyboard-based tagging.
+ - **Preserved state**: Input value is preserved when closing via Esc, blur, or
+   cancel button. Reopening the form shows the preserved value. Value clears on
+   successful submit or when changing to a different recipe.
+
+**App State:**
+ - `showTaggingForm`: Boolean controlling form visibility
+ - `tagFormInputValue`: String storing current/preserved input value
+
+**Component Structure:**
+ - `TagRecipeForm`: Main form component with Combobox, submit/cancel buttons
+ - `TagListItem`: Individual tag display with unlink button
+ - `AddTagTrigger`: "+ add label" button to open form
+
 #### Terminology: Labels vs Tags
 The application uses two related concepts:
  - **Label**: An object representing a recipe attribute that can be used for
