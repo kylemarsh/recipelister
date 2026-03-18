@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 const NoteList = (props) => {
   var notes;
@@ -122,13 +122,55 @@ const NoteActions = (props) => {
 
 const EditNoteForm = (props) => {
   const defaultText = props.note ? props.note.Note : "";
+  const textareaRef = useRef(null);
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, []);
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      props.handleCancel(event);
+    }
+  };
+
+  // Only close form if focus is moving outside the form
+  const handleBlur = (event) => {
+    // Check if the new focus target is within the form
+    if (formRef.current && !formRef.current.contains(event.relatedTarget)) {
+      props.handleCancel(event);
+    }
+  };
+
+  // Prevent blur from firing when clicking buttons
+  const handleButtonMouseDown = (event) => {
+    event.preventDefault();
+  };
+
   return (
-    <form className="note-edit-form" onSubmit={props.handleSubmit}>
-      <textarea name="text" defaultValue={defaultText} />
-      <button className="textarea-button submit">
+    <form ref={formRef} className="note-edit-form" onSubmit={props.handleSubmit}>
+      <textarea
+        ref={textareaRef}
+        name="text"
+        defaultValue={defaultText}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+      />
+      <button
+        className="textarea-button submit"
+        onMouseDown={handleButtonMouseDown}
+      >
         {String.fromCharCode(0x2713)}
       </button>
-      <button className="textarea-button cancel" onClick={props.handleCancel}>
+      <button
+        className="textarea-button cancel"
+        onClick={props.handleCancel}
+        onMouseDown={handleButtonMouseDown}
+      >
         {String.fromCharCode(0x2717)}
       </button>
     </form>
