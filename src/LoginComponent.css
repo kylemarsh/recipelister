@@ -12,15 +12,76 @@
 	margin: 1px;
 }
 
+.manage-labels-button {
+	position: relative;
+}
+
 @media screen and (max-width:600px) {
-	.topnav .login-container{
-		float: none;
+	.topnav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		padding: 0.25rem;
+		align-items: flex-start;
 	}
-	.topnav button, .login-container input[type=text], .login-container input[type=password], .login-container button {
+	.topnav .login-container {
 		float: none;
-		display: block;
-		text-align: left;
-		width: 100%;
-		margin: 1;
+		display: contents;
+	}
+	.topnav button {
+		padding: 0.4rem 0.8rem !important;
+		font-size: 0.9rem !important;
+		margin: 0 !important;
+		flex: 1 1 0;
+		height: 2.5rem;
+		min-width: 0;
+		white-space: nowrap;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 1;
+	}
+	/* Button order: New Recipe, Settings, Log Out */
+	.topnav > button {
+		order: 1;
+	}
+	.manage-labels-button {
+		order: 2;
+	}
+	.auth-button {
+		order: 3;
+	}
+	.login-container input[type=text],
+	.login-container input[type=password] {
+		width: auto;
+		min-width: 100px;
+		flex: 1 1 auto;
+		padding: 0.4rem 0.6rem;
+		font-size: 0.9rem;
+	}
+}
+
+/* Mobile tooltip for manage labels button */
+@media (hover: none) {
+	.manage-labels-button::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: rgba(0, 0, 0, 0.8);
+		color: white;
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		white-space: nowrap;
+		font-size: 0.875rem;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s;
+		margin-bottom: 0.25rem;
+	}
+
+	.manage-labels-button:active::after {
+		opacity: 1;
 	}
 }
