@@ -10,4 +10,30 @@
   margin-left: 0.25em;
   cursor: pointer;
   display: inline;
+  position: relative;
+}
+
+/* Mobile tooltip for recipe icons */
+@media (hover: none) {
+  .recipe-icon::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 0.25rem;
+  }
+
+  .recipe-icon:active::after {
+    opacity: 1;
+  }
 }

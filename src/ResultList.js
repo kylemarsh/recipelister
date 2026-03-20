@@ -13,6 +13,7 @@ const ResultList = (props) => {
               key={label.ID}
               className="recipe-icon"
               title={label.Label}
+              data-label={label.Label}
               onClick={(e) => props.handleIconClick(e, label)}
             >
               {label.Icon}

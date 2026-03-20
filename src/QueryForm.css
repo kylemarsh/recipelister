@@ -24,6 +24,7 @@
 	border-radius: 4px;
 	box-shadow: inset 0 0 0 2px #ccc;
 	transition: background-color 0.2s ease, box-shadow 0.2s ease;
+	position: relative;
 }
 
 .sort-buttons button:hover {
@@ -42,6 +43,31 @@
 	width: 1px;
 	background-color: #ccc;
 	margin: 0.25rem 0;
+}
+
+/* Mobile tooltips for sort buttons */
+@media (hover: none) {
+	.sort-buttons button::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: rgba(0, 0, 0, 0.8);
+		color: white;
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		white-space: nowrap;
+		font-size: 0.875rem;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s;
+		margin-bottom: 0.25rem;
+	}
+
+	.sort-buttons button:active::after {
+		opacity: 1;
+	}
 }
 
 @media (max-width: 450px) {
