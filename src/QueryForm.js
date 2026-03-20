@@ -4,13 +4,27 @@ import AdvancedQuery from "./AdvancedQuery.js";
 const QueryForm = (props) => {
   return (
     <form className="query-form" onSubmit={suppressSubmit}>
-      <input
-        placeholder="Search recipe titles"
-        name="fragments"
-        type="text"
-        value={props.fragments}
-        onChange={props.handleChange}
-      />
+      <div className="search-input-row">
+        <input
+          placeholder="Search recipe titles"
+          name="fragments"
+          type="text"
+          value={props.fragments}
+          onChange={props.handleChange}
+        />
+        <button
+          type="button"
+          className={props.fullText ? "active" : ""}
+          onClick={(e) => {
+            e.preventDefault();
+            props.handleChange({ target: { name: "fullText", type: "checkbox", checked: !props.fullText }});
+          }}
+          title="Search full recipe text"
+          data-tooltip="Search full recipe text"
+        >
+          📄
+        </button>
+      </div>
       <div className="search-options">
         <label>
           <input

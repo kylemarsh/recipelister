@@ -37,6 +37,25 @@
   border-right-width: thin;
   border-right-color: gray;
   min-width: 40%;
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.search-pane .query-form {
+  flex-shrink: 0;
+}
+
+.search-pane > hr {
+  flex-shrink: 0;
+  margin: 0.5rem 0;
+}
+
+.search-pane-results {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .topnav {
@@ -53,10 +72,14 @@
     border-bottom-style: solid;
     border-bottom-width: thin;
     border-bottom-color: gray;
+    max-height: none;
   }
 	.recipe-selected {
 		display: none;
 	}
+  .search-pane-results {
+    max-height: 60vh;
+  }
 }
 
 .rw-multiselect-tag-btn:hover {
