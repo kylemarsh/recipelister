@@ -15,8 +15,8 @@ All of the react code are in the `src/` directory.
 ## UI
 The application shows a header at the top of the page. When not logged in, there
 is a login form with username and password fields and a "Log In" button. When
-logged in, the login form is replaced with a "Log Out" button, and a "New Recipe"
-button appears which opens a form to add a recipe to the database.
+logged in, the login form is replaced with a "Log Out" button. For admin users,
+a "Manage Labels" button and a "New Recipe" button also appear.
 
 Below the buttons  is a horizontal rule, and below that the screen splits into
 two panes; the right is the Recipe Pane and it is empty until a recipe is
@@ -121,6 +121,52 @@ It does not have the ability to add notes or labels to the recipe before it's
 created. At the bottom of the form are "Add" and "Cancel" buttons. The recipe
 is added to the database once the user clicks "Add".
 
+### Label Manager (Admin Only)
+
+The Label Manager is an admin-only interface for managing labels in the system.
+It is accessible at the URL route `/admin/labels` and replaces the List Pane
+and Recipe Pane when active. Non-admin users attempting to access this route
+are redirected to the main view.
+
+**Access:** Click the "Manage Labels" button in the header (visible only to
+admin users), or navigate directly to `/admin/labels`.
+
+**Features:**
+- **Search/Filter:** Text search filters labels by name or type in real-time
+- **Grouped Display:** Labels are grouped by Type (Course, Protein, etc.) with
+  collapsible group headers. Labels without a type appear in an "Other" group.
+  All groups are expanded by default.
+- **Inline Editing:** Click any label name, type, or icon to edit inline. Press
+  Enter to submit, Escape to cancel, or click away to submit.
+  - Icon validation ensures only single characters/emojis (uses `Intl.Segmenter`
+    for proper grapheme counting on modern browsers)
+  - Empty label names are rejected
+- **Usage Count:** Each label shows the number of recipes tagged with it. Click
+  the count to open the recipe association panel.
+- **Delete:** Click the delete button (🗑) to delete a label. A confirmation
+  modal shows how many recipes will be affected. The API automatically unlinks
+  the label from all recipes when deleted.
+- **Create New Label:** Click "New Label" button to open a form for creating
+  labels with name, type, and icon fields.
+
+**Recipe Association Panel:**
+When you click a usage count, a side panel slides in from the right (desktop)
+or replaces the label list (mobile) showing all recipes tagged with that label.
+- Click the chain link icon (🔗) to unlink a recipe. The icon changes to a
+  broken chain (⛓️‍💥) and the title is struck through.
+- Click the broken chain icon to re-link the recipe.
+- Recipes remain in the panel until it closes, even after unlinking, to allow
+  undoing mistakes.
+- Close button (×) or back button (mobile) returns to the label list.
+
+**URL Routing:** The label manager route (`/admin/labels`) is integrated with
+browser history. The back button returns to the recipe view, and direct
+navigation to the URL works as expected.
+
+**Implementation:** Defined in `LabelManager.js` component with corresponding
+styles in `LabelManager.css`. API methods `updateLabel`, `deleteLabel`, and
+label creation are defined in `api.js` using urlencoded form data format.
+
 ## API
 The react application gets data and interacts with the database via the
 database's API, implemented in `api.js`. This file provides functions that the
@@ -171,43 +217,55 @@ API routes are organized by privilege level:
 - **Authenticated routes** (`/priv/*`): Read-only access requiring valid JWT
   (e.g., full recipe bodies, notes)
 - **Admin routes** (`/admin/*`): Mutation operations requiring admin privilege
-  (all POST, PUT, DELETE operations)
+  (all POST, PUT, DELETE operations). Label management routes include:
+  - `PUT /admin/label/{labelName}`: Create label (idempotent)
+  - `PUT /admin/label/id/{labelId}`: Update label fields (accepts urlencoded data: label, type, icon)
+  - `DELETE /admin/label/id/{labelId}`: Delete label (auto-unlinks from all recipes)
 
 When making authenticated requests, the api function includes the JWT as the
 value for the `x-access-token` header.
 
 ### URL Routing
 The application implements client-side URL routing using the browser History
-API to enable direct links to recipes while maintaining SPA behavior (no page
-reloads).
+API to enable direct links to recipes and the label manager while maintaining
+SPA behavior (no page reloads).
 
-**URL Format:**
+**Recipe URL Format:**
 - Pattern: `/{recipe-id}/{slug}` where slug is optional
 - Examples: `/123/chicken-soup`, `/123`
 - Recipe ID is required; slug is auto-generated from recipe title for readability
 - Invalid slugs are auto-corrected using `replaceState` (no history entry)
+
+**Label Manager URL:**
+- Pattern: `/admin/labels`
+- Admin-only route; non-admin users are redirected to `/` (main view)
+- Navigating to this URL opens the Label Manager interface
+- Back button or close returns to main view at `/`
 
 **Routing Behavior:**
 - **Recipe selection**: Updates URL via `pushState` to `/{id}/{slug}`
 - **Recipe close**: Clears URL via `pushState` to `/`
 - **Recipe deletion**: Clears URL via `pushState` to `/`
 - **Recipe edit**: Updates slug via `replaceState` (no history entry)
+- **Label manager open**: Updates URL via `pushState` to `/admin/labels`
+- **Label manager close**: Updates URL via `pushState` to `/`
 - **Browser back/forward**: `popstate` event listener routes appropriately
-- **Initial page load**: Parses URL and routes to recipe (if valid ID)
+- **Initial page load**: Parses URL and routes to recipe, label manager, or main view
 
 **Deep Linking:**
 - Unauthenticated users can navigate to recipe URLs
 - Recipe displays with title and labels only (existing auth behavior)
 - If user logs in while viewing a recipe, notes load automatically
 - Invalid recipe IDs show "Recipe not found" error and clear URL
+- Non-admin users navigating to `/admin/labels` are redirected to main view
 
 **Implementation:**
 - URL parsing/building in `Util.js` (`parseUrl`, `buildRecipeUrl`, `generateSlug`)
 - Routing methods in `App.js` (`updateUrl`, `clearUrl`, `validateAndCorrectSlug`,
-  `routeToRecipeFromUrl`, `handlePopState`)
+  `routeToRecipeFromUrl`, `handlePopState`, `navigateToLabelManager`, `navigateFromLabelManager`)
 - `popstate` event listener added in `componentDidMount`, removed in `componentWillUnmount`
 - URL updates integrated into `handleResultClick`, recipe close/delete handlers,
-  and recipe edit flow
+  recipe edit flow, and label manager navigation
 
 
 ## Libraries
@@ -497,6 +555,64 @@ A "label" object (used throughout the code and API) has the following properties
    "Course", "Protein", "Cuisine"). Displayed in title case.
  - `Icon` (string, optional): an emoji or character used as a visual icon for
    this label in the recipe list
+
+### LabelManager Component
+
+Defined in `LabelManager.js`. This component provides a comprehensive interface
+for managing labels, accessible only to admin users at `/admin/labels`.
+
+**Component Structure:**
+- Full-page layout that replaces the List Pane and Recipe Pane
+- Header with back button (←) and "Manage Labels" title
+- Controls row with search input and "New Label" button
+- Grouped label list with collapsible groups
+- Modal overlays for delete confirmation and recipe association panel
+
+**State:**
+- `searchQuery`: string for filtering labels
+- `collapsedGroups`: Set of group names that are collapsed (default: empty, all expanded)
+- `recipePanelLabel`: ID of label for which recipe panel is open
+- `recipePanelRecipes`: snapshot of recipes when panel opened (persists across unlinks)
+- `editingLabel`: `{ labelId, field }` for inline editing state
+- `editValue`: current value in inline edit input
+- `showNewLabelForm`: boolean for new label form visibility
+- `newLabel`: `{ label, type, icon }` for new label form data
+- `deleteConfirm`: `{ labelId, labelName, usageCount }` for delete confirmation modal
+
+**Methods:**
+- `getFilteredLabels()`: filters labels by search query (case-insensitive)
+- `getGroupedLabels()`: groups filtered labels by Type, returns object with type as keys
+- `getLabelUsage(labelId)`: counts recipes tagged with label
+- `getRecipesForLabel(labelId)`: returns array of recipes tagged with label
+- `handleGroupToggle(groupName)`: toggles group collapse state
+- `startEdit/cancelEdit/submitEdit`: inline editing lifecycle
+- `showDeleteConfirm/cancelDelete/confirmDelete`: delete confirmation lifecycle
+- `openRecipePanel/closeRecipePanel`: recipe panel lifecycle
+- `handleUnlink/handleRelink`: recipe association management
+- `openNewLabelForm/cancelNewLabel/submitNewLabel`: new label form lifecycle
+
+**Props from App:**
+- `allLabels`: all labels in system
+- `allRecipes`: all recipes in system
+- `loginState`: authentication state (for API calls)
+- `handleBack`: callback to navigate back to recipe view
+- `handleLabelUpdate(labelId, updates, callback)`: updates label fields
+- `handleLabelDelete(labelId, callback)`: deletes label
+- `handleLabelCreate(labelData, callback)`: creates new label
+- `handleUnlinkRecipe(recipeId, labelId)`: unlinks recipe from label
+- `handleLinkRecipe(recipeId, labelId)`: links recipe to label
+- `setAlert(error, message, context)`: displays error alerts
+
+**Key Features:**
+- Groups expand/collapse via header clicks, tracked in `collapsedGroups` Set
+- Inline editing uses auto-focus and text selection on mount
+- Icon validation uses `Intl.Segmenter` when available for proper grapheme counting
+- Recipe panel snapshots recipes on open, compares to current state to show unlink status
+- Delete confirmation shows usage count before deletion
+- All API calls go through App handlers for proper state management
+
+**Styling:** Defined in `LabelManager.css` with responsive mobile layout. On
+mobile, the recipe panel replaces the label list instead of appearing side-by-side.
 
 
 ## Helpers

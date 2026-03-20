@@ -1,17 +1,6 @@
 # TODO
 This file contains feature or bugfix requests.
 
-## Label Manager Interface
-We should have an interface that, when active, replaces the List Pane and
-Recipe Pane and instead shows all the labels in the system and allows us to
-manage them. Management includes:
- - Renaming the label (assuming API support exists)
- - Associating a meta-label with the label (assuming API support exists)
- - Associating an icon with the label (assuming API support exists)
- - Deleting a label
- - Adding a new label
- - Viewing titles for all recipes tagged with a label, and unlinking them
-
 ## Query Parameters for Filter State
 Preserve filter/search state in URL query parameters (e.g.,
 ?search=chicken&tags=dinner&sort=newest) so direct links can include

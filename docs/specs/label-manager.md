@@ -1,5 +1,7 @@
 # Spec: Label Manager Interface
 
+**Status:** ✅ Implemented (2026-03-19)
+
 ## Overview
 Create an admin-only interface for managing labels (editing, creating, deleting, and viewing/unlinking recipe associations). The interface replaces the List Pane and Recipe Pane when active and is accessible via URL routing.
 
@@ -751,8 +753,56 @@ export default {
 
 4. **Delete confirmation styling**: Modal overlay for prominence on destructive action.
 
-5. **Group collapse persistence**: Reset to defaults on each visit (Course expanded, others collapsed). No session/URL persistence.
+5. **Group collapse persistence**: Reset to defaults on each visit (all groups expanded). No session/URL persistence.
 
 6. **Mobile layout**: Single-column layout. When recipe panel opens, it replaces the label list with a back button to return to label list.
 
 7. **Unlink vs Delete in recipe panel**: Only support unlinking recipes from labels. No recipe deletion from this interface.
+
+---
+
+## Implementation Notes
+
+**Completed:** 2026-03-19
+
+### API Changes
+- Added `updateLabel(labelId, updates, auth)` in `api.js`
+  - Uses URLSearchParams for `application/x-www-form-urlencoded` format
+  - Accepts object with `{ label, type, icon }` fields
+  - No return value (uses `doAction` not `doFetch`)
+- Added `deleteLabel(labelId, auth)` in `api.js`
+  - Returns no value, API handles unlinking from recipes
+
+### Component Structure
+- **LabelManager** (`src/LabelManager.js`) - Main component (448 lines)
+  - State: `collapsedGroups` (Set), `recipePanelRecipes` (snapshot), `editingLabel`, `deleteConfirm`, `newLabel` form
+  - All groups expanded by default (inverse of original spec)
+  - Recipe panel snapshots recipes when opened, tracks unlinks by comparing to current state
+- **Styling** (`src/LabelManager.css`) - Complete styling for all features
+
+### App Integration
+- URL routing at `/admin/labels` with admin-only access
+- Non-admin users redirected to main view
+- Browser back/forward button support
+- "Manage Labels" button in header (admin-only)
+- Handlers: `handleLabelUpdate`, `handleLabelDelete`, `handleLabelCreate`, `handleUnlinkRecipe`, `handleLinkRecipe`
+- Auto-dismiss error alerts on success
+
+### Key Implementation Decisions
+1. **Data format**: Changed from FormData to URLSearchParams to match API expectations
+2. **Group expansion**: All groups expanded by default (tracked via `collapsedGroups` Set)
+3. **Recipe panel persistence**: Snapshot recipes on open, compare to current state to show unlink status
+4. **Icon for unlinked**: Uses ⛓️‍💥 (broken chain) instead of 🔓 (open lock)
+5. **Refetch strategy**: After updates, refetch both labels and recipes from API to ensure consistency
+6. **Empty type handling**: Labels with `Type: ""` grouped under "Other" (not as separate empty group)
+
+### Bug Fixes During Development
+1. **JSON parsing error**: Changed `updateLabel` from `doFetch` to `doAction` (API returns no body)
+2. **Recipe panel empty**: Fixed click handler to call `openRecipePanel()` instead of setting state directly
+3. **Duplicate "Other" groups**: Filter empty string types when creating named groups
+4. **Content-Type mismatch**: Changed from multipart/form-data to urlencoded format
+
+### Testing
+- All existing tests passing (84 tests)
+- API tests updated to verify urlencoded format
+- Manual testing verified all CRUD operations work correctly
