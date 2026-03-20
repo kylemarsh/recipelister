@@ -87,6 +87,35 @@ async function unlinkLabel(recipeId, labelId, auth) {
   await doAction(resource, requestInit);
 }
 
+async function updateLabel(labelId, updates, auth) {
+  const resource = `${API_HOST}admin/label/id/${labelId}`;
+
+  // Convert to URLSearchParams for urlencoded format
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(updates)) {
+    params.append(key, value);
+  }
+
+  const requestInit = {
+    method: "PUT",
+    headers: {
+      "x-access-token": auth.token,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  };
+  await doAction(resource, requestInit);
+}
+
+async function deleteLabel(labelId, auth) {
+  const resource = `${API_HOST}admin/label/id/${labelId}`;
+  const requestInit = {
+    method: "DELETE",
+    headers: { "x-access-token": auth.token },
+  };
+  await doAction(resource, requestInit);
+}
+
 /*********
  * NOTES *
  *********/
@@ -163,6 +192,8 @@ export {
   deleteRecipe,
   fetchLabels,
   createLabel,
+  updateLabel,
+  deleteLabel,
   linkLabel,
   unlinkLabel,
   fetchNotes,

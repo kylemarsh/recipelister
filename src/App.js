@@ -6,6 +6,7 @@ import QueryForm from "./QueryForm";
 import GroupedResultList from "./GroupedResultList";
 import Alert from "./Alert";
 import { Recipe, NewRecipeForm } from "./Recipe";
+import LabelManager from "./LabelManager";
 import * as Util from "./Util";
 import * as Api from "./api";
 
@@ -56,6 +57,7 @@ class App extends Component {
       showNoteEditor: false,
       showAddNote: false,
       recipeJustEdited: false,
+      showLabelManager: false,
     };
   }
   render() {
@@ -70,7 +72,9 @@ class App extends Component {
           <LoginComponent
             loggedIn={loggedIn}
             username={this.state.login.username}
+            isAdmin={this.state.login.isAdmin}
             handleClick={loggedIn ? this.doLogout : this.doLogin}
+            handleManageLabelsClick={this.navigateToLabelManager}
           />
           {loggedIn && this.state.login.isAdmin ? (
             <button onClick={this.triggerAddRecipe}>New Recipe</button>
@@ -88,8 +92,22 @@ class App extends Component {
         ) : (
           ""
         )}
-        <div className="content-container">
-          <div className={searchClass}>
+        {this.state.showLabelManager ? (
+          <LabelManager
+            allLabels={this.state.allLabels}
+            allRecipes={this.state.allRecipes}
+            loginState={this.state.login}
+            handleBack={this.navigateFromLabelManager}
+            handleLabelUpdate={this.handleLabelUpdate}
+            handleLabelDelete={this.handleLabelDelete}
+            handleLabelCreate={this.handleLabelCreate}
+            handleUnlinkRecipe={this.handleUnlinkRecipe}
+            handleLinkRecipe={this.handleLinkRecipe}
+            setAlert={this.handleError}
+          />
+        ) : (
+          <div className="content-container">
+            <div className={searchClass}>
             <QueryForm
               fragments={this.state.filters.fragments}
               handleChange={this.handleFilterChange}
@@ -167,7 +185,8 @@ class App extends Component {
           ) : (
             ""
           )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -356,6 +375,139 @@ class App extends Component {
       this.setState(updates);
     } catch (e) {
       this.handleError(e, "error unlinking label from recipe", "unlinkLabel");
+    }
+  };
+
+  /**********************
+   * LABEL MANAGER ACTIONS *
+   **********************/
+  handleLabelUpdate = async (labelId, updates, callback) => {
+    try {
+      await Api.updateLabel(labelId, updates, this.state.login);
+
+      // Refetch labels and recipes to get updated data
+      await this.getLabels();
+      await this.getRecipes();
+
+      // Auto-dismiss editLabel errors on successful update
+      if (this.state.errorContext === "editLabel") {
+        this.setState({
+          error: null,
+          errorContext: null,
+        });
+      }
+      if (callback) callback();
+    } catch (e) {
+      this.handleError(e, "error updating label", "editLabel");
+    }
+  };
+
+  handleLabelDelete = async (labelId, callback) => {
+    try {
+      await Api.deleteLabel(labelId, this.state.login);
+
+      // Remove label from allLabels
+      const allLabels = this.state.allLabels.filter(l => l.ID !== labelId);
+
+      // Remove label from all recipes
+      const allRecipes = this.state.allRecipes.map(recipe => {
+        if (recipe.Labels) {
+          recipe.Labels = recipe.Labels.filter(l => l.ID !== labelId);
+        }
+        return recipe;
+      });
+
+      // Auto-dismiss deleteLabel errors on successful deletion
+      const updates = { allLabels, allRecipes };
+      if (this.state.errorContext === "deleteLabel") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
+      if (callback) callback();
+    } catch (e) {
+      this.handleError(e, "error deleting label", "deleteLabel");
+    }
+  };
+
+  handleLabelCreate = async (labelData, callback) => {
+    try {
+      const newLabel = await Api.createLabel(labelData.label, this.state.login);
+
+      // If type or icon were provided, update the label with those fields
+      if (labelData.type || labelData.icon) {
+        const updates = {};
+        if (labelData.type) updates.type = labelData.type;
+        if (labelData.icon) updates.icon = labelData.icon;
+        await Api.updateLabel(newLabel.ID, updates, this.state.login);
+      }
+
+      // Refetch labels to get the updated data
+      await this.getLabels();
+
+      // Auto-dismiss addLabel errors on successful creation
+      if (this.state.errorContext === "addLabel") {
+        this.setState({
+          error: null,
+          errorContext: null,
+        });
+      }
+      if (callback) callback();
+    } catch (e) {
+      this.handleError(e, "error creating label", "addLabel");
+    }
+  };
+
+  handleUnlinkRecipe = async (recipeId, labelId) => {
+    try {
+      await Api.unlinkLabel(recipeId, labelId, this.state.login);
+
+      // Update recipe in allRecipes
+      const allRecipes = this.state.allRecipes.map(recipe => {
+        if (recipe.ID === recipeId && recipe.Labels) {
+          recipe.Labels = recipe.Labels.filter(l => l.ID !== labelId);
+        }
+        return recipe;
+      });
+
+      // Auto-dismiss unlinkLabel errors on successful unlinking
+      const updates = { allRecipes };
+      if (this.state.errorContext === "unlinkLabel") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
+    } catch (e) {
+      this.handleError(e, "error unlinking recipe from label", "unlinkLabel");
+    }
+  };
+
+  handleLinkRecipe = async (recipeId, labelId) => {
+    try {
+      await Api.linkLabel(recipeId, labelId, this.state.login);
+
+      // Update recipe in allRecipes
+      const label = this.state.allLabels.find(l => l.ID === labelId);
+      const allRecipes = this.state.allRecipes.map(recipe => {
+        if (recipe.ID === recipeId) {
+          if (recipe.Labels) {
+            recipe.Labels.push(label);
+          } else {
+            recipe.Labels = [label];
+          }
+        }
+        return recipe;
+      });
+
+      // Auto-dismiss linkLabel errors on successful linking
+      const updates = { allRecipes };
+      if (this.state.errorContext === "linkLabel") {
+        updates.error = null;
+        updates.errorContext = null;
+      }
+      this.setState(updates);
+    } catch (e) {
+      this.handleError(e, "error linking recipe to label", "linkLabel");
     }
   };
 
@@ -751,12 +903,42 @@ class App extends Component {
     }
   };
 
+  navigateToLabelManager = () => {
+    this.setState({ showLabelManager: true, targetRecipe: undefined });
+    window.history.pushState(null, '', '/admin/labels');
+  };
+
+  navigateFromLabelManager = () => {
+    this.setState({ showLabelManager: false });
+    window.history.pushState(null, '', '/');
+  };
+
   handlePopState = () => {
     this.routeToRecipeFromUrl();
   };
 
   routeToRecipeFromUrl = () => {
-    const recipeId = Util.parseUrl(window.location.pathname);
+    const pathname = window.location.pathname;
+
+    // Check for label manager route
+    if (pathname === '/admin/labels') {
+      // Only navigate if user is admin
+      if (this.state.login.isAdmin) {
+        this.setState({ showLabelManager: true, targetRecipe: undefined });
+      } else {
+        // Non-admin trying to access admin route, redirect to main view
+        this.setState({ showLabelManager: false, targetRecipe: undefined });
+        window.history.replaceState(null, '', '/');
+      }
+      return;
+    }
+
+    // Close label manager if it's open and we're navigating away
+    if (this.state.showLabelManager) {
+      this.setState({ showLabelManager: false });
+    }
+
+    const recipeId = Util.parseUrl(pathname);
 
     if (recipeId) {
       // Validate recipe exists

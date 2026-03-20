@@ -12,6 +12,7 @@ import "./Tags.css";
 import "./ResultList.css";
 import "./GroupedResultList.css";
 import "./Alert.css";
+import "./LabelManager.css";
 import * as serviceWorker from "./serviceWorker";
 
 const root = createRoot(document.getElementById("root"));
