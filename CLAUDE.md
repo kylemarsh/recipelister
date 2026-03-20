@@ -14,22 +14,31 @@ All of the react code are in the `src/` directory.
 
 ## UI
 The application shows a header at the top of the page. When not logged in, there
-is a login form with username and password fields and a "Log In" button. When
-logged in, the login form is replaced with a "Log Out" button. For admin users,
-a "Manage Labels" button and a "New Recipe" button also appear.
+is a login form with username and password fields and a "Log In" button (👤 icon).
+When logged in, the login form is replaced with a "Log Out" button (👋 icon). For
+admin users, a "Manage Labels" button (⚙️ icon) and a "New Recipe" button also
+appear. All header buttons use a consistent white background with gray inset
+borders, matching the modern button style used throughout the app.
 
-Below the buttons  is a horizontal rule, and below that the screen splits into
+On mobile, header buttons are compact and arranged horizontally: "New Recipe" on
+the left, with "Manage Labels" and "Log Out" grouped on the right. When logged in
+as a non-admin guest, only the "Log Out" button appears, aligned to the right.
+
+Below the buttons is a horizontal rule, and below that the screen splits into
 two panes; the right is the Recipe Pane and it is empty until a recipe is
 selected. On the left is the List Pane containing a query form and the list
-of recipes that match the query.
+of recipes that match the query. Both panes scroll independently on desktop.
 
 ### List Pane
 The top of the list pane is the Query Form, containing a search box that
-performs a search against recipe titles and a checkbox to enable advanced
-searching. When checked, additional form fields appear giving advanced search
-options:
- - "Search full recipe text": checkbox; changes search behavior to search full
-   text of recipes instead of just the titles
+performs a search against recipe titles, with a 📄 (document) button to the
+right that toggles full-text search. When full-text search is enabled, the
+button shows with a blue active state and searches the full recipe text instead
+of just titles. The button remains on the same line as the search input even
+on mobile.
+
+Below the search input is a checkbox to enable advanced searching. When checked,
+additional form fields appear giving advanced search options:
  - "All": multiselect drop-down that lets the user select labels. Labels in
    this box are combined with "AND" logic so recipes must match all labels
    selected in order to appear in search.
@@ -38,9 +47,11 @@ options:
    the labels selected in order to appear in search.
  - "None": multiselect drop-down that lets the user select labels. Labels in
    this box are inverted and combined with "OR" logic so recipes cannot match
-   any labels selected in order to appear in search. The search form operates
-   as a filter on the recipe list in the List Pane (below) and applies as the
-   user types/clicks; the user does not need to click a submit button.
+   any labels selected in order to appear in search.
+
+The search form operates as a filter on the recipe list in the List Pane (below)
+and applies as the user types/clicks; the user does not need to click a submit
+button.
 
 Below the advanced search options are three sort buttons that control the order
 of the recipe list:
@@ -49,10 +60,12 @@ of the recipe list:
  - 🔀 (Shuffle): Randomizes the recipe list with a stable shuffle that persists
    across filter changes until another sort option is selected
 
-The active sort option is visually indicated with a blue border and background.
+The active sort option is visually indicated with a blue border and light blue
+background. All buttons use a white background with gray inset borders in their
+default state.
 
 To the right of the sort buttons (separated by a vertical divider on desktop, or
-above the sort buttons on mobile) is a group button:
+on a separate line below the sort buttons on mobile) is a group button:
  - 📂 (Group): Clicking cycles through available label types for grouping.
    When active, displays the current grouping type (e.g., "📂 Course", "📂
    Protein"). Click progression starts at "Course" (default), cycles through
@@ -71,15 +84,24 @@ above the sort buttons on mobile) is a group button:
 
 Below the query form is another horizontal rule and below that the list of all
 recipes matching the current search (when nothing is searched, the list
-contains all recipes in the database).
+contains all recipes in the database). The recipe list scrolls independently
+from the query form, keeping the search controls fixed at the top while
+scrolling through results.
 
 This UI should be reasonable to view on both desktop and mobile. When viewed on
 desktop the query form and list pane should be visible alongside the selected
 recipe. On Mobile the selected recipe should fill the page.
 
+**Mobile Tooltips**: On touch devices, tapping and holding on icon buttons
+(sort, group, full-text search, header buttons) or recipe label icons shows a
+tooltip with the button/label name. The tooltip appears above the element while
+holding, and clicking/releasing still triggers the normal action.
+
 ### Recipe Pane
 On the right side of the page is the Recipe Pane, where the selected recipe is
-displayed. Recipes are structured in 6 parts:
+displayed. The Recipe Pane scrolls independently from the List Pane, allowing
+users to scroll through a long recipe while maintaining their position in the
+recipe list. Recipes are structured in 6 parts:
 
  1. Title -- this is a header at the top of the pane. If the recipe has not been
     cooked yet (recipe.New is true), the title is followed by "(New!)" to indicate
@@ -128,8 +150,9 @@ It is accessible at the URL route `/admin/labels` and replaces the List Pane
 and Recipe Pane when active. Non-admin users attempting to access this route
 are redirected to the main view.
 
-**Access:** Click the "Manage Labels" button in the header (visible only to
-admin users), or navigate directly to `/admin/labels`.
+**Access:** Click the settings button (⚙️ icon) in the header (visible only to
+admin users when not already in the label manager), or navigate directly to
+`/admin/labels`. The settings button is hidden while the label manager is active.
 
 **Features:**
 - **Search/Filter:** Text search filters labels by name or type in real-time
@@ -166,6 +189,11 @@ navigation to the URL works as expected.
 **Implementation:** Defined in `LabelManager.js` component with corresponding
 styles in `LabelManager.css`. API methods `updateLabel`, `deleteLabel`, and
 label creation are defined in `api.js` using urlencoded form data format.
+
+**Mobile Layout:** Label rows are optimized for mobile display with compact
+column widths that keep all fields (name, type, icon, usage count, delete button)
+on a single row. Text truncates with ellipsis if too long, and tapping a field
+expands it for editing.
 
 ## API
 The react application gets data and interacts with the database via the
@@ -310,16 +338,35 @@ Each component has its own CSS file in the `src/` directory (e.g., `App.css`,
 `Recipe.css`, `Tags.css`, etc.) that are imported by `index.js`.
 
 ### LoginComponent
-Defined in `LoginComponent.js`. This component builds the log in/out button and
-the form for logging in. The App renders it inside a div with class `topnav`
+Defined in `LoginComponent.js`. This component builds the login/logout buttons
+and the form for logging in. The App renders it inside a div with class `topnav`.
+
+**Button Icons:**
+- Log In: 👤 (person silhouette)
+- Log Out: 👋 (waving hand)
+- Settings (admin only): ⚙️ (gear icon)
+
+All buttons use consistent white background styling with gray inset borders,
+matching the modern button design throughout the app. On mobile, buttons are
+arranged horizontally with "New Recipe" on the left and settings/logout grouped
+on the right. Mobile tooltips appear on tap-and-hold for icon buttons.
 
 ### QueryForm Component
 Defined in `QueryForm.js`. This component renders the search form. The App
 renders it inside a div with class `search-pane` and, when the user has
-selected a recipe, adds the `recipe-selected` class. When the "Advanced"
-checkbox is ticked, it renders the `AdvancedQuery` component as well. Below
-the advanced search options, it renders three sort buttons (Alphabetic, Newest,
-Shuffle) that control the recipe list sort order.
+selected a recipe, adds the `recipe-selected` class.
+
+The search form includes:
+- Search input with a 📄 (full-text search) button to the right that toggles
+  between title-only and full-text search modes
+- "Advanced" checkbox that reveals the `AdvancedQuery` component when checked
+- Three sort buttons (🔤 Alphabetic, 📅 Newest, 🔀 Shuffle) that control the
+  recipe list sort order
+- A group button (📂) for grouping recipes by label type
+
+On mobile, the three sort buttons stay on one line, while the group button wraps
+to a second line. The vertical divider between sort and group becomes horizontal
+on mobile.
 
 ### AdvancedQuery Component
 Defined in `AdvancedQuery.js`. This component holds the form for advanced
@@ -366,8 +413,9 @@ an unordered list.
 Recipes with the `New` field set to true (untried recipes) are displayed with
 a bullet point (•) before the title. After the title, label icons are displayed
 for any labels that have an `Icon` field. The icons use native browser tooltips
-(via the `title` attribute) to show the label name on hover (desktop) or tap
-(mobile).
+(via the `title` attribute) to show the label name on hover (desktop). On mobile
+touch devices, tap-and-hold on an icon shows a custom tooltip above the icon
+using CSS.
 
 **Clickable Icons**: Label icons are clickable and add the label to the advanced
 query "All" filter when clicked. The click handler prevents event bubbling so
