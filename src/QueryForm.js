@@ -41,6 +41,7 @@ const QueryForm = (props) => {
           className={props.sortBy === "alphabetic" ? "active" : ""}
           onClick={() => props.handleSortChange("alphabetic")}
           title="Sort alphabetically"
+          data-tooltip="Sort alphabetically"
         >
           🔤
         </button>
@@ -49,6 +50,7 @@ const QueryForm = (props) => {
           className={props.sortBy === "newest" ? "active" : ""}
           onClick={() => props.handleSortChange("newest")}
           title="Sort by newest first"
+          data-tooltip="Sort by newest first"
         >
           📅
         </button>
@@ -57,6 +59,7 @@ const QueryForm = (props) => {
           className={props.sortBy === "shuffle" ? "active" : ""}
           onClick={() => props.handleSortChange("shuffle")}
           title="Shuffle"
+          data-tooltip="Shuffle"
         >
           🔀
         </button>
@@ -66,6 +69,7 @@ const QueryForm = (props) => {
           className={props.groupBy !== "" ? "active" : ""}
           onClick={props.handleGroupToggle}
           title="Group by label type"
+          data-tooltip="Group by label type"
         >
           📂{props.groupBy !== "" ? ` ${props.groupBy}` : ""}
         </button>
