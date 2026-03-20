@@ -7,9 +7,12 @@ const LoginComponent = (props) => {
         {props.isAdmin && !props.showLabelManager && (
           <button
             type="button"
+            className="manage-labels-button"
             onClick={props.handleManageLabelsClick}
+            title="Manage Labels"
+            data-tooltip="Manage Labels"
           >
-            Manage Labels
+            ⚙️
           </button>
         )}
         <button className="auth-button" onClick={props.handleClick}>
