@@ -111,6 +111,7 @@ class App extends Component {
             <div className={searchClass}>
             <QueryForm
               fragments={this.state.filters.fragments}
+              fullText={this.state.filters.fullText}
               handleChange={this.handleFilterChange}
               handleMultiselectUpdate={this.handleMultiselectUpdate}
               handleSortChange={this.handleSortChange}
@@ -124,18 +125,20 @@ class App extends Component {
               groupBy={this.state.filters.groupBy}
             />
             <hr />
-            <GroupedResultList
-              items={this.state.allRecipes}
-              labels={this.state.allLabels}
-              filters={this.state.filters}
-              groupBy={this.state.filters.groupBy}
-              sortBy={this.state.filters.sortBy}
-              shuffleKeys={this.state.shuffleKeys}
-              expandedGroups={this.state.expandedGroups}
-              handleGroupToggle={this.handleGroupCollapse}
-              handleClick={this.handleResultClick}
-              handleIconClick={this.handleIconClick}
-            />
+            <div className="search-pane-results">
+              <GroupedResultList
+                items={this.state.allRecipes}
+                labels={this.state.allLabels}
+                filters={this.state.filters}
+                groupBy={this.state.filters.groupBy}
+                sortBy={this.state.filters.sortBy}
+                shuffleKeys={this.state.shuffleKeys}
+                expandedGroups={this.state.expandedGroups}
+                handleGroupToggle={this.handleGroupCollapse}
+                handleClick={this.handleResultClick}
+                handleIconClick={this.handleIconClick}
+              />
+            </div>
           </div>
           {this.state.showRecipeEditor ? (
             <NewRecipeForm
