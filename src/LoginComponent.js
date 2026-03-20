@@ -15,8 +15,13 @@ const LoginComponent = (props) => {
             ⚙️
           </button>
         )}
-        <button className="auth-button" onClick={props.handleClick}>
-          Log Out
+        <button
+          className="auth-button"
+          onClick={props.handleClick}
+          title="Log Out"
+          data-tooltip="Log Out"
+        >
+          👋
         </button>
       </form>
     );
@@ -26,8 +31,13 @@ const LoginComponent = (props) => {
     <form className="login-container">
       <input placeholder="Username" name="username" type="text" />
       <input name="password" type="password" placeholder="Password" />
-      <button className="auth-button" onClick={props.handleClick}>
-        Log In
+      <button
+        className="auth-button"
+        onClick={props.handleClick}
+        title="Log In"
+        data-tooltip="Log In"
+      >
+        👤
       </button>
     </form>
   );
