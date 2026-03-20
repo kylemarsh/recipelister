@@ -7,8 +7,13 @@ Preserve filter/search state in URL query parameters (e.g.,
 search context. Should work alongside recipe routing.
 
 ## More responsive UI
-Currently there's no way to hide the list pane in desktop, and the Recipe Pane
-can be too "squashed". We should find a better way to balance this.
+Currently there's no way to hide the query pane in desktop, and width priority
+is given to the query pane over the the Recipe Pane leading to the recipe pane
+looking too "squashed". When there is no active recipe selected we should
+allow the query pane to take up most of the horizontal space (or even collapse
+the Recipe Pane altogether), but when a recipe is selected, priority should be
+given to the recipe pane, even if it means the Query Pane is narrower than
+ideal.
 
 ## Development/deploy instructions for both frontend and api server
 Create a document detailing the steps needed to develop and deploy both parts
