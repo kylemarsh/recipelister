@@ -140,55 +140,57 @@ class App extends Component {
               />
             </div>
           </div>
-          {this.state.showRecipeEditor ? (
-            <NewRecipeForm
-              recipeId={this.state.targetRecipe}
-              recipes={this.state.allRecipes}
-              handleSubmit={this.handleNewRecipeSubmit}
-              handleCancel={this.handleNewRecipeCancel}
-            />
-          ) : this.state.targetRecipe ? (
-            <Recipe
-              loggedIn={loggedIn}
-              isAdmin={this.state.login.isAdmin}
-              recipes={this.state.allRecipes}
-              availableLabels={this.state.allLabels}
-              targetRecipeId={this.state.targetRecipe}
-              showTaggingForm={this.state.showTaggingForm}
-              showNoteEditor={this.state.showNoteEditor}
-              showAddNote={this.state.showAddNote}
-              recipeHandlers={{
-                EditClick: () => this.setState({ showRecipeEditor: true }),
-                UntargetClick: () => {
-                  this.setState({ targetRecipe: undefined });
-                  this.clearUrl();
-                },
-                DeleteClick: this.handleRecipeDelete,
-              }}
-              noteHandlers={{
-                FlagClick: this.handleNoteFlagClick,
-                EditClick: this.handleNoteEditClick,
-                EditCancel: this.handleNoteEditCancel,
-                EditSubmit: this.handleNoteEditSubmit,
-                DeleteClick: this.handleNoteDeleteClick,
-                AddClick: this.handleNoteAddClick,
-                AddCancel: this.handleNoteAddCancel,
-                AddSubmit: this.handleNoteAddSubmit,
-              }}
-              labelHandlers={{
-                LinkClick: this.handleLabelLinkClick,
-                LinkSubmit: this.handleLabelLinkSubmit,
-                LinkCancel: this.handleLabelLinkCancel,
-                UnlinkClick: this.handleLabelUnlinkClick,
-                InputChange: this.handleTagInputChange,
-                FormClose: this.handleTagFormClose,
-                TabSubmit: this.handleTagFormTabSubmit,
-              }}
-              tagFormInputValue={this.state.tagFormInputValue}
-            />
-          ) : (
-            ""
-          )}
+          <div className="recipe-pane">
+            {this.state.showRecipeEditor ? (
+              <NewRecipeForm
+                recipeId={this.state.targetRecipe}
+                recipes={this.state.allRecipes}
+                handleSubmit={this.handleNewRecipeSubmit}
+                handleCancel={this.handleNewRecipeCancel}
+              />
+            ) : this.state.targetRecipe ? (
+              <Recipe
+                loggedIn={loggedIn}
+                isAdmin={this.state.login.isAdmin}
+                recipes={this.state.allRecipes}
+                availableLabels={this.state.allLabels}
+                targetRecipeId={this.state.targetRecipe}
+                showTaggingForm={this.state.showTaggingForm}
+                showNoteEditor={this.state.showNoteEditor}
+                showAddNote={this.state.showAddNote}
+                recipeHandlers={{
+                  EditClick: () => this.setState({ showRecipeEditor: true }),
+                  UntargetClick: () => {
+                    this.setState({ targetRecipe: undefined });
+                    this.clearUrl();
+                  },
+                  DeleteClick: this.handleRecipeDelete,
+                }}
+                noteHandlers={{
+                  FlagClick: this.handleNoteFlagClick,
+                  EditClick: this.handleNoteEditClick,
+                  EditCancel: this.handleNoteEditCancel,
+                  EditSubmit: this.handleNoteEditSubmit,
+                  DeleteClick: this.handleNoteDeleteClick,
+                  AddClick: this.handleNoteAddClick,
+                  AddCancel: this.handleNoteAddCancel,
+                  AddSubmit: this.handleNoteAddSubmit,
+                }}
+                labelHandlers={{
+                  LinkClick: this.handleLabelLinkClick,
+                  LinkSubmit: this.handleLabelLinkSubmit,
+                  LinkCancel: this.handleLabelLinkCancel,
+                  UnlinkClick: this.handleLabelUnlinkClick,
+                  InputChange: this.handleTagInputChange,
+                  FormClose: this.handleTagFormClose,
+                  TabSubmit: this.handleTagFormTabSubmit,
+                }}
+                tagFormInputValue={this.state.tagFormInputValue}
+              />
+            ) : (
+              ""
+            )}
+          </div>
           </div>
         )}
       </div>

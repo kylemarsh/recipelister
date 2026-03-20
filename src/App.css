@@ -23,8 +23,9 @@
 
 .content-container {
   display: flex;
+  height: calc(100vh - 200px);
+  overflow: hidden;
 }
-
 
 .content-container > div {
   margin: 5px;
@@ -58,6 +59,12 @@
   min-height: 0;
 }
 
+.recipe-pane {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .topnav {
 	overflow: hidden;
 }
@@ -65,6 +72,7 @@
 @media (max-width: 600px) {
   .content-container {
     display: block;
+    height: auto;
   }
 	/*TODO: allow this to collapse upwards*/
   .search-pane {
@@ -79,6 +87,9 @@
 	}
   .search-pane-results {
     max-height: 60vh;
+  }
+  .recipe-pane {
+    max-height: calc(100vh - 100px);
   }
 }
 
