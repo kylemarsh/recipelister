@@ -4,7 +4,7 @@ const LoginComponent = (props) => {
   if (props.loggedIn) {
     return (
       <form className="login-container">
-        {props.isAdmin && (
+        {props.isAdmin && !props.showLabelManager && (
           <button
             type="button"
             onClick={props.handleManageLabelsClick}

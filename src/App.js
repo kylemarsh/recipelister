@@ -75,6 +75,7 @@ class App extends Component {
             isAdmin={this.state.login.isAdmin}
             handleClick={loggedIn ? this.doLogout : this.doLogin}
             handleManageLabelsClick={this.navigateToLabelManager}
+            showLabelManager={this.state.showLabelManager}
           />
           {loggedIn && this.state.login.isAdmin ? (
             <button onClick={this.triggerAddRecipe}>New Recipe</button>
