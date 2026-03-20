@@ -1,299 +1,62 @@
 # OVERVIEW
-Recipelister's react_frontend is a single-page web application to provide
-access to a database of recipes. It's written in react and the production
-deployment is hosted at `https://eats.dashery.xyz`. Communication with the
-database is with an API layer using JSON over REST.
-
-The application supports direct links to individual recipes via URL routing
-(e.g., `/123/chicken-soup`). URLs update dynamically as users navigate without
-page reloads, and the browser back/forward buttons work within the app.
+React-based SPA for recipe database management. Production: `https://eats.dashery.xyz`.
+Communicates with backend API via JSON over REST. Supports URL routing for deep linking
+to recipes (e.g., `/123/chicken-soup`) and admin label management (`/admin/labels`).
 
 
 # Structure
 All of the react code are in the `src/` directory.
 
 ## UI
-The application shows a header at the top of the page. When not logged in, there
-is a login form with username and password fields and a "Log In" button (👤 icon).
-When logged in, the login form is replaced with a "Log Out" button (👋 icon). For
-admin users, a "Manage Labels" button (⚙️ icon) and a "New Recipe" button also
-appear. All header buttons use a consistent white background with gray inset
-borders, matching the modern button style used throughout the app.
+**Layout:** Header + two-pane layout (List Pane | Recipe Pane). Both panes scroll independently.
 
-On mobile, header buttons are compact and arranged horizontally: "New Recipe" on
-the left, with "Manage Labels" and "Log Out" grouped on the right. When logged in
-as a non-admin guest, only the "Log Out" button appears, aligned to the right.
-
-Below the buttons is a horizontal rule, and below that the screen splits into
-two panes; the right is the Recipe Pane and it is empty until a recipe is
-selected. On the left is the List Pane containing a query form and the list
-of recipes that match the query. Both panes scroll independently on desktop.
+**Header:** Login/logout controls, admin-only buttons (New Recipe, ⚙️ Manage Labels).
+Mobile: horizontal compact layout. See `docs/features/admin-role-support.md` for auth details.
 
 ### List Pane
-The top of the list pane is the Query Form, containing a search box that
-performs a search against recipe titles, with a 📄 (document) button to the
-right that toggles full-text search. When full-text search is enabled, the
-button shows with a blue active state and searches the full recipe text instead
-of just titles. The button remains on the same line as the search input even
-on mobile.
+**Query Form:**
+- Search input with 📄 full-text toggle button
+- Advanced checkbox reveals label filters (All/Any/None multiselects with AND/OR/NOT logic)
+- Sort buttons: 🔤 Alphabetic (default), 📅 Newest, 🔀 Shuffle
+- 📂 Group button cycles through label types (Course → other types → none). See `docs/specs/cycling-group-button.md`
 
-Below the search input is a checkbox to enable advanced searching. When checked,
-additional form fields appear giving advanced search options:
- - "All": multiselect drop-down that lets the user select labels. Labels in
-   this box are combined with "AND" logic so recipes must match all labels
-   selected in order to appear in search.
- - "Any": multiselect drop-down that lets the user select labels. Labels in
-   this box are combined with "OR" logic so recipes must match at least one of
-   the labels selected in order to appear in search.
- - "None": multiselect drop-down that lets the user select labels. Labels in
-   this box are inverted and combined with "OR" logic so recipes cannot match
-   any labels selected in order to appear in search.
-
-The search form operates as a filter on the recipe list in the List Pane (below)
-and applies as the user types/clicks; the user does not need to click a submit
-button.
-
-Below the advanced search options are three sort buttons that control the order
-of the recipe list:
- - 🔤 (Alphabetic): Sorts recipes A-Z by title (default)
- - 📅 (Newest): Sorts recipes by ID descending (most recently added first)
- - 🔀 (Shuffle): Randomizes the recipe list with a stable shuffle that persists
-   across filter changes until another sort option is selected
-
-The active sort option is visually indicated with a blue border and light blue
-background. All buttons use a white background with gray inset borders in their
-default state.
-
-To the right of the sort buttons (separated by a vertical divider on desktop, or
-on a separate line below the sort buttons on mobile) is a group button:
- - 📂 (Group): Clicking cycles through available label types for grouping.
-   When active, displays the current grouping type (e.g., "📂 Course", "📂
-   Protein"). Click progression starts at "Course" (default), cycles through
-   all other available label types (determined dynamically from the data), and
-   ends at no grouping before cycling back to "Course". Groups recipes by
-   labels matching the selected Type field with collapsible group headers
-   showing recipe counts. Grouping is enabled by default to "Course" with all
-   groups collapsed except "Main". Recipes tagged with multiple labels of the
-   grouping type appear in each relevant group. Recipes without any labels of
-   the grouping type appear in an "Other" group. The selected sort mode applies
-   within each group. Group expand/collapse state persists across filter
-   changes.
-
-   The grouping dynamically uses label Type values from the API, so new label
-   types automatically become available in the cycle without code changes.
-
-Below the query form is another horizontal rule and below that the list of all
-recipes matching the current search (when nothing is searched, the list
-contains all recipes in the database). The recipe list scrolls independently
-from the query form, keeping the search controls fixed at the top while
-scrolling through results.
-
-This UI should be reasonable to view on both desktop and mobile. When viewed on
-desktop the query form and list pane should be visible alongside the selected
-recipe. On Mobile the selected recipe should fill the page.
-
-**Mobile Tooltips**: On touch devices, tapping and holding on icon buttons
-(sort, group, full-text search, header buttons) or recipe label icons shows a
-tooltip with the button/label name. The tooltip appears above the element while
-holding, and clicking/releasing still triggers the normal action.
+**Recipe List:** Scrolls independently. Shows filtered/sorted recipes. Label icons are clickable
+(adds to advanced filter). Recipes with `New=true` display bullet (•) prefix. Mobile tooltips on
+tap-and-hold. See `docs/specs/SPEC-clickable-tag-icons.md`
 
 ### Recipe Pane
-On the right side of the page is the Recipe Pane, where the selected recipe is
-displayed. The Recipe Pane scrolls independently from the List Pane, allowing
-users to scroll through a long recipe while maintaining their position in the
-recipe list. Recipes are structured in 6 parts:
+Displays selected recipe with 6 sections: (1) Title with "(New!)" indicator, (2) Action buttons
+(close, edit, delete - admin-only), (3) Timing info, (4) Body (ingredients + instructions),
+(5) Tags with "+ add label" (admin-only), (6) Notes with flag/edit/delete controls (admin-only).
 
- 1. Title -- this is a header at the top of the pane. If the recipe has not been
-    cooked yet (recipe.New is true), the title is followed by "(New!)" to indicate
-    this is an untried recipe
- 2. Action Buttons -- buttons to close the recipe pane, edit the recipe, and
-    delete the recipe
- 3. Timing -- two lines indicating how long the recipe takes to cook. Active
-    time is how long the cook needs to be working on it; total time is the
-    amount of time the recipe needs from start to finish, including cooking or
-    resting time when the cook can be focusing on other things.
- 4. Recipe Body -- a free-form text section containing the ingredients and
-    instructions for the recipe. Some are plain text, some are markdown. By
-    convention a recipe starts with a list of ingredients, one per line. After
-    the ingredients is usually a blank line, and then the recipe instructions,
-    usually one step per line. Sometimes there are multiple parts (a dish and
-    its sauce, for instance) and these are usually separated by blank lines and
-    header lines.
- 5. Tags -- Recipes can be tagged with labels for easier searching. All of the
-    labels a recipe is tagged with appear here, along with a button that reads
-    "+ add label" to tag the recipe with an additional label. When clicked, a
-    text box appears where the user can enter a label name. When submitted, the
-    recipe is tagged with that label. If the label doesn't exist yet, it is
-    created first.
- 6. Notes -- Similar to tags, recipes can have notes. Notes can be added with
-    "+ Add Note" button and once added they appear in a list. Each note shows
-    the date it was added, buttons to flag, edit, and delete the note, and the
-    body of the note itself. Flagging a note causes it to be displayed with a
-    different background color (the intention is that some notes may be things
-    that should be incorporated into the main body of the recipe eventually,
-    and they can be marked as flagged once that's done).
-
-The new recipe form also appears in the Recipe Pane, and has fields for:
- - Title
- - Active Time
- - Total Time
- - Recipe Body
-
-It does not have the ability to add notes or labels to the recipe before it's
-created. At the bottom of the form are "Add" and "Cancel" buttons. The recipe
-is added to the database once the user clicks "Add".
+**New Recipe Form:** Title, ActiveTime, TotalTime, Body fields. Toggle for "tried/untried" status.
+See `docs/specs/SPEC-tag-workflow.md` for tagging details.
 
 ### Label Manager (Admin Only)
-
-The Label Manager is an admin-only interface for managing labels in the system.
-It is accessible at the URL route `/admin/labels` and replaces the List Pane
-and Recipe Pane when active. Non-admin users attempting to access this route
-are redirected to the main view.
-
-**Access:** Click the settings button (⚙️ icon) in the header (visible only to
-admin users when not already in the label manager), or navigate directly to
-`/admin/labels`. The settings button is hidden while the label manager is active.
-
-**Features:**
-- **Search/Filter:** Text search filters labels by name or type in real-time
-- **Grouped Display:** Labels are grouped by Type (Course, Protein, etc.) with
-  collapsible group headers. Labels without a type appear in an "Other" group.
-  All groups are expanded by default.
-- **Inline Editing:** Click any label name, type, or icon to edit inline. Press
-  Enter to submit, Escape to cancel, or click away to submit.
-  - Icon validation ensures only single characters/emojis (uses `Intl.Segmenter`
-    for proper grapheme counting on modern browsers)
-  - Empty label names are rejected
-- **Usage Count:** Each label shows the number of recipes tagged with it. Click
-  the count to open the recipe association panel.
-- **Delete:** Click the delete button (🗑) to delete a label. A confirmation
-  modal shows how many recipes will be affected. The API automatically unlinks
-  the label from all recipes when deleted.
-- **Create New Label:** Click "New Label" button to open a form for creating
-  labels with name, type, and icon fields.
-
-**Recipe Association Panel:**
-When you click a usage count, a side panel slides in from the right (desktop)
-or replaces the label list (mobile) showing all recipes tagged with that label.
-- Click the chain link icon (🔗) to unlink a recipe. The icon changes to a
-  broken chain (⛓️‍💥) and the title is struck through.
-- Click the broken chain icon to re-link the recipe.
-- Recipes remain in the panel until it closes, even after unlinking, to allow
-  undoing mistakes.
-- Close button (×) or back button (mobile) returns to the label list.
-
-**URL Routing:** The label manager route (`/admin/labels`) is integrated with
-browser history. The back button returns to the recipe view, and direct
-navigation to the URL works as expected.
-
-**Implementation:** Defined in `LabelManager.js` component with corresponding
-styles in `LabelManager.css`. API methods `updateLabel`, `deleteLabel`, and
-label creation are defined in `api.js` using urlencoded form data format.
-
-**Mobile Layout:** Label rows are optimized for mobile display with compact
-column widths that keep all fields (name, type, icon, usage count, delete button)
-on a single row. Text truncates with ellipsis if too long, and tapping a field
-expands it for editing.
+Admin-only interface at `/admin/labels`. Full-page layout with search, grouped display,
+inline editing, usage counts, delete confirmation, and recipe association panel for
+linking/unlinking. Component: `LabelManager.js`. See `docs/specs/label-manager.md` for
+full details.
 
 ## API
-The react application gets data and interacts with the database via the
-database's API, implemented in `api.js`. This file provides functions that the
-application can call to make requests to the database's API, grouped roughly
-by model -- there are functions that operate on recipes, labels, and notes,
-as well as some helpers.
+Functions in `api.js` interact with backend (URL: `REACT_APP_API_HOST` env var).
 
-The API server URL is configured via the `REACT_APP_API_HOST` environment
-variable.
+**Auth:** JWT-based. Login returns token with `is_admin` claim. Token stored in localStorage,
+included in `x-access-token` header. Routes: public (`/recipes/`, `/labels/`), authenticated
+(`/priv/*`), admin (`/admin/*`). See `docs/features/admin-role-support.md`.
 
-The API server returns data in response bodies in JSON format when there is data
-to be returned.
+**Data Loading:** Unauthenticated users see titles/labels only. Authenticated users get full
+bodies upfront, notes loaded on-demand.
 
-### Data Loading Behavior
-Recipe data loading differs based on authentication status:
- - **Unauthenticated users**: Can view recipe titles and labels only. Recipe
-   bodies are not loaded or displayed.
- - **Authenticated users**: Can view full recipe data. Recipe bodies are loaded
-   with the initial recipe list. Notes are loaded on-demand when a user clicks
-   on a recipe (see `App.js:398-401`).
+**Data Formatting:** Labels title-cased via `Util.formatLabelsForDisplay()` (presentation layer).
 
-### Data Formatting
-Label data is formatted for display after fetching from the API:
- - `Label` and `Type` fields are title-cased using `Util.formatLabelsForDisplay()`
- - Formatting is applied in `App.getLabels()` for the label list and
-   `App.getRecipes()` for labels attached to recipes
- - When new labels are created via the UI, they are formatted before being added
-   to state
- - This formatting is a presentation concern handled in the application layer,
-   not the API layer. The API returns normalized (lowercase) data suitable for
-   any client; the web app transforms it for display.
-
-### Auth
-Authentication is handled by the `doLogin` and `doLogout` functions in
-`App.js`. The log in method calls `Api.login` which POSTs a request to
-`$api_host/login/` including the username and password in the request body.
-Upon successful login the response body contains a JWT in the `token` field.
-The JWT contains an `is_admin` claim indicating whether the user has admin
-privileges. The JWT and username are stored in local storage.
-
-On page load and successful login, the JWT is decoded using `jwt-decode` to
-extract the `is_admin` claim, which is stored in application state as
-`login.isAdmin`. This flag controls UI visibility of admin-only controls (edit,
-delete, add note, add label, etc.).
-
-API routes are organized by privilege level:
-- **Public routes** (no auth): `/recipes/`, `/labels/`
-- **Authenticated routes** (`/priv/*`): Read-only access requiring valid JWT
-  (e.g., full recipe bodies, notes)
-- **Admin routes** (`/admin/*`): Mutation operations requiring admin privilege
-  (all POST, PUT, DELETE operations). Label management routes include:
-  - `PUT /admin/label/{labelName}`: Create label (idempotent)
-  - `PUT /admin/label/id/{labelId}`: Update label fields (accepts urlencoded data: label, type, icon)
-  - `DELETE /admin/label/id/{labelId}`: Delete label (auto-unlinks from all recipes)
-
-When making authenticated requests, the api function includes the JWT as the
-value for the `x-access-token` header.
+**Error Responses:** See `docs/API_ERROR_RESPONSES.md` for complete error reference.
 
 ### URL Routing
-The application implements client-side URL routing using the browser History
-API to enable direct links to recipes and the label manager while maintaining
-SPA behavior (no page reloads).
-
-**Recipe URL Format:**
-- Pattern: `/{recipe-id}/{slug}` where slug is optional
-- Examples: `/123/chicken-soup`, `/123`
-- Recipe ID is required; slug is auto-generated from recipe title for readability
-- Invalid slugs are auto-corrected using `replaceState` (no history entry)
-
-**Label Manager URL:**
-- Pattern: `/admin/labels`
-- Admin-only route; non-admin users are redirected to `/` (main view)
-- Navigating to this URL opens the Label Manager interface
-- Back button or close returns to main view at `/`
-
-**Routing Behavior:**
-- **Recipe selection**: Updates URL via `pushState` to `/{id}/{slug}`
-- **Recipe close**: Clears URL via `pushState` to `/`
-- **Recipe deletion**: Clears URL via `pushState` to `/`
-- **Recipe edit**: Updates slug via `replaceState` (no history entry)
-- **Label manager open**: Updates URL via `pushState` to `/admin/labels`
-- **Label manager close**: Updates URL via `pushState` to `/`
-- **Browser back/forward**: `popstate` event listener routes appropriately
-- **Initial page load**: Parses URL and routes to recipe, label manager, or main view
-
-**Deep Linking:**
-- Unauthenticated users can navigate to recipe URLs
-- Recipe displays with title and labels only (existing auth behavior)
-- If user logs in while viewing a recipe, notes load automatically
-- Invalid recipe IDs show "Recipe not found" error and clear URL
-- Non-admin users navigating to `/admin/labels` are redirected to main view
-
-**Implementation:**
-- URL parsing/building in `Util.js` (`parseUrl`, `buildRecipeUrl`, `generateSlug`)
-- Routing methods in `App.js` (`updateUrl`, `clearUrl`, `validateAndCorrectSlug`,
-  `routeToRecipeFromUrl`, `handlePopState`, `navigateToLabelManager`, `navigateFromLabelManager`)
-- `popstate` event listener added in `componentDidMount`, removed in `componentWillUnmount`
-- URL updates integrated into `handleResultClick`, recipe close/delete handlers,
-  recipe edit flow, and label manager navigation
+Client-side routing via History API. Patterns: `/{id}/{slug}` for recipes, `/admin/labels` for
+label manager. Uses `pushState`/`replaceState` for navigation, `popstate` listener for back/forward.
+Deep linking supported (auth-aware). Implementation in `Util.js` (parsing) and `App.js` (routing methods).
+See `docs/specs/direct-links-to-recipes.md`.
 
 
 ## Libraries
@@ -305,416 +68,67 @@ This project uses:
  - "jwt-decode" (for decoding JWTs to extract admin flag)
 
 ## Components
-The top-level application is in `App.js`, bootstrapped by `index.js` using React
-18's `createRoot` API. This Component renders the overall UI and holds state
-(query form state, selected recipe, logged in state, URL routing state, which
-other Components are visible...).
+**App.js:** Top-level component (bootstrapped by `index.js`). Manages state (recipes, labels, filters,
+auth, routing), handles actions, renders child components. Key state: `targetRecipe`, `recipeJustEdited`,
+`expandedGroups`, `login.isAdmin`. Lifecycle: `componentDidMount` adds `popstate` listener,
+`componentDidUpdate` handles routing/note loading, `componentWillUnmount` cleans up.
 
-All of the functions that handle actions (clicks, typing, etc) are defined here
-and passed down into components as props.
+**LoginComponent:** (`LoginComponent.js`) Login/logout UI with icons (👤/👋/⚙️).
 
-**App.js State:**
-- `targetRecipe`: ID of currently selected recipe (or undefined)
-- `recipeJustEdited`: Flag indicating recipe was just edited (triggers URL slug
-  update after recipes reload)
-- Other state: filters, login, errors, UI visibility flags, etc.
+**QueryForm:** (`QueryForm.js`) Search input, full-text toggle, advanced checkbox, sort/group buttons.
 
-**App.js URL Routing Methods:**
-- `updateUrl(recipeId, recipeTitle)`: Updates URL using `pushState`
-- `clearUrl()`: Clears URL to `/` using `pushState`
-- `validateAndCorrectSlug(recipeId, recipeTitle)`: Auto-corrects slug using
-  `replaceState`
-- `handlePopState()`: Handles browser back/forward (delegates to
-  `routeToRecipeFromUrl`)
-- `routeToRecipeFromUrl()`: Routes to recipe from current URL pathname
+**AdvancedQuery:** (`AdvancedQuery.js`) All/Any/None label multiselects using `react-widgets`.
+Grouped by Type. See `docs/specs/SPEC-multiselect-grouping.md`.
 
-**App.js Lifecycle Integration:**
-- `componentDidMount`: Adds `popstate` listener for browser navigation
-- `componentDidUpdate`: Routes from URL after recipes load; updates slug after
-  recipe edit; loads notes after login (if viewing recipe)
-- `componentWillUnmount`: Removes `popstate` listener
+**GroupedResultList:** (`GroupedResultList.js`) Applies filters (`Util.applyFilters`), conditionally
+renders by `groupBy` prop. Renders `ResultList` for each group or ungrouped.
 
-Each component has its own CSS file in the `src/` directory (e.g., `App.css`,
-`Recipe.css`, `Tags.css`, etc.) that are imported by `index.js`.
+**ResultList:** (`ResultList.js`) Sorts/renders recipe list. Shows "•" for new recipes, label icons
+(clickable), tooltips. See `docs/specs/SPEC-clickable-tag-icons.md`.
 
-### LoginComponent
-Defined in `LoginComponent.js`. This component builds the login/logout buttons
-and the form for logging in. The App renders it inside a div with class `topnav`.
+**Recipe:** (`Recipe.js`) Displays recipe with RecipeActions, TagList, NoteList child components.
+Receives `isAdmin` prop for conditional rendering.
 
-**Button Icons:**
-- Log In: 👤 (person silhouette)
-- Log Out: 👋 (waving hand)
-- Settings (admin only): ⚙️ (gear icon)
+**NewRecipeForm:** (`Recipe.js`) Form with toggle for tried/untried status. See
+`docs/superpowers/specs/2026-03-12-checkbox-to-toggle.md`.
 
-All buttons use consistent white background styling with gray inset borders,
-matching the modern button design throughout the app. On mobile, buttons are
-arranged horizontally with "New Recipe" on the left and settings/logout grouped
-on the right. Mobile tooltips appear on tap-and-hold for icon buttons.
+**Alert:** (`Alert.js`) Error display with auto-dismiss contexts. Parsing via `Util.parseApiError()`,
+`Util.formatErrorMessage()`. See `docs/API_ERROR_RESPONSES.md` for error types.
 
-### QueryForm Component
-Defined in `QueryForm.js`. This component renders the search form. The App
-renders it inside a div with class `search-pane` and, when the user has
-selected a recipe, adds the `recipe-selected` class.
+**NoteList:** (`Notes.js`) List of notes with add/edit/flag/delete controls (admin-only). Auto-focus
+textarea. See `docs/specs/auto-focus-note-textarea.md`.
 
-The search form includes:
-- Search input with a 📄 (full-text search) button to the right that toggles
-  between title-only and full-text search modes
-- "Advanced" checkbox that reveals the `AdvancedQuery` component when checked
-- Three sort buttons (🔤 Alphabetic, 📅 Newest, 🔀 Shuffle) that control the
-  recipe list sort order
-- A group button (📂) for grouping recipes by label type
+**TagList:** (`Tags.js`) Shows recipe's labels with add/unlink controls (admin-only). Combobox with
+autocomplete, auto-submit, keyboard workflow. See `docs/specs/SPEC-tag-workflow.md`.
 
-On mobile, the three sort buttons stay on one line, while the group button wraps
-to a second line. The vertical divider between sort and group becomes horizontal
-on mobile.
+**Terminology:** "Label" = reusable categorization object. "Tag" = recipe-label association.
 
-### AdvancedQuery Component
-Defined in `AdvancedQuery.js`. This component holds the form for advanced
-searching/filtering options, including the `Multiselect` Components from the
-`react-widgets` library that we use for picking labels.
-
-The label multiselects use `groupBy="Type"` to group labels by their Type field
-and display organized dropdowns with group headers. Labels are sorted
-alphabetically within each group using `Util.sortLabelsForMultiselect()`. Labels
-without a Type value are displayed in an "Other" group at the end of the list.
-
-### GroupedResultList Component
-Defined in `GroupedResultList.js`. This component is the primary list display
-controller that handles filtering and conditional rendering. The App renders
-the List Pane as the GroupedResultList component below a horizontal rule in
-the `search-pane` div.
-
-This component applies all search and label filters (via `Util.applyFilters`),
-then decides how to render based on the `groupBy` prop:
- - When `groupBy` is "" (empty string): Renders a single `ResultList` component
-   with all filtered recipes
- - When `groupBy` contains a label type (e.g., "Course", "Protein", "Cuisine"):
-   Groups recipes by labels where Type matches the groupBy value (dynamically
-   determined from API data) with collapsible group headers. Each group renders
-   its own `ResultList` component. Recipes without labels matching the grouping
-   type appear in an "Other" group.
-
-The `groupBy` prop is a string indicating the label Type to group by (e.g.,
-"Course", "Protein"), or "" for no grouping. The application starts with
-`groupBy="Course"` by default.
-
-Group headers display the group name and recipe count, with expand/collapse
-indicators (▼/▶). The expand state is managed in App.js via the
-`expandedGroups` state and `handleGroupCollapse` handler. Groups are collapsed
-by default (not present in expandedGroups) except for "Main" which is expanded
-on initial load.
-
-### ResultList Component
-Defined in `ResultList.js`. This is a pure presentation component that sorts
-and renders a list of recipes. It receives pre-filtered recipes as props,
-applies the selected sort mode (via `Util.sortRecipes`), and renders them as
-an unordered list.
-
-Recipes with the `New` field set to true (untried recipes) are displayed with
-a bullet point (•) before the title. After the title, label icons are displayed
-for any labels that have an `Icon` field. The icons use native browser tooltips
-(via the `title` attribute) to show the label name on hover (desktop). On mobile
-touch devices, tap-and-hold on an icon shows a custom tooltip above the icon
-using CSS.
-
-**Clickable Icons**: Label icons are clickable and add the label to the advanced
-query "All" filter when clicked. The click handler prevents event bubbling so
-clicking an icon doesn't trigger recipe selection. If advanced options are
-collapsed, clicking an icon automatically expands them. Icons show a pointer
-cursor to indicate they are clickable.
-
-The list styling removes default CSS bullets (list-style-type: none) so the
-bullet indicator is controlled explicitly in the component. It does not handle
-filtering - that's done by GroupedResultList.
-
-### Recipe Component
-Defined in `Recipe.js`. This component renders the currently seleted recipe in
-the Recipe Pane (the Recipe Pane is rendered as either the `Recipe` component
-or the `NewRecipeForm` component in the `content-container` div just after the
-`search-pane` div). This component renders the recipe inside a div with class
-`recipe-container`.
-
-The Recipe component receives an `isAdmin` prop from App.js that controls the
-visibility of admin-only UI elements. This prop is passed down to child
-components (RecipeActions, TagList, NoteList) to conditionally render mutation
-controls.
-
-In addition to the details of the recipe, it renders three additional Components:
- - RecipeActions -- defined in `Recipe.js`; renders button controls. The back
-   button (←, navy) is always visible. Edit (✎, goldenrod) and delete (🗑)
-   buttons are only rendered when `isAdmin` is true. Uses semantic `<button>`
-   elements with descriptive aria-labels and keyboard navigation support.
-   Visual styling matches sort button design language.
- - TagList -- receives `isAdmin` prop to conditionally render "+ add label"
-   button and label unlink (×) buttons
- - NoteList -- rendered inside the `notes-section` div; receives `isAdmin` prop
-   to conditionally render "+ Add Note" button and note action buttons (flag,
-   edit, delete)
-
-A "recipe" object has the following properties:
- - `ID` (int): the primary identifier for this recipe
- - `Title` (string): the recipe's title, displayed in a search list
- - `Body` (string): the bulk of the recipe as a free text field. This usually includes
-   ingredients and instructions both
- - `Time` (int): how long this recipe takes to cook
- - `ActiveTime` (int): how long the cook needs to spend working on this this recipe
-   (chopping, stirring, etc.)
- - `New` (boolean): indicates whether the recipe has been cooked yet. When true, the
-   recipe has not been cooked and is displayed with visual indicators ("(New!)" in
-   the recipe title, bullet point in the recipe list)
- - `Labels` (array): array of `Label` structures this recipe is tagged with
- - `Notes` (array): array of `Note` structures attached to this recipe
-
-### NewRecipeForm Component
-Defined in `Recipe.js`. This component renders the form that lets users add a
-new recipe to the database. The form includes a toggle control that manages the
-`New` field on the recipe.
-
-**Toggle Control:**
-- Visual sliding toggle for marking recipes as tried/untried
-- Toggle ON ("I've tried it!"): Recipe marked as tried (New: false)
-- Toggle OFF ("I haven't tried this yet"): Recipe marked as new (New: true)
-- Implemented as styled checkbox with value transformation in form submission
-- Maintains accessibility through hidden checkbox element
-
-The form does not currently support adding labels to a recipe on creation.
-
-### Alert Component
-Defined in `Alert.js`. The app renders this component to display errors --
-usually API failures. It wraps the error message in a box that appears with a
-red background at the top of the page.
-
-**Error Display:** The application displays detailed API error messages to users
-with human-readable status labels and capitalized messages. For example:
-- API returns `"400: title is required"` → User sees `"Bad Request: Title is required"`
-- API returns `"403: admin access required"` → User sees `"Forbidden: Admin access required"`
-- Network errors show the fallback message with error details
-
-Error parsing and formatting is handled by utility functions in `Util.js`
-(`parseApiError()` and `formatErrorMessage()`). Special handling for 401 errors
-logs the user out and displays "You have been logged out. Please log in again".
-
-The App component manages error state including auto-dismiss functionality.
-Errors are stored with an optional context that identifies what type of error
-occurred. When the action that caused the error succeeds, the error is
-automatically dismissed if its context matches. This prevents stale errors from
-remaining visible after the user has resolved the issue.
-
-Implemented auto-dismiss contexts:
- - `"login"`: Dismissed when user successfully logs in
- - `"addRecipe"`: Dismissed when a recipe is successfully created/updated
- - `"deleteRecipe"`: Dismissed when a recipe is successfully deleted
- - `"addLabel"`: Dismissed when a label is successfully linked to a recipe
- - `"unlinkLabel"`: Dismissed when a label is successfully unlinked from a recipe
- - `"addNote"`: Dismissed when a note is successfully added
- - `"editNote"`: Dismissed when a note is successfully edited
- - `"deleteNote"`: Dismissed when a note is successfully deleted
- - `"flagNote"`: Dismissed when a note is successfully flagged/unflagged
- - `"fetchRecipes"`: Dismissed when recipes are successfully fetched
- - `"fetchLabels"`: Dismissed when labels are successfully fetched
- - `"fetchNotes"`: Dismissed when notes are successfully loaded
- - `"auth"`: Set when 401 errors occur (user logged out)
- - `"routing"`: Set when recipe ID in URL doesn't exist; dismissed when a recipe
-   is successfully selected (via click or URL navigation)
-
-Users can also manually dismiss any alert by clicking the × button.
-
-### NoteList Component
-Defined in `Notes.js`. This renders an unordered list of `NoteListItem`
-Components followed by the `AddNoteTrigger` or `EditNoteForm` Component to
-allow a user to add a new note.
-
-The component receives an `isAdmin` prop and only renders the "+ Add Note"
-button and note action controls (flag, edit, delete) when `isAdmin` is true.
-Non-admin users can view notes but cannot modify them.
-
-**EditNoteForm behavior:**
-The note textarea automatically receives focus when the form opens (either for
-adding a new note or editing an existing one). The form closes when the user
-presses Escape or when focus moves outside the form entirely (checked via
-`event.relatedTarget`). Pressing Tab moves focus between textarea and buttons
-without closing the form. Buttons use `onMouseDown` preventDefault to prevent
-blur from firing when clicked, ensuring submit works correctly.
-
-A "note" object has the following properties:
- - `ID` (int): the primary identifier for this note
- - `RecipeId` (int): the RecipeId for the recipe this note belongs to
- - `Created` (int): the unix timestamp of the date this note was created (used
-   for sorting the notes)
- - `Note` (string): the text body of the note
- - `Flagged` (boolean): marks a note as incorporated into the recipe
-
-### TagList Component
-Defined in `Tags.js`. This renders an unordered list of `TagListItem`
-components in a div with class `tag-list-container` to show the tags that are
-linked to a recipe.
-
-The component receives an `isAdmin` prop and only renders the "+ add label"
-button and label unlink (×) buttons when `isAdmin` is true. Non-admin users can
-view labels but cannot add or remove them. When adding a label, the component
-performs a case-insensitive search against existing labels to prevent
-duplicates.
-
-**Tagging Workflow:**
-The tag form (`TagRecipeForm`) uses `react-widgets` Combobox to provide an
-enhanced tagging experience:
- - **Autocomplete**: Shows dropdown of available labels grouped by Type,
-   alphabetically sorted within groups. Filters out labels already tagged to the
-   recipe. Typing filters the list. Non-existent labels show "(new)" indicator.
- - **Auto-submit**: Clicking a label from the dropdown immediately submits the
-   form and adds the tag.
- - **Auto-focus**: Input automatically receives focus when form opens, with text
-   selected for easy replacement.
- - **Keyboard workflow**: Tab key submits the form and immediately reopens it
-   with focus for rapid keyboard-based tagging.
-
-**App State:**
- - `showTaggingForm`: Boolean controlling form visibility
- - `tagFormInputValue`: String storing current input value (cleared when form closes)
- - `tagFormTabSubmit`: Boolean flag tracking Tab-initiated submits (for reopening form)
-
-**Component Structure:**
- - `TagRecipeForm`: Main form component with Combobox, submit/cancel buttons
- - `TagListItem`: Individual tag display with unlink button
- - `AddTagTrigger`: "+ add label" button to open form
-
-#### Terminology: Labels vs Tags
-The application uses two related concepts:
- - **Label**: An object representing a recipe attribute that can be used for
-   categorization and filtering. A label has an `ID`, a `Label` (name) field,
-   and optionally a `Type` field for grouping. Labels exist independently in the
-   database and can be reused across many recipes. Labels are stored in lowercase
-   in the database (e.g., "chicken", "gluten free") but formatted to title case
-   for display (e.g., "Chicken", "Gluten Free").
- - **Tag**: The association between a recipe and a label. When we say a recipe is
-   "tagged with" a label, we mean there is a tag linking that recipe to that
-   label. In the backend database, tags are represented by a junction table
-   (`recipe_label`) between the `recipe` and `label` tables.
-
-From an end-user perspective, they primarily interact with "tags" (the act of
-tagging/untagging recipes), while the underlying data structures are "labels".
-The component is named `TagList` because it shows the tags (label associations)
-for a specific recipe.
-
-A "label" object (used throughout the code and API) has the following properties:
- - `ID` (int): the primary identifier for this label
- - `Label` (string): the label's name (displayed in title case)
- - `Type` (string, optional): categorizes the label for grouping purposes (e.g.,
-   "Course", "Protein", "Cuisine"). Displayed in title case.
- - `Icon` (string, optional): an emoji or character used as a visual icon for
-   this label in the recipe list
-
-### LabelManager Component
-
-Defined in `LabelManager.js`. This component provides a comprehensive interface
-for managing labels, accessible only to admin users at `/admin/labels`.
-
-**Component Structure:**
-- Full-page layout that replaces the List Pane and Recipe Pane
-- Header with back button (←) and "Manage Labels" title
-- Controls row with search input and "New Label" button
-- Grouped label list with collapsible groups
-- Modal overlays for delete confirmation and recipe association panel
-
-**State:**
-- `searchQuery`: string for filtering labels
-- `collapsedGroups`: Set of group names that are collapsed (default: empty, all expanded)
-- `recipePanelLabel`: ID of label for which recipe panel is open
-- `recipePanelRecipes`: snapshot of recipes when panel opened (persists across unlinks)
-- `editingLabel`: `{ labelId, field }` for inline editing state
-- `editValue`: current value in inline edit input
-- `showNewLabelForm`: boolean for new label form visibility
-- `newLabel`: `{ label, type, icon }` for new label form data
-- `deleteConfirm`: `{ labelId, labelName, usageCount }` for delete confirmation modal
-
-**Methods:**
-- `getFilteredLabels()`: filters labels by search query (case-insensitive)
-- `getGroupedLabels()`: groups filtered labels by Type, returns object with type as keys
-- `getLabelUsage(labelId)`: counts recipes tagged with label
-- `getRecipesForLabel(labelId)`: returns array of recipes tagged with label
-- `handleGroupToggle(groupName)`: toggles group collapse state
-- `startEdit/cancelEdit/submitEdit`: inline editing lifecycle
-- `showDeleteConfirm/cancelDelete/confirmDelete`: delete confirmation lifecycle
-- `openRecipePanel/closeRecipePanel`: recipe panel lifecycle
-- `handleUnlink/handleRelink`: recipe association management
-- `openNewLabelForm/cancelNewLabel/submitNewLabel`: new label form lifecycle
-
-**Props from App:**
-- `allLabels`: all labels in system
-- `allRecipes`: all recipes in system
-- `loginState`: authentication state (for API calls)
-- `handleBack`: callback to navigate back to recipe view
-- `handleLabelUpdate(labelId, updates, callback)`: updates label fields
-- `handleLabelDelete(labelId, callback)`: deletes label
-- `handleLabelCreate(labelData, callback)`: creates new label
-- `handleUnlinkRecipe(recipeId, labelId)`: unlinks recipe from label
-- `handleLinkRecipe(recipeId, labelId)`: links recipe to label
-- `setAlert(error, message, context)`: displays error alerts
-
-**Key Features:**
-- Groups expand/collapse via header clicks, tracked in `collapsedGroups` Set
-- Inline editing uses auto-focus and text selection on mount
-- Icon validation uses `Intl.Segmenter` when available for proper grapheme counting
-- Recipe panel snapshots recipes on open, compares to current state to show unlink status
-- Delete confirmation shows usage count before deletion
-- All API calls go through App handlers for proper state management
-
-**Styling:** Defined in `LabelManager.css` with responsive mobile layout. On
-mobile, the recipe panel replaces the label list instead of appearing side-by-side.
+**LabelManager:** (`LabelManager.js`) Admin-only full-page interface. See `docs/specs/label-manager.md`
+for state, methods, and features.
 
 
 ## Helpers
-`Util.js` contains helper functions for querying/filtering, sorting, and URL
-routing:
+`Util.js` utility functions:
 
-**Recipe Filtering & Sorting:**
- - `applyFilters()`: filters recipes by search text and label selections
- - `sortRecipes()`: sorts recipes by the selected sort mode (alphabetic, newest,
-   or shuffle with stable random keys)
- - `selectRecipe()`: finds a recipe by ID from the recipe list
- - `getGroupingLabels(allLabels, groupBy)`: Returns array of label names that
-   match the specified type. Filters labels where Type === groupBy.
- - `filterRecipesByLabel()`: filters recipes that have a specific label
-   (case-insensitive matching)
+**Filtering/Sorting:** `applyFilters()`, `sortRecipes()`, `selectRecipe()`, `getGroupingLabels()`,
+`filterRecipesByLabel()`
 
-**Label Formatting & Display:**
- - `formatLabelsForDisplay(labels)`: Title-cases Label and Type fields for
-   display. Applied when labels are loaded from the API. This is a presentation
-   concern (not data transport), so it belongs in Util rather than Api. The API
-   layer returns raw data that could be used by different clients with different
-   formatting needs.
- - `sortLabelsForMultiselect(labels)`: Prepares labels for display in grouped
-   multiselect dropdowns. Preserves the original order of Type groups while
-   sorting labels alphabetically within each Type. Labels without a Type are
-   mapped to `Type: "Other"` and placed at the end of the list, sorted
-   alphabetically.
- - `getAvailableTypes(allLabels)`: Extracts unique label Type values from the
-   label list, filtering out undefined/null. Returns array with "Course" first
-   (when present) to maintain the default grouping type.
+**Label Formatting:** `formatLabelsForDisplay()` (title-case for display), `sortLabelsForMultiselect()`
+(grouped/sorted for dropdowns), `getAvailableTypes()` (extracts unique Types)
 
-**Form Utilities:**
- - `transformNewField()`: transforms the "new recipe" toggle value from the form
-   to the correct `New` field value for API submission
+**Form:** `transformNewField()` (toggle → API `New` field)
 
-**URL Routing:**
- - `generateSlug(title)`: Converts recipe title to URL-safe slug. Lowercases,
-   replaces spaces/special chars with hyphens, removes consecutive hyphens, trims
-   edges. Example: `"Mom's Chicken Soup"` → `"moms-chicken-soup"`
- - `parseUrl(pathname)`: Extracts recipe ID from URL pathname. Returns integer
-   ID or null. Handles formats like `/123/slug`, `/123`, `/123/`
- - `buildRecipeUrl(recipeId, recipeTitle)`: Builds complete recipe URL with ID
-   and slug. Returns `/{id}/{slug}` or `/{id}` if title is empty.
+**URL Routing:** `generateSlug()`, `parseUrl()`, `buildRecipeUrl()`
 
-**Error Handling:**
- - `parseApiError(error)`: Parses error objects from API calls. Extracts status
-   code and message from errors in the format `"400: title is required"`. Returns
-   an object with `status`, `message`, and `isApiError` fields. Network errors
-   (no status code) return `isApiError: false`.
- - `formatErrorMessage(parsedError)`: Formats parsed errors for user display.
-   Converts status codes to human-readable labels (400 → "Bad Request", 403 →
-   "Forbidden", etc.) and capitalizes the first letter of the error message.
-   Example: `{status: 400, message: "title is required"}` → `"Bad Request: Title is required"`
+**Error Handling:** `parseApiError()`, `formatErrorMessage()` (status codes → human-readable)
 
+## Data Models
+**Recipe:** `{ID, Title, Body, Time, ActiveTime, New, Labels[], Notes[]}`
+
+**Label:** `{ID, Label, Type?, Icon?}` - Stored lowercase in DB, title-cased for display.
+"Tag" = recipe-label association.
+
+**Note:** `{ID, RecipeId, Created, Note, Flagged}`
 
 # Development
 This is a react application bootstrapped with Create React App. To run in
