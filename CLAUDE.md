@@ -9,6 +9,9 @@ All of the react code are in the `src/` directory.
 
 ## UI
 **Layout:** Header + two-pane layout (List Pane | Recipe Pane). Both panes scroll independently.
+Dynamic space allocation: List Pane gets ~75% width when browsing (no recipe selected), Recipe
+Pane gets ~75% width when reading (recipe selected). Mobile: List Pane hidden when recipe
+selected. See `docs/specs/responsive-pane-layout.md`.
 
 **Header:** Login/logout controls, admin-only buttons (New Recipe, ⚙️ Manage Labels).
 Mobile: horizontal compact layout. See `docs/features/admin-role-support.md` for auth details.

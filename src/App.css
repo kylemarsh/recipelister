@@ -32,16 +32,31 @@
   padding: 5px;
 }
 
-/*TODO: allow this to collapse to the side*/
+/*
+ * Responsive pane layout:
+ * - Browsing mode (no recipe): search pane takes 3 parts, recipe pane takes 1 part
+ * - Reading mode (recipe selected): search pane takes 1 part, recipe pane takes 3 parts
+ */
 .search-pane {
   border-right-style: solid;
   border-right-width: thin;
   border-right-color: gray;
-  min-width: 40%;
   display: flex;
   flex-direction: column;
   max-height: 100vh;
   overflow: hidden;
+
+  /* Browsing mode: search pane gets majority of space */
+  flex: 3;
+  min-width: 300px;
+  max-width: 800px;
+}
+
+/* Reading mode: search pane shrinks to narrower width */
+.search-pane.recipe-selected {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
 }
 
 .search-pane .query-form {
@@ -60,9 +75,18 @@
 }
 
 .recipe-pane {
-  flex: 1;
   overflow-y: auto;
   min-height: 0;
+
+  /* Browsing mode: recipe pane minimal space */
+  flex: 1;
+  min-width: 0;
+}
+
+/* Reading mode: recipe pane gets majority of space */
+.content-container:has(.recipe-selected) .recipe-pane {
+  flex: 3;
+  min-width: 400px;
 }
 
 .topnav {
