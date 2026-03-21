@@ -38,8 +38,8 @@ See `docs/specs/SPEC-tag-workflow.md` for tagging details.
 ### Label Manager (Admin Only)
 Admin-only interface at `/admin/labels`. Full-page layout with search, grouped display,
 inline editing, usage counts, delete confirmation, and recipe association panel for
-linking/unlinking. Component: `LabelManager.js`. See `docs/specs/label-manager.md` for
-full details.
+linking/unlinking. Recipe titles in the association panel are clickable and navigate to
+the recipe. Component: `LabelManager.js`. See `docs/specs/label-manager.md` for full details.
 
 ## API
 Functions in `api.js` interact with backend (URL: `REACT_APP_API_HOST` env var).
