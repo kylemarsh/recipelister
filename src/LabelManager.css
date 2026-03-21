@@ -331,6 +331,18 @@
   text-decoration: line-through;
 }
 
+.recipe-title {
+  cursor: pointer;
+  flex: 1;
+}
+
+@media (hover: hover) {
+  .recipe-title:hover {
+    color: #4a90e2;
+    text-decoration: underline;
+  }
+}
+
 .link-icon {
   cursor: pointer;
   font-size: 1.2rem;

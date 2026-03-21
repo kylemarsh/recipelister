@@ -22,10 +22,12 @@
 	flex-shrink: 0;
 }
 
-.search-input-row button:hover {
-	border: none !important;
-	box-shadow: inset 0 0 0 2px #999;
-	background-color: #f5f5f5;
+@media (hover: hover) {
+	.search-input-row button:hover {
+		border: none !important;
+		box-shadow: inset 0 0 0 2px #999;
+		background-color: #f5f5f5;
+	}
 }
 
 .search-input-row button.active {
@@ -63,10 +65,12 @@
 	position: relative;
 }
 
-.sort-buttons button:hover {
-	border: none !important;
-	box-shadow: inset 0 0 0 2px #999;
-	background-color: #f5f5f5;
+@media (hover: hover) {
+	.sort-buttons button:hover {
+		border: none !important;
+		box-shadow: inset 0 0 0 2px #999;
+		background-color: #f5f5f5;
+	}
 }
 
 .sort-buttons button.active {

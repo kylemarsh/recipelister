@@ -18,6 +18,17 @@ class LabelManager extends React.Component {
     };
   }
 
+  componentDidMount() {
+    // If returning from a recipe view, re-open the recipe panel
+    if (this.props.openRecipePanelForLabel) {
+      this.openRecipePanel(this.props.openRecipePanelForLabel);
+      // Notify parent that we've handled the return navigation
+      if (this.props.onReturnHandled) {
+        this.props.onReturnHandled();
+      }
+    }
+  }
+
   // Filter labels by search query
   getFilteredLabels = () => {
     const query = this.state.searchQuery.toLowerCase();
@@ -515,7 +526,12 @@ class LabelManager extends React.Component {
                     >
                       {isCurrentlyLinked ? '🔗' : '⛓️‍💥'}
                     </span>
-                    <span className="recipe-title">{recipe.Title}</span>
+                    <span
+                      className="recipe-title"
+                      onClick={() => this.props.handleRecipeClick(recipe.ID, this.state.recipePanelLabel)}
+                    >
+                      {recipe.Title}
+                    </span>
                   </div>
                 );
               })}

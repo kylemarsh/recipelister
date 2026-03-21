@@ -58,6 +58,7 @@ class App extends Component {
       showAddNote: false,
       recipeJustEdited: false,
       showLabelManager: false,
+      returnToLabelManager: null, // { labelId: X } when navigating from label manager
     };
   }
   render() {
@@ -99,12 +100,15 @@ class App extends Component {
             allRecipes={this.state.allRecipes}
             loginState={this.state.login}
             handleBack={this.navigateFromLabelManager}
+            handleRecipeClick={this.navigateToRecipeFromLabelManager}
             handleLabelUpdate={this.handleLabelUpdate}
             handleLabelDelete={this.handleLabelDelete}
             handleLabelCreate={this.handleLabelCreate}
             handleUnlinkRecipe={this.handleUnlinkRecipe}
             handleLinkRecipe={this.handleLinkRecipe}
             setAlert={this.handleError}
+            openRecipePanelForLabel={this.state.returnToLabelManager?.labelId}
+            onReturnHandled={this.clearReturnToLabelManager}
           />
         ) : (
           <div className="content-container">
@@ -161,8 +165,17 @@ class App extends Component {
                 recipeHandlers={{
                   EditClick: () => this.setState({ showRecipeEditor: true }),
                   UntargetClick: () => {
-                    this.setState({ targetRecipe: undefined });
-                    this.clearUrl();
+                    if (this.state.returnToLabelManager) {
+                      // Return to label manager with recipe panel open
+                      this.setState({
+                        targetRecipe: undefined,
+                        showLabelManager: true,
+                      });
+                      window.history.pushState(null, '', '/admin/labels');
+                    } else {
+                      this.setState({ targetRecipe: undefined });
+                      this.clearUrl();
+                    }
                   },
                   DeleteClick: this.handleRecipeDelete,
                 }}
@@ -915,8 +928,24 @@ class App extends Component {
   };
 
   navigateFromLabelManager = () => {
-    this.setState({ showLabelManager: false });
+    this.setState({ showLabelManager: false, returnToLabelManager: null });
     window.history.pushState(null, '', '/');
+  };
+
+  clearReturnToLabelManager = () => {
+    this.setState({ returnToLabelManager: null });
+  };
+
+  navigateToRecipeFromLabelManager = (recipeId, labelId) => {
+    const recipe = Util.selectRecipe(recipeId, this.state.allRecipes);
+    if (!recipe) return;
+
+    this.setState({
+      showLabelManager: false,
+      targetRecipe: recipeId,
+      returnToLabelManager: { labelId: labelId }
+    });
+    this.validateAndCorrectSlug(recipeId, recipe.Title);
   };
 
   handlePopState = () => {

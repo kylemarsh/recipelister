@@ -248,20 +248,38 @@ If compatibility is a concern, use the alternative approach with explicit `recip
 ```
 Modified:
   src/App.css (lines 35-87 - replaced fixed min-width with responsive flex layout)
+  src/App.js (multiple locations):
+    - Added returnToLabelManager state to track navigation from label manager
+    - Added navigateToRecipeFromLabelManager handler with labelId parameter
+    - Modified recipe UntargetClick to return to label manager when applicable
+    - Added clearReturnToLabelManager callback
+    - Passed openRecipePanelForLabel and onReturnHandled props to LabelManager
   src/GroupedResultList.css (line 46 - reduced recipe indentation from 1rem to 0.5rem)
+  src/LabelManager.css (lines 330-345 - made recipe titles clickable with hover state)
+  src/LabelManager.js (multiple locations):
+    - Added componentDidMount to re-open recipe panel on return navigation
+    - Modified handleRecipeClick to pass labelId parameter
+    - Added onReturnHandled callback invocation
   src/ResultList.css (line 3 - removed default ul padding for cleaner grouped display)
-  CLAUDE.md (lines 11-14 - documented dynamic space allocation)
+  src/QueryForm.css (lines 25-31, 66-72 - wrapped hover states in @media (hover: hover) to prevent lingering on mobile)
+  CLAUDE.md (lines 11-14, 38-42 - documented dynamic space allocation and clickable recipe titles)
   TODO.md (removed "More responsive UI" feature request)
+  docs/specs/label-manager.md (line 356-357 - documented clickable recipe titles and back navigation)
   docs/specs/responsive-pane-layout.md (this file - marked as implemented)
 ```
 
 ## Implementation Details
 
-Used the `:has()` selector approach (CSS-only, no JavaScript changes):
+Used the `:has()` selector approach (CSS-only for pane layout):
 - `.search-pane`: `flex: 3` by default, `flex: 1` when `.recipe-selected`
 - `.recipe-pane`: `flex: 1` by default, `flex: 3` when container has `.recipe-selected`
 - Min/max width constraints applied to both panes for usability
 - Reduced grouped recipe indentation: removed default ul padding, set explicit 0.5rem margin-left
+- Fixed mobile button hover states: wrapped button hover styles in `@media (hover: hover)` to prevent lingering grey state on touch devices
+- Added clickable recipe titles in Label Manager:
+  - Clicking a recipe title navigates to that recipe, closing the label manager
+  - Clicking the recipe's back arrow returns to label manager with the same label's recipe panel still open
+  - State tracking via `returnToLabelManager` in App.js
 - All 84 existing tests pass
 
 ## Testing Checklist

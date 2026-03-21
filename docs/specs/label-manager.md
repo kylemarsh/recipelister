@@ -353,6 +353,8 @@ handleLabelDelete = (labelId, callback) => {
 - Mobile: Replaces label list entirely, shows back button (←) to return to label list
 - Header: "Recipes tagged with '{Label}'" and close button (×) (desktop) or back button (mobile)
 - List of recipe titles
+- **Clicking recipe title navigates to that recipe** (closes label manager, opens recipe view)
+  - **Back navigation**: Clicking the recipe's back arrow returns to label manager with the same label's recipe panel still open
 - Unlink icon (🔗) next to each recipe
 - When clicked, icon changes to broken link (🔓) and title struck through
 - Recipe remains in list until panel closes
