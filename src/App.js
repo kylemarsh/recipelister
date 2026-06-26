@@ -63,7 +63,7 @@ class App extends Component {
   }
   render() {
     const loggedIn = this.state.login.valid;
-    const searchClass = this.state.targetRecipe
+    const searchClass = (this.state.targetRecipe || this.state.showRecipeEditor)
       ? "search-pane recipe-selected"
       : "search-pane";
     return (
