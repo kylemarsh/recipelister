@@ -83,10 +83,15 @@
   min-width: 0;
 }
 
-/* Reading mode: recipe pane gets majority of space */
-.content-container:has(.recipe-selected) .recipe-pane {
-  flex: 3;
-  min-width: 400px;
+/* Reading mode: recipe pane gets majority of space. Desktop-only: at
+   <=600px the panes stack (display:block) and a min-width here would force
+   the recipe pane wider than a phone screen while the mobile rules already
+   give it full width (see docs/specs/2026-10-27-too-wide-for-my-phone.md) */
+@media (min-width: 601px) {
+  .content-container:has(.recipe-selected) .recipe-pane {
+    flex: 3;
+    min-width: 400px;
+  }
 }
 
 .topnav {
@@ -112,6 +117,9 @@
     border-bottom-width: thin;
     border-bottom-color: gray;
     max-height: none;
+    /* base min-width:300px leaves only 22px slack at 375px and overflows
+       320px devices */
+    min-width: 0;
   }
 	.recipe-selected {
 		display: none;
