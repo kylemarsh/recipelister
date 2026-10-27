@@ -22,6 +22,12 @@
   border-radius: 10px;
   border-width: thin;
   margin: 5px;
+  /* unbreakable labels must stay inside the pane: max-width clamps the box,
+     normal overrides the list's nowrap (else text escapes the chip), and
+     anywhere shrinks min-content so fit-content actually clamps */
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .link-tag-trigger {

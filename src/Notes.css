@@ -7,6 +7,9 @@
   border-radius: 10px;
   border-width: thin;
   margin-block: 5px;
+  /* long unbreakable note text (e.g. pasted URLs) must not widen the pane */
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .note-list > li.flagged {
