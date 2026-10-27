@@ -4,6 +4,8 @@ import { act } from "react";
 import App from "./App";
 import { Recipe, NewRecipeForm } from "./Recipe";
 import ResultList from "./ResultList";
+import TagList from "./Tags";
+import NoteList from "./Notes";
 import * as Util from "./Util";
 
 it("renders without crashing", () => {
@@ -1569,5 +1571,110 @@ describe('Error handling utilities', () => {
 
       expect(result).toBe('Bad Request: ActiveTime must be an integer');
     });
+  });
+});
+
+describe('Overflow hardening DOM contract', () => {
+  // E3-style "unbreakable" string: words glued with NO-BREAK SPACEs (U+00A0)
+  // and a NON-BREAKING HYPHEN (U+2011), leaving zero line-break opportunities.
+  // Recipe bodies copied from websites can contain these; the CSS fix in
+  // Recipe.css/Tags.css/Notes.css (see docs/specs/2026-10-27-too-wide-for-my-phone.md)
+  // targets exactly these elements, and jsdom cannot test layout -- so these
+  // tests lock the selectors the CSS hangs off and document the failure mode.
+  const NBSP = String.fromCharCode(0xA0);
+  const NBHY = String.fromCharCode(0x2011);
+  const UNBREAKABLE =
+    "1 medium-size Zucchini Sliced moon-shaped or diced"
+      .split(" ").join(NBSP)
+      .split("-").join(NBHY);
+
+  test('recipe body renders an unbreakable string inside p.recipe-body', () => {
+    const recipe = {
+      ID: 1,
+      Title: 'Soondubu Jjigae',
+      New: false,
+      ActiveTime: 15,
+      Time: 30,
+      Body: UNBREAKABLE + '\nPrepare your dashi stock by boiling one dashi packet.',
+      Labels: [],
+      Notes: []
+    };
+
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <Recipe
+          loggedIn={true}
+          isAdmin={true}
+          recipes={[recipe]}
+          availableLabels={[]}
+          targetRecipeId={1}
+          showTaggingForm={false}
+          showNoteEditor={false}
+          showAddNote={false}
+          recipeHandlers={{ EditClick: jest.fn(), UntargetClick: jest.fn(), DeleteClick: jest.fn() }}
+          noteHandlers={{}}
+          labelHandlers={{}}
+        />
+      );
+    });
+
+    const body = div.querySelector("p.recipe-body");
+    expect(body).toBeTruthy();
+    // The invisible code points must survive rendering untouched
+    expect(body.textContent).toContain(UNBREAKABLE);
+    expect(body.textContent.includes(NBSP)).toBe(true);
+    expect(body.textContent.includes(NBHY)).toBe(true);
+
+    const title = div.querySelector(".recipe-container h2");
+    expect(title).toBeTruthy();
+
+    act(() => root.unmount());
+  });
+
+  test('long unbreakable label renders as a single chip in ul.tag-list > li', () => {
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <TagList
+          loggedIn={false}
+          isAdmin={false}
+          tags={[{ ID: 1, Label: UNBREAKABLE, Icon: null }]}
+          allLabels={[]}
+          showTaggingForm={false}
+          handlers={{}}
+        />
+      );
+    });
+
+    const chip = div.querySelector("ul.tag-list > li");
+    expect(chip).toBeTruthy();
+    expect(chip.textContent).toContain(UNBREAKABLE);
+
+    act(() => root.unmount());
+  });
+
+  test('note with unbreakable text renders inside ul.note-list .note-content', () => {
+    const div = document.createElement("div");
+    const root = createRoot(div);
+    act(() => {
+      root.render(
+        <NoteList
+          isAdmin={false}
+          notes={[{ ID: 1, RecipeId: 1, Created: 1730000000, Note: UNBREAKABLE, Flagged: false }]}
+          showNoteEditor={false}
+          showAddNote={false}
+          handlers={{}}
+        />
+      );
+    });
+
+    const content = div.querySelector("ul.note-list .note-content");
+    expect(content).toBeTruthy();
+    expect(content.textContent).toBe(UNBREAKABLE);
+
+    act(() => root.unmount());
   });
 });

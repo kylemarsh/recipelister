@@ -135,3 +135,15 @@
 .toggle-checkbox:checked + .toggle-label .toggle-text-on {
   display: inline;
 }
+
+/* Long unbreakable strings (URLs, NBSP-locked ingredient lines) must break
+   mid-segment instead of forming a width floor that overflows the viewport.
+   white-space:pre-wrap (main.css) is untouched: ordinary spaces still wrap. */
+.recipe-body {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.recipe-container h2 {
+  overflow-wrap: break-word;
+}
